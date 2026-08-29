@@ -47,7 +47,7 @@ const COACHES = [
   {
     id: 1, nome: "Marco Bertolini", cat: ["coperte"], tag: "vela", lic: "A", ir: 4820, prezzo: 45, fasciaDichiarata: "b2",
     auto: ["Ferrari 296 GT3", "Lamborghini Huracán GT3 EVO"], spec: ["Trail braking", "Qualifica"],
-    obiettivi: ["tempo", "quali"], irMed: 412, gg: 30, tracciati: 14, agg: "6 ore fa",
+    obiettivi: ["frenata", "qualifica"], irMed: 412, gg: 30, tracciati: 14, agg: "6 ore fa",
     fasce: { b1: [520, 26, 4], b2: [470, 28, 6], b3: [210, 34, 3], b4: null },
     curva: [1980, 1972, 1990, 1966, 1974, 1985, 2040, 2120, 2185, 2240, 2318, 2372, 2396], start: 5,
     patto: null,
@@ -61,7 +61,7 @@ const COACHES = [
   {
     id: 2, nome: "Elena Kovač", cat: ["coperte"], tag: "kovi", lic: "A", ir: 5610, prezzo: 60, fasciaDichiarata: "b3",
     auto: ["Porsche 911 GT3 R (992)", "BMW M4 GT3 EVO"], spec: ["Race craft", "Traffico"],
-    obiettivi: ["gara"], irMed: 508, gg: 34, tracciati: 11, agg: "2 ore fa",
+    obiettivi: ["attacco_difesa", "passo_gara"], irMed: 508, gg: 34, tracciati: 11, agg: "2 ore fa",
     fasce: { b1: null, b2: [430, 30, 4], b3: [560, 32, 5], b4: [190, 44, 3] },
     curva: [3120, 3098, 3140, 3105, 3132, 3260, 3348, 3410, 3502, 3560, 3618, 3690, 3712], start: 4,
     patto: null,
@@ -75,7 +75,7 @@ const COACHES = [
   {
     id: 3, nome: "Davide Sanna", cat: ["coperte"], tag: "sanna_dvd", lic: "B", ir: 3240, prezzo: 35, fasciaDichiarata: "b1",
     auto: ["Lamborghini Huracán GT3 EVO", "Audi R8 LMS EVO II GT3"], spec: ["Setup", "Gomme"],
-    obiettivi: ["setup", "endurance"], irMed: 260, gg: 28, tracciati: 22, agg: "1 giorno fa",
+    obiettivi: ["setup", "gomme"], irMed: 260, gg: 28, tracciati: 22, agg: "1 giorno fa",
     fasce: { b1: [340, 24, 9], b2: [250, 30, 10], b3: [120, 38, 3], b4: null },
     curva: [1640, 1652, 1630, 1648, 1690, 1742, 1780, 1812, 1868, 1890, 1922, 1948, 1960], start: 3,
     patto: { ir: 200, gg: 60 },
@@ -89,7 +89,7 @@ const COACHES = [
   {
     id: 4, nome: "Giulia Ferraro", cat: ["coperte"], tag: "giu_f", lic: "B", ir: 2880, prezzo: 25, fasciaDichiarata: "b1",
     auto: ["Ferrari 296 GT3"], spec: ["Fondamentali", "Licenza D"],
-    obiettivi: ["licenza", "tempo"], irMed: 640, gg: 26, tracciati: 19, agg: "4 ore fa",
+    obiettivi: ["traiettorie", "frenata"], irMed: 640, gg: 26, tracciati: 19, agg: "4 ore fa",
     fasce: { b1: [720, 22, 12], b2: [540, 28, 6], b3: null, b4: null },
     curva: [1180, 1164, 1192, 1150, 1210, 1298, 1372, 1450, 1524, 1608, 1690, 1748, 1802], start: 4,
     patto: { ir: 300, gg: 60 },
@@ -103,7 +103,7 @@ const COACHES = [
   {
     id: 5, nome: "Tom Reeves", cat: ["coperte"], tag: "reeves", lic: "A", ir: 6110, prezzo: 70, fasciaDichiarata: "b4",
     auto: ["Acura ARX-06 GTP", "Mercedes-AMG GT3 2020", "BMW M4 GT3 EVO"], spec: ["Endurance", "Ritmo di stint"],
-    obiettivi: ["endurance", "gara"], irMed: 300, gg: 40, tracciati: 9, agg: "8 ore fa",
+    obiettivi: ["passo_gara", "strategia"], irMed: 300, gg: 40, tracciati: 9, agg: "8 ore fa",
     fasce: { b1: null, b2: null, b3: [380, 36, 5], b4: [240, 42, 3] },
     curva: [3980, 3962, 3990, 4010, 4055, 4098, 4140, 4188, 4210, 4262, 4290, 4318, 4340], start: 3,
     patto: null,
@@ -117,7 +117,7 @@ const COACHES = [
   {
     id: 6, nome: "Niko Aaltonen", cat: ["coperte"], tag: "aalto", lic: "A", ir: 7020, prezzo: 85, fasciaDichiarata: "b4",
     auto: ["Porsche 911 GT3 R (992)", "Mercedes-AMG GT3 2020"], spec: ["Qualifica", "Trail braking"],
-    obiettivi: ["quali", "tempo"], irMed: 210, gg: 35, tracciati: 6, agg: "3 giorni fa",
+    obiettivi: ["qualifica", "frenata"], irMed: 210, gg: 35, tracciati: 6, agg: "3 giorni fa",
     fasce: { b1: null, b2: null, b3: [180, 38, 3], b4: [260, 32, 4] },
     curva: [4820, 4796, 4840, 4812, 4858, 4902, 4940, 4988, 5010, 5044, 5062, 5090, 5110], start: 4,
     patto: null,
@@ -131,7 +131,7 @@ const COACHES = [
   {
     id: 7, nome: "Andrea Pili", cat: ["scoperte"], tag: "pili_a", lic: "A", ir: 4180, prezzo: 40, fasciaDichiarata: "b1",
     auto: ["Dallara F3", "Super Formula Lights", "Ray FF1600"], spec: ["Monoposto", "Staccata"],
-    obiettivi: ["tempo", "quali"], irMed: 380, gg: 32, tracciati: 8, agg: "1 giorno fa",
+    obiettivi: ["frenata", "traiettorie"], irMed: 380, gg: 32, tracciati: 8, agg: "1 giorno fa",
     fasce: { b1: [430, 28, 3], b2: [400, 32, 4], b3: null, b4: null },
     curva: [2260, 2242, 2274, 2250, 2288, 2340, 2402, 2456, 2510, 2548, 2596, 2632, 2660], start: 4,
     patto: null,
@@ -224,15 +224,24 @@ const gruppiDi = (cat) => {
 
 const autoDi = (cat) => gruppiDi(cat).flatMap(([, auto]) => auto);
 
+// selezionabili nel filtro fino a un massimo di 4 (vedi MAX_OBIETTIVI)
 const OBIETTIVI = [
-  { k: "tutti", l: "Qualsiasi obiettivo" },
-  { k: "licenza", l: "Uscire dalla licenza D" },
-  { k: "tempo", l: "Trovare il tempo sul giro" },
-  { k: "quali", l: "Andare forte in qualifica" },
-  { k: "gara", l: "Race craft in gara" },
-  { k: "setup", l: "Setup e gestione gomme" },
-  { k: "endurance", l: "Endurance e ritmo di stint" },
+  { k: "frenata", l: "Gestione frenata" },
+  { k: "periferiche", l: "Consulenza su periferiche" },
+  { k: "uscita_curve", l: "Uscita curve" },
+  { k: "traiettorie", l: "Percorrenza e traiettorie" },
+  { k: "nuovo_circuito", l: "Apprendere un nuovo circuito" },
+  { k: "bagnato", l: "Guida sul bagnato" },
+  { k: "gomme", l: "Gestione gomme" },
+  { k: "setup", l: "Creazione setup" },
+  { k: "qualifica", l: "Preparazione qualifica" },
+  { k: "passo_gara", l: "Passo gara" },
+  { k: "attacco_difesa", l: "Attacco e difesa" },
+  { k: "strategia", l: "Supporto strategico" },
+  { k: "altro", l: "Altro" },
 ];
+
+const MAX_OBIETTIVI = 4;
 
 /* ---------------------------------- stile ---------------------------------- */
 
@@ -370,8 +379,8 @@ const CSS = `
 .campo textarea{resize:vertical;min-height:88px;line-height:1.5}
 .campo select:focus,.campo textarea:focus{outline:none;border-color:var(--grigio)}
 .checkgrid{display:flex;flex-wrap:wrap;gap:8px;margin-top:4px}
-.checkgrid label{display:flex;align-items:center;gap:7px;border:1px solid var(--bordo);padding:8px 12px;
-  font-size:13px;cursor:pointer;border-radius:2px;color:var(--grigio)}
+.checkgrid label{display:flex;align-items:center;gap:7px;flex-shrink:0;white-space:nowrap;
+  border:1px solid var(--bordo);padding:8px 12px;font-size:13px;cursor:pointer;border-radius:2px;color:var(--grigio)}
 .checkgrid label:has(input:checked){border-color:var(--blu2);color:var(--blu2);background:var(--bluSoft)}
 .checkgrid input{accent-color:var(--blu2)}
 .hintbox{border-left:2px solid var(--bordo);padding-left:12px;margin-top:18px;color:var(--grigio2);font-size:12.5px;line-height:1.6}
@@ -390,9 +399,9 @@ const CSS = `
 .frow{display:flex;align-items:center;gap:12px;padding:11px 14px;border-bottom:1px solid var(--bordo)}
 .frow:last-child{border-bottom:0}
 .frow.hi{background:var(--bluSoft)}
-.frow label{font-family:'Roboto Mono',monospace;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;
+.frow > label{font-family:'Roboto Mono',monospace;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;
   color:var(--grigio2);width:104px;flex:none}
-.frow.hi label{color:var(--blu2)}
+.frow.hi > label{color:var(--blu2)}
 .frow select,.frow input{flex:1;background:var(--nero);color:var(--bianco);border:1px solid var(--bordo);
   padding:8px 10px;font-family:'Roboto Mono',monospace;font-size:13px;border-radius:2px}
 .frow input::placeholder{color:var(--grigio2)}
@@ -839,16 +848,23 @@ function Login({ ruolo, setRuolo, entra }) {
 function Cerca({ apri, mia, setMia, miaIr, setMiaIr }) {
   const [cat, setCat] = useState("tutte");
   const [auto, setAuto] = useState(TUTTE);
-  const [obi, setObi] = useState("tutti");
+  const [obi, setObi] = useState(OBIETTIVI.map((o) => o.k).slice(0, 0));
 
   const cambiaCat = (k) => { setCat(k); setAuto(TUTTE); };
+
+  const toggleObi = (k) =>
+    setObi((prev) => {
+      if (prev.includes(k)) return prev.filter((x) => x !== k);
+      if (prev.length >= MAX_OBIETTIVI) return prev;
+      return [...prev, k];
+    });
 
   const allievoIr = iRAllievo(miaIr, mia);
 
   const list = [...COACHES]
     .filter((c) => (cat === "tutte" || c.cat.includes(cat)) &&
                    (auto === TUTTE || c.auto.includes(auto)) &&
-                   (obi === "tutti" || c.obiettivi.includes(obi)))
+                   (obi.length === 0 || obi.some((o) => c.obiettivi.includes(o))))
     .sort((a, b) => {
       const fa = a.fasce[mia], fb = b.fasce[mia];
       if (fa && !fb) return -1;
@@ -901,11 +917,25 @@ function Cerca({ apri, mia, setMia, miaIr, setMiaIr }) {
             ))}
           </select>
         </div>
-        <div className="frow">
+        <div className="frow" style={{ alignItems: "flex-start" }}>
           <label htmlFor="f3">Obiettivo</label>
-          <select id="f3" value={obi} onChange={(e) => setObi(e.target.value)}>
-            {OBIETTIVI.map((o) => <option key={o.k} value={o.k}>{o.l}</option>)}
-          </select>
+          <div style={{ flex: 1 }}>
+            <div className="checkgrid" id="f3">
+              {OBIETTIVI.map((o) => {
+                const on = obi.includes(o.k);
+                return (
+                  <label key={o.k}>
+                    <input type="checkbox" checked={on} disabled={!on && obi.length >= MAX_OBIETTIVI}
+                           onChange={() => toggleObi(o.k)} />
+                    {o.l}
+                  </label>
+                );
+              })}
+            </div>
+            <p className="nn" style={{ marginTop: 8 }}>
+              {obi.length === 0 ? `Nessuno selezionato · fino a ${MAX_OBIETTIVI}` : `${obi.length}/${MAX_OBIETTIVI} selezionati`}
+            </p>
+          </div>
         </div>
       </div>
 
