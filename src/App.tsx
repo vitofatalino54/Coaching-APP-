@@ -180,7 +180,7 @@ const OBIETTIVI = [
 /* ---------------------------------- stile ---------------------------------- */
 
 const CSS = `
-@import url('https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=Inter:wght@400;500;600&family=Roboto+Mono:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Saira+Condensed:wght@500;600;700;800;900&family=Titillium+Web:wght@400;600;700&family=Roboto+Mono:wght@400;500&display=swap');
 
 .crd{
   --nero:#0A0B0D; --nero2:#121418; --nero3:#1A1D23; --bordo:#282C34;
@@ -188,10 +188,10 @@ const CSS = `
   --rosso:#8E1A20; --rosso2:#B32229; --rossoSoft:rgba(179,34,41,.12);
   --blu:#1D4FD7; --blu2:#3C6DF0; --bluSoft:rgba(29,79,215,.12);
   background:var(--nero); color:var(--bianco); min-height:100%;
-  font-family:'Inter',system-ui,sans-serif; -webkit-font-smoothing:antialiased; line-height:1.5;
+  font-family:'Titillium Web',system-ui,sans-serif; -webkit-font-smoothing:antialiased; line-height:1.5;
 }
 .crd *{box-sizing:border-box}
-.crd h1,.crd h2,.crd h3{font-family:'Archivo',system-ui,sans-serif;font-weight:700;line-height:1.08;margin:0;letter-spacing:-.02em}
+.crd h1,.crd h2,.crd h3{font-family:'Saira Condensed',system-ui,sans-serif;font-weight:700;line-height:1.08;margin:0;letter-spacing:-.02em}
 .mn{font-family:'Roboto Mono',ui-monospace,monospace;font-variant-numeric:tabular-nums}
 .w{max-width:1080px;margin:0 auto;padding:0 20px}
 .eyebrow{font-family:'Roboto Mono',monospace;font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--grigio2)}
@@ -199,7 +199,7 @@ const CSS = `
 /* ---- barra ---- */
 .nav{position:sticky;top:0;z-index:40;background:rgba(10,11,13,.94);backdrop-filter:blur(10px);border-bottom:1px solid var(--bordo)}
 .navin{display:flex;align-items:center;gap:18px;height:62px}
-.brand{font-family:'Archivo',sans-serif;font-weight:800;font-size:21px;letter-spacing:.14em;cursor:pointer;
+.brand{font-family:'Saira Condensed',sans-serif;font-weight:800;font-size:21px;letter-spacing:.14em;cursor:pointer;
   background:none;border:0;color:var(--bianco);padding:0}
 .brand i{color:var(--rosso2);font-style:normal}
 .navlinks{display:none;gap:22px;margin-left:14px}
@@ -209,7 +209,7 @@ const CSS = `
 .navcta{margin-left:auto;display:flex;gap:8px}
 
 /* ---- bottoni ---- */
-.b{font-family:'Archivo',sans-serif;font-weight:600;font-size:14px;letter-spacing:.01em;
+.b{font-family:'Saira Condensed',sans-serif;font-weight:600;font-size:14px;letter-spacing:.01em;
   padding:11px 18px;border:1px solid transparent;cursor:pointer;border-radius:3px;transition:background .15s,border-color .15s}
 .b:focus-visible{outline:2px solid var(--bianco);outline-offset:2px}
 .b-rosso{background:var(--rosso);color:#fff}
@@ -251,7 +251,7 @@ const CSS = `
 .bandin{display:grid;grid-template-columns:repeat(2,1fr);gap:1px;background:var(--bordo)}
 @media(min-width:760px){.bandin{grid-template-columns:repeat(4,1fr)}}
 .bcell{background:var(--nero2);padding:22px 18px}
-.bcell b{display:block;font-family:'Archivo',sans-serif;font-size:29px;font-weight:700;letter-spacing:-.02em}
+.bcell b{display:block;font-family:'Saira Condensed',sans-serif;font-size:29px;font-weight:700;letter-spacing:-.02em}
 .bcell span{font-family:'Roboto Mono',monospace;font-size:10.5px;letter-spacing:.16em;color:var(--grigio2);text-transform:uppercase}
 
 .sez{padding:70px 0;border-bottom:1px solid var(--bordo)}
@@ -268,7 +268,7 @@ const CSS = `
 .duo{display:grid;gap:34px;grid-template-columns:1fr;align-items:center}
 @media(min-width:900px){.duo{grid-template-columns:1fr 1fr;gap:52px}}
 .metric{border:1px solid var(--bordo);background:var(--nero2);padding:22px}
-.metric .big{font-family:'Archivo',sans-serif;font-size:52px;font-weight:800;color:var(--blu2);letter-spacing:-.03em;line-height:1}
+.metric .big{font-family:'Saira Condensed',sans-serif;font-size:52px;font-weight:800;color:var(--blu2);letter-spacing:-.03em;line-height:1}
 .metric .sm{font-family:'Roboto Mono',monospace;font-size:12px;color:var(--grigio2);margin-top:8px;letter-spacing:.06em}
 .check{list-style:none;padding:0;margin:20px 0 0}
 .check li{position:relative;padding-left:24px;margin-bottom:12px;color:var(--grigio);font-size:15px;line-height:1.55}
@@ -284,7 +284,7 @@ const CSS = `
 
 .faq{border-top:1px solid var(--bordo)}
 .faq details{border-bottom:1px solid var(--bordo);padding:18px 0}
-.faq summary{cursor:pointer;font-family:'Archivo',sans-serif;font-weight:600;font-size:16.5px;list-style:none}
+.faq summary{cursor:pointer;font-family:'Saira Condensed',sans-serif;font-weight:600;font-size:16.5px;list-style:none}
 .faq summary::-webkit-details-marker{display:none}
 .faq summary::before{content:"+ ";color:var(--rosso2)}
 .faq details[open] summary::before{content:"− "}
@@ -298,14 +298,14 @@ const CSS = `
 .authbox{width:100%;max-width:420px;border:1px solid var(--bordo);background:var(--nero2);padding:28px}
 .tabs{display:grid;grid-template-columns:1fr 1fr;gap:0;border:1px solid var(--bordo);margin:20px 0 22px}
 .tabs button{background:transparent;border:0;padding:12px;cursor:pointer;color:var(--grigio);
-  font-family:'Archivo',sans-serif;font-weight:600;font-size:14px}
+  font-family:'Saira Condensed',sans-serif;font-weight:600;font-size:14px}
 .tabs button[data-on="1"][data-r="pilota"]{background:var(--blu);color:#fff}
 .tabs button[data-on="1"][data-r="coach"]{background:var(--rosso);color:#fff}
 .campo{margin-bottom:14px}
 .campo label{display:block;font-family:'Roboto Mono',monospace;font-size:10.5px;letter-spacing:.16em;
   text-transform:uppercase;color:var(--grigio2);margin-bottom:6px}
 .campo input{width:100%;background:var(--nero);border:1px solid var(--bordo);color:var(--bianco);
-  padding:11px 12px;font-family:'Inter',sans-serif;font-size:14px;border-radius:2px}
+  padding:11px 12px;font-family:'Titillium Web',sans-serif;font-size:14px;border-radius:2px}
 .campo input:focus{outline:none;border-color:var(--grigio)}
 .hintbox{border-left:2px solid var(--bordo);padding-left:12px;margin-top:18px;color:var(--grigio2);font-size:12.5px;line-height:1.6}
 
@@ -313,7 +313,7 @@ const CSS = `
 .appbar{border-bottom:1px solid var(--bordo);background:var(--nero2)}
 .appbarin{display:flex;align-items:center;gap:4px;height:50px;overflow-x:auto}
 .appbarin button{background:none;border:0;border-bottom:2px solid transparent;color:var(--grigio);
-  padding:14px 12px;cursor:pointer;font-family:'Archivo',sans-serif;font-weight:600;font-size:14px;white-space:nowrap}
+  padding:14px 12px;cursor:pointer;font-family:'Saira Condensed',sans-serif;font-weight:600;font-size:14px;white-space:nowrap}
 .appbarin button[data-on="1"]{color:var(--bianco);border-bottom-color:var(--rosso2)}
 .appbarin .esci{margin-left:auto;color:var(--grigio2);font-size:13px;font-weight:500}
 
@@ -337,11 +337,11 @@ const CSS = `
 .cc:focus-visible{outline:2px solid var(--blu2);outline-offset:2px}
 .cctop{display:flex;gap:12px;align-items:center}
 .avat{width:44px;height:44px;flex:none;background:var(--nero3);border:1px solid var(--bordo);
-  display:flex;align-items:center;justify-content:center;font-family:'Archivo',sans-serif;font-weight:700;color:var(--grigio)}
-.ccnome{font-family:'Archivo',sans-serif;font-weight:700;font-size:18px}
+  display:flex;align-items:center;justify-content:center;font-family:'Saira Condensed',sans-serif;font-weight:700;color:var(--grigio)}
+.ccnome{font-family:'Saira Condensed',sans-serif;font-weight:700;font-size:18px}
 .ccsub{font-family:'Roboto Mono',monospace;font-size:11.5px;color:var(--grigio2)}
 .ccmetr{display:flex;align-items:flex-end;gap:14px;margin-top:16px}
-.ccbig{font-family:'Archivo',sans-serif;font-weight:800;font-size:30px;color:var(--blu2);letter-spacing:-.02em;line-height:1}
+.ccbig{font-family:'Saira Condensed',sans-serif;font-weight:800;font-size:30px;color:var(--blu2);letter-spacing:-.02em;line-height:1}
 .ccsm{font-family:'Roboto Mono',monospace;font-size:11px;color:var(--grigio2);line-height:1.5}
 .fit{margin-top:14px;border:1px solid rgba(29,79,215,.35);background:var(--bluSoft);padding:9px 11px;font-size:13px}
 .fit b{color:var(--blu2)}
@@ -351,7 +351,7 @@ const CSS = `
   color:var(--grigio2);padding:4px 8px}
 .chip.p{border-color:rgba(179,34,41,.45);color:var(--rosso2)}
 .ccfoot{display:flex;justify-content:space-between;align-items:center;margin-top:16px;padding-top:14px;border-top:1px solid var(--bordo)}
-.prezzo{font-family:'Archivo',sans-serif;font-weight:700;font-size:20px}
+.prezzo{font-family:'Saira Condensed',sans-serif;font-weight:700;font-size:20px}
 .prezzo small{color:var(--grigio2);font-weight:500;font-size:12px}
 
 .blocco{border:1px solid var(--bordo);background:var(--nero2);padding:18px}
@@ -373,7 +373,7 @@ const CSS = `
 @media(min-width:620px){.kpigrid{grid-template-columns:1fr 1fr}}
 .kbox{border:1px solid var(--bordo);background:var(--nero2);padding:18px}
 .klab{font-family:'Roboto Mono',monospace;font-size:10px;letter-spacing:.16em;color:var(--grigio2);text-transform:uppercase}
-.kval{font-family:'Archivo',sans-serif;font-weight:800;font-size:32px;margin-top:8px;letter-spacing:-.02em}
+.kval{font-family:'Saira Condensed',sans-serif;font-weight:800;font-size:32px;margin-top:8px;letter-spacing:-.02em}
 .apri{background:none;border:0;color:var(--blu2);cursor:pointer;font-family:'Roboto Mono',monospace;font-size:12px;padding:10px 0;text-align:left}
 .regole{border-left:2px solid var(--bordo);padding-left:14px;margin:4px 0 0}
 .regole li{font-size:12.5px;color:var(--grigio2);line-height:1.55;margin-bottom:8px}
