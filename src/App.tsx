@@ -144,6 +144,54 @@ const COACHES = [
   },
 ];
 
+/* ---------------------- "Il mio percorso" — dati pilota (mock) ----------------------
+   Tre fonti tenute separate, come da spec:
+   - PERCORSO: dati CORDA (interni) — disponibili subito, nessuna API esterna.
+   - CALENDARIO_STAGIONE: PLACEHOLDER del calendario ufficiale iRacing. Da sostituire
+     con corda-vetture-2026s2.js / la schedule reale quando arriva — per ora piste e
+     date sono inventate solo per popolare la selezione "gare che pensi di fare".
+   - I riquadri "strato 2" (curva iRating, ultime gare, licenza/SR) non hanno dati
+     mock qui apposta: restano nello stato "Collega il tuo account iRacing" finché
+     l'integrazione vera non c'è.
+   ------------------------------------------------------------------------------- */
+
+const CALENDARIO_STAGIONE = [
+  { id: "s1", data: "2026-09-06", pista: "Monza", auto: "Ferrari 296 GT3" },
+  { id: "s2", data: "2026-09-13", pista: "Spa-Francorchamps", auto: "Porsche 911 GT3 R (992)" },
+  { id: "s3", data: "2026-09-20", pista: "Silverstone", auto: "BMW M4 GT3 EVO" },
+  { id: "s4", data: "2026-09-27", pista: "Watkins Glen", auto: "Lamborghini Huracán GT3 EVO" },
+  { id: "s5", data: "2026-10-04", pista: "Road Atlanta", auto: "Ferrari 296 GT3" },
+  { id: "s6", data: "2026-10-11", pista: "Nürburgring", auto: "Mercedes-AMG GT3 2020" },
+  { id: "s7", data: "2026-10-18", pista: "Sebring", auto: "Audi R8 LMS EVO II GT3" },
+  { id: "s8", data: "2026-10-25", pista: "Charlotte", auto: "Ferrari 296 GT3" },
+];
+
+const PERCORSO = {
+  oreAcquistate: 20,
+  oreResidue: 6,
+  sessioniTotali: 12,
+  coachAttualeId: 1, // Marco Bertolini
+  dalCoachAttuale: "2026-08-02",
+  sessioniConAttuale: 4,
+  storicoCoach: [
+    { coachId: 3, periodo: "mag – lug 2026", sessioni: 5, irGuadagnato: 180, auto: ["Lamborghini Huracán GT3 EVO"] },
+    { coachId: 4, periodo: "mar – apr 2026", sessioni: 3, irGuadagnato: 90, auto: ["Ferrari 296 GT3"] },
+  ],
+  prenotazioni: [
+    { id: "p1", data: "2026-09-05", coachId: 1, orario: "20:30" },
+    { id: "p2", data: "2026-09-19", coachId: 1, orario: "21:00" },
+  ],
+  garePianificateIds: ["s1", "s3", "s5"],
+  note: [
+    { id: "n1", coachId: 1, data: "2026-08-30", pista: "Monza",
+      testo: "Prima variante: stai ancora frenando dritta.", fatto: false },
+    { id: "n2", coachId: 1, data: "2026-08-30", pista: "Monza",
+      testo: "Lesmo 1: entri lunga per compensare il sottosterzo.", fatto: false },
+    { id: "n3", coachId: 1, data: "2026-08-23", pista: null,
+      testo: "Parabolica: qui vai bene, non toccare niente.", fatto: true },
+  ],
+};
+
 const CATEGORIE = [
   { k: "tutte", l: "Tutte le categorie" },
   { k: "coperte", l: "Ruote coperte · GT, prototipi, turismo" },
@@ -496,6 +544,10 @@ const CSS = `
 .recens{border-left:2px solid var(--bordo);padding-left:14px;margin-bottom:16px}
 .recens p{font-size:14px;line-height:1.6;margin:7px 0}
 .recmeta{display:flex;gap:12px;flex-wrap:wrap;font-family:'Roboto Mono',monospace;font-size:11.5px;color:var(--grigio2)}
+.dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:8px;vertical-align:middle}
+.orebar{height:8px;background:var(--bordo);border-radius:4px;overflow:hidden;margin-top:14px}
+.orebarfill{height:100%;background:var(--blu2)}
+.lockbox{border:1px dashed var(--bordo);background:var(--nero2);padding:22px}
 @media (prefers-reduced-motion:reduce){.crd *{transition:none!important}}
 `;
 
@@ -503,6 +555,11 @@ const CSS = `
 
 const iniz = (n) => n.split(" ").map((x) => x[0]).join("");
 const perSett = (ir, gg) => Math.round((ir / gg) * 7);
+
+const fmtData = (iso) => {
+  const s = new Date(iso + "T00:00:00").toLocaleDateString("it-IT", { weekday: "short", day: "numeric", month: "short" });
+  return s.charAt(0).toUpperCase() + s.slice(1);
+};
 
 /* ---- forbice iRating coach ↔ allievo -----------------------------------
    Sotto i 3.000 iR dell'allievo il coach deve stare almeno il 50% sopra,
@@ -1253,64 +1310,176 @@ function Scheda({ c, mia, miaIr, chiudi, vaiPercorso, vediCoach }) {
   );
 }
 
-function Percorso() {
-  const curva = [1780, 1762, 1794, 1770, 1802, 1788, 1842, 1898, 1940, 2010, 2064, 2118, 2172, 2206];
-  const start = 5;
-  const min = Math.min(...curva), max = Math.max(...curva);
-  const pts = curva.map((v, i) => {
-    const x = (i / (curva.length - 1)) * 300;
-    const y = 88 - ((v - min) / (max - min)) * 74;
-    return `${x.toFixed(1)},${y.toFixed(1)}`;
-  });
-  const sx = ((start / (curva.length - 1)) * 300).toFixed(1);
+function Percorso({ vaiScheda }) {
+  const [gareIds, setGareIds] = useState(PERCORSO.garePianificateIds);
+  const [pickerAperto, setPickerAperto] = useState(false);
+  const [ricaricaAperta, setRicaricaAperta] = useState(false);
+
+  const toggleGara = (id) =>
+    setGareIds((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
+
+  const coachAttuale = COACHES.find((c) => c.id === PERCORSO.coachAttualeId);
+  const prossimeSessioni = [...PERCORSO.prenotazioni].sort((a, b) => a.data.localeCompare(b.data));
+  const garePianificate = CALENDARIO_STAGIONE
+    .filter((g) => gareIds.includes(g.id))
+    .sort((a, b) => a.data.localeCompare(b.data));
+  const oreUsate = PERCORSO.oreAcquistate - PERCORSO.oreResidue;
 
   return (
     <div className="w">
-      <div className="stit" style={{ marginTop: 26 }}><span>Il tuo percorso · Marco Bertolini</span><span>giorno 22</span></div>
-      <div className="kpigrid">
-        <div className="kbox">
-          <div className="klab">Guadagno dal punto zero</div>
-          <div className="kval" style={{ color: "var(--blu2)" }}>+564 iR</div>
-          <div className="ccsm" style={{ marginTop: 6 }}>in 22 giorni · 179 iR a settimana</div>
+      {/* 1. riga-titolo: sintesi del percorso — solo dati CORDA finché non c'è iRacing */}
+      <div className="stit" style={{ marginTop: 26 }}><span>Il tuo percorso</span></div>
+      <div className="metric">
+        <div className="eyebrow">Da quando fai coaching</div>
+        <div style={{ display: "flex", gap: 32, flexWrap: "wrap", marginTop: 12, alignItems: "baseline" }}>
+          <div>
+            <div className="kval" style={{ fontSize: 34 }}>{PERCORSO.sessioniTotali}</div>
+            <div className="ccsm">sessioni</div>
+          </div>
+          <div>
+            <div className="kval" style={{ fontSize: 34 }}>{oreUsate}</div>
+            <div className="ccsm">ore di coaching</div>
+          </div>
         </div>
-        <div className="kbox">
-          <div className="klab">Proiezione a 60 giorni</div>
-          <div className="kval">≈ 2.680</div>
-          <div className="ccsm" style={{ marginTop: 6 }}>se tieni questo ritmo di gare</div>
-        </div>
+        <p className="nota">
+          Il guadagno di iRating comparirà qui appena colleghi il tuo account iRacing.
+        </p>
       </div>
 
-      <div className="stit"><span>iRating · 30 giorni prima e dopo</span></div>
+      {/* 2. coach attuale + storico — il tuo percorso, non una classifica */}
+      <div className="stit"><span>Il tuo coach</span></div>
       <div className="blocco">
-        <svg viewBox="0 0 300 100" width="100%" height="130" role="img" aria-label="Curva iRating">
-          <line x1={sx} y1="0" x2={sx} y2="94" stroke="#8E1A20" strokeWidth="1" strokeDasharray="3 3" />
-          <polyline points={pts.slice(0, start + 1).join(" ")} fill="none" stroke="#6B727D" strokeWidth="2" />
-          <polyline points={pts.slice(start).join(" ")} fill="none" stroke="#3C6DF0" strokeWidth="2.5" />
-          <text x={+sx + 4} y="10" fill="#B32229" fontSize="8" fontFamily="Roboto Mono, monospace">prima sessione</text>
-        </svg>
-        <div className="ccsm">1.788 al punto zero · 2.206 oggi · 19 gare nel periodo</div>
+        {coachAttuale ? (
+          <>
+            <div className="cctop">
+              <div className="avat" style={{ width: 52, height: 52, fontSize: 18 }}>{iniz(coachAttuale.nome)}</div>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div className="ccnome">{coachAttuale.nome}</div>
+                <div className="ccsub">
+                  Dal {fmtData(PERCORSO.dalCoachAttuale)} · {PERCORSO.sessioniConAttuale} sessioni insieme
+                </div>
+              </div>
+            </div>
+            <div style={{ marginTop: 16 }}>
+              <button className="b b-blu" onClick={() => vaiScheda?.(coachAttuale)}>Vai al suo profilo</button>
+            </div>
+          </>
+        ) : (
+          <p className="nota" style={{ marginTop: 0 }}>Non hai ancora un coach attivo.</p>
+        )}
       </div>
 
-      <div className="avviso" style={{ marginTop: 20 }}>
-        Sei fermo da 6 giorni. Servono otto gare ogni 30 giorni: senza gare la curva si appiattisce
-        e il lavoro fatto non risulta a nessuno dei due.
+      {PERCORSO.storicoCoach.length > 0 && (
+        <>
+          <div className="stit"><span>Con chi hai lavorato prima</span></div>
+          <div className="blocco">
+            {PERCORSO.storicoCoach.map((s, i) => {
+              const co = COACHES.find((c) => c.id === s.coachId);
+              if (!co) return null;
+              return (
+                <div className="riga" key={i}>
+                  <span>{co.nome} <span className="nn">· {s.periodo}</span></span>
+                  <span>
+                    <b className="mn" style={{ color: "var(--blu2)" }}>+{s.irGuadagnato} iR</b>{" "}
+                    <span className="nn">· {s.sessioni} sessioni · {s.auto.join(", ")}</span>
+                  </span>
+                </div>
+              );
+            })}
+            <p className="nota">È il tuo percorso, non una classifica: questi numeri restano tuoi.</p>
+          </div>
+        </>
+      )}
+
+      {/* 3. dati iRacing — strato 2, non ancora collegato */}
+      <div className="stit"><span>I tuoi dati iRacing</span></div>
+      <div className="lockbox">
+        <div className="eyebrow">Da collegare</div>
+        <p style={{ marginTop: 10, color: "var(--grigio)", fontSize: 14.5, lineHeight: 1.6 }}>
+          Collega il tuo account iRacing per sbloccare qui la tua curva iRating, le ultime gare —
+          con il confronto prima/dopo ogni sessione di coaching — e la tua licenza e Safety Rating.
+        </p>
+        <button className="b b-blu" style={{ marginTop: 14 }}>Collega il tuo account iRacing</button>
       </div>
 
-      <div className="stit"><span>Note del coach · sessione 03</span></div>
-      <ul style={{ paddingLeft: 20 }}>
-        <li style={{ color: "var(--grigio)", marginBottom: 8 }}>Prima variante: stai ancora frenando dritta.</li>
-        <li style={{ color: "var(--grigio)", marginBottom: 8 }}>Lesmo 1: entri lunga per compensare il sottosterzo.</li>
-        <li style={{ color: "var(--grigio)", marginBottom: 8 }}>Parabolica: qui vai bene, non toccare niente.</li>
-      </ul>
+      {/* 4. ore acquistate */}
+      <div className="stit"><span>Ore di coaching</span></div>
+      <div className="blocco">
+        <div className="ccbig">{PERCORSO.oreResidue} ore residue</div>
+        <div className="ccsm">su {PERCORSO.oreAcquistate} acquistate finora</div>
+        <div className="orebar"><div className="orebarfill" style={{ width: `${(PERCORSO.oreResidue / PERCORSO.oreAcquistate) * 100}%` }} /></div>
+        <button className="b b-ghost" style={{ marginTop: 16 }} onClick={() => setRicaricaAperta(true)}>
+          Ricarica ore
+        </button>
+        {ricaricaAperta && (
+          <p className="nota">
+            Il pagamento online arriva in una prossima versione: per ora contatta il tuo coach o
+            l'assistenza per aggiungere ore.
+          </p>
+        )}
+      </div>
 
-      <div className="stit"><span>Da fare prima di venerdì</span></div>
-      <ul style={{ paddingLeft: 20 }}>
-        <li style={{ color: "var(--grigio)", marginBottom: 8 }}>Tre gare ufficiali, servono anche al conteggio.</li>
-        <li style={{ color: "var(--grigio)", marginBottom: 8 }}>Venti giri sulla prima variante.</li>
-        <li style={{ color: "var(--grigio)", marginBottom: 8 }}>Carica il run qui.</li>
-      </ul>
-      <div style={{ margin: "16px 0 40px" }}>
-        <button className="b b-ghost b-lg" style={{ width: "100%" }}>Carica il run</button>
+      {/* 5. calendario — sessioni di coaching e gare pianificate, due liste separate */}
+      <div className="stit"><span>Prossime sessioni di coaching</span></div>
+      <div className="blocco">
+        {prossimeSessioni.length === 0 && <p className="nota" style={{ marginTop: 0 }}>Nessuna sessione in calendario.</p>}
+        {prossimeSessioni.map((p) => {
+          const co = COACHES.find((c) => c.id === p.coachId);
+          return (
+            <div className="riga" key={p.id}>
+              <span><span className="dot" style={{ background: "var(--blu2)" }} />{fmtData(p.data)} · {p.orario}</span>
+              <span className="nn">{co?.nome}</span>
+            </div>
+          );
+        })}
+      </div>
+
+      <div className="stit"><span>Gare che hai in programma</span></div>
+      <div className="blocco">
+        {garePianificate.length === 0 && (
+          <p className="nota" style={{ marginTop: 0 }}>Non hai ancora selezionato gare dal calendario di stagione.</p>
+        )}
+        {garePianificate.map((g) => (
+          <div className="riga" key={g.id}>
+            <span><span className="dot" style={{ background: "var(--oro)" }} />{fmtData(g.data)} · {g.pista}</span>
+            <span className="nn">{g.auto}</span>
+          </div>
+        ))}
+        <button className="apri" onClick={() => setPickerAperto((v) => !v)}>
+          {pickerAperto ? "▾ Chiudi il calendario di stagione" : "▸ Aggiungi una gara dal calendario di stagione"}
+        </button>
+        {pickerAperto && (
+          <div style={{ marginTop: 4, borderTop: "1px solid var(--bordo)", paddingTop: 6 }}>
+            {CALENDARIO_STAGIONE.map((g) => (
+              <label className="riga" style={{ cursor: "pointer" }} key={g.id}>
+                <span>
+                  <input type="checkbox" checked={gareIds.includes(g.id)} onChange={() => toggleGara(g.id)}
+                         style={{ marginRight: 10 }} />
+                  {fmtData(g.data)} · {g.pista}
+                </span>
+                <span className="nn">{g.auto}</span>
+              </label>
+            ))}
+            <p className="nota">Calendario di stagione provvisorio — verrà sostituito con quello ufficiale.</p>
+          </div>
+        )}
+      </div>
+
+      {/* 6. note & consigli del coach — archivio in lettura */}
+      <div className="stit"><span>Note & consigli del coach</span></div>
+      <div className="blocco" style={{ marginBottom: 40 }}>
+        {PERCORSO.note.length === 0 && <p className="nota" style={{ marginTop: 0 }}>Ancora nessuna nota.</p>}
+        {PERCORSO.note.map((n) => {
+          const co = COACHES.find((c) => c.id === n.coachId);
+          return (
+            <div className="recens" key={n.id}>
+              <div className="recmeta">
+                <span>{co?.nome}</span><span>{fmtData(n.data)}</span>{n.pista && <span>· {n.pista}</span>}
+              </div>
+              <p>{n.testo}</p>
+            </div>
+          );
+        })}
       </div>
     </div>
   );
@@ -1683,7 +1852,9 @@ export default function App() {
             ? <Scheda c={coach} mia={mia} miaIr={miaIr} chiudi={() => setCoach(null)}
                        vaiPercorso={() => { setCoach(null); setTab("percorso"); }} vediCoach={setCoach} />
             : <Cerca apri={setCoach} mia={mia} setMia={setMia} miaIr={miaIr} setMiaIr={setMiaIr} />)}
-          {ruolo === "pilota" && tab === "percorso" && <Percorso />}
+          {ruolo === "pilota" && tab === "percorso" && (
+            <Percorso vaiScheda={(co) => { setCoach(co); setTab("cerca"); }} />
+          )}
           {ruolo === "coach" && <AreaCoach />}
         </>
       )}
