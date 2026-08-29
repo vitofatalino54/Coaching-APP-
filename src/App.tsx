@@ -30,9 +30,22 @@ const FASCE = [
   { k: "b4", l: "Sopra 4k" },
 ];
 
+// punto medio di ogni fascia: usato come iRating di riferimento del
+// pilota quando non inserisce il proprio valore esatto
+const FASCE_MEDIO = { b1: 1000, b2: 2000, b3: 3250, b4: 5000 };
+
+// come si racconta ogni fascia in una frase, per i messaggi di forbice e
+// per il confronto dichiarazione/dati sul profilo del coach
+const FASCE_FRASE = {
+  b1: "sotto 1.500 iR",
+  b2: "tra 1.500 e 2.500 iR",
+  b3: "tra 2.500 e 4.000 iR",
+  b4: "sopra 4.000 iR",
+};
+
 const COACHES = [
   {
-    id: 1, nome: "Marco Bertolini", cat: ["gt"], tag: "vela", lic: "A", ir: 4820, prezzo: 45,
+    id: 1, nome: "Marco Bertolini", cat: ["coperte"], tag: "vela", lic: "A", ir: 4820, prezzo: 45, fasciaDichiarata: "b2",
     auto: ["Ferrari 296 GT3", "Lamborghini Huracán GT3 EVO"], spec: ["Trail braking", "Qualifica"],
     obiettivi: ["tempo", "quali"], irMed: 412, gg: 30, tracciati: 14, agg: "6 ore fa",
     fasce: { b1: [520, 26, 4], b2: [470, 28, 6], b3: [210, 34, 3], b4: null },
@@ -46,7 +59,7 @@ const COACHES = [
       txt: "Mi ha smontato la staccata della prima variante e ricostruita in due sessioni." }],
   },
   {
-    id: 2, nome: "Elena Kovač", cat: ["gt"], tag: "kovi", lic: "A", ir: 5610, prezzo: 60,
+    id: 2, nome: "Elena Kovač", cat: ["coperte"], tag: "kovi", lic: "A", ir: 5610, prezzo: 60, fasciaDichiarata: "b3",
     auto: ["Porsche 911 GT3 R", "BMW M4 GT3"], spec: ["Race craft", "Traffico"],
     obiettivi: ["gara"], irMed: 508, gg: 34, tracciati: 11, agg: "2 ore fa",
     fasce: { b1: null, b2: [430, 30, 4], b3: [560, 32, 5], b4: [190, 44, 3] },
@@ -60,7 +73,7 @@ const COACHES = [
       txt: "Ho smesso di buttare via gare al primo giro. Sembra poco, vale mezzo campionato." }],
   },
   {
-    id: 3, nome: "Davide Sanna", cat: ["gt"], tag: "sanna_dvd", lic: "B", ir: 3240, prezzo: 35,
+    id: 3, nome: "Davide Sanna", cat: ["coperte"], tag: "sanna_dvd", lic: "B", ir: 3240, prezzo: 35, fasciaDichiarata: "b1",
     auto: ["Lamborghini Huracán GT3 EVO", "Audi R8 LMS EVO II"], spec: ["Setup", "Gomme"],
     obiettivi: ["setup", "endurance"], irMed: 260, gg: 28, tracciati: 22, agg: "1 giorno fa",
     fasce: { b1: [340, 24, 9], b2: [250, 30, 10], b3: [120, 38, 3], b4: null },
@@ -74,7 +87,7 @@ const COACHES = [
       txt: "Due sessioni e ho capito che il problema era il differenziale, non il posteriore." }],
   },
   {
-    id: 4, nome: "Giulia Ferraro", cat: ["gt"], tag: "giu_f", lic: "B", ir: 2880, prezzo: 25,
+    id: 4, nome: "Giulia Ferraro", cat: ["coperte"], tag: "giu_f", lic: "B", ir: 2880, prezzo: 25, fasciaDichiarata: "b1",
     auto: ["Ferrari 296 GT3"], spec: ["Fondamentali", "Licenza D"],
     obiettivi: ["licenza", "tempo"], irMed: 640, gg: 26, tracciati: 19, agg: "4 ore fa",
     fasce: { b1: [720, 22, 12], b2: [540, 28, 6], b3: null, b4: null },
@@ -88,7 +101,7 @@ const COACHES = [
       txt: "Ero fermo in D da sei mesi. In cinque settimane sono passato in C." }],
   },
   {
-    id: 5, nome: "Tom Reeves", cat: ["proto", "gt"], tag: "reeves", lic: "A", ir: 6110, prezzo: 70,
+    id: 5, nome: "Tom Reeves", cat: ["coperte"], tag: "reeves", lic: "A", ir: 6110, prezzo: 70, fasciaDichiarata: "b4",
     auto: ["Oreca 07 LMP2", "Mercedes-AMG GT3 EVO", "BMW M4 GT3"], spec: ["Endurance", "Ritmo di stint"],
     obiettivi: ["endurance", "gara"], irMed: 300, gg: 40, tracciati: 9, agg: "8 ore fa",
     fasce: { b1: null, b2: null, b3: [380, 36, 5], b4: [240, 42, 3] },
@@ -102,7 +115,7 @@ const COACHES = [
       txt: "Ci ha riscritto le procedure di pit. Finita la 12h senza un danno." }],
   },
   {
-    id: 6, nome: "Niko Aaltonen", cat: ["gt"], tag: "aalto", lic: "A", ir: 7020, prezzo: 85,
+    id: 6, nome: "Niko Aaltonen", cat: ["coperte"], tag: "aalto", lic: "A", ir: 7020, prezzo: 85, fasciaDichiarata: "b4",
     auto: ["Porsche 911 GT3 R", "Mercedes-AMG GT3 EVO"], spec: ["Qualifica", "Trail braking"],
     obiettivi: ["quali", "tempo"], irMed: 210, gg: 35, tracciati: 6, agg: "3 giorni fa",
     fasce: { b1: null, b2: null, b3: [180, 38, 3], b4: [260, 32, 4] },
@@ -116,7 +129,7 @@ const COACHES = [
       txt: "Tre curve, una sessione, quattro decimi. Caro, ma sa dove guardare." }],
   },
   {
-    id: 7, nome: "Andrea Pili", cat: ["mono"], tag: "pili_a", lic: "A", ir: 4180, prezzo: 40,
+    id: 7, nome: "Andrea Pili", cat: ["scoperte"], tag: "pili_a", lic: "A", ir: 4180, prezzo: 40, fasciaDichiarata: "b1",
     auto: ["Dallara F3", "Super Formula Lights", "Ray FF1600"], spec: ["Monoposto", "Staccata"],
     obiettivi: ["tempo", "quali"], irMed: 380, gg: 32, tracciati: 8, agg: "1 giorno fa",
     fasce: { b1: [430, 28, 3], b2: [400, 32, 4], b3: null, b4: null },
@@ -130,7 +143,7 @@ const COACHES = [
       txt: "Venivo dalle GT e frenavo come un camion. Mi ha rifatto il piede da zero." }],
   },
   {
-    id: 8, nome: "Wade Carter", cat: ["oval"], tag: "wcarter", lic: "B", ir: 2960, prezzo: 30,
+    id: 8, nome: "Wade Carter", cat: ["coperte"], tag: "wcarter", lic: "B", ir: 2960, prezzo: 30, fasciaDichiarata: "b1",
     auto: ["NASCAR Next Gen Camry", "ARCA Menards Chevrolet"], spec: ["Ovali", "Pack racing"],
     obiettivi: ["gara", "licenza"], irMed: 470, gg: 30, tracciati: 12, agg: "9 ore fa",
     fasce: { b1: [560, 26, 5], b2: [420, 30, 5], b3: [190, 40, 3], b4: null },
@@ -147,18 +160,16 @@ const COACHES = [
 
 const CATEGORIE = [
   { k: "tutte", l: "Tutte le categorie" },
-  { k: "gt", l: "Gran Turismo · GT3 e GT4" },
-  { k: "proto", l: "Prototipi · LMP2 e GTP" },
-  { k: "mono", l: "Monoposto" },
-  { k: "oval", l: "Ovali" },
+  { k: "coperte", l: "Ruote coperte · GT, prototipi, ovali" },
+  { k: "scoperte", l: "Ruote scoperte · Monoposto" },
 ];
 
 const AUTO_PER_CAT = {
-  gt: ["Ferrari 296 GT3", "Porsche 911 GT3 R", "Lamborghini Huracán GT3 EVO", "BMW M4 GT3",
-       "Mercedes-AMG GT3 EVO", "Audi R8 LMS EVO II", "Porsche 718 GT4"],
-  proto: ["Oreca 07 LMP2", "Acura ARX-06 GTP", "Ligier JS P320"],
-  mono: ["Dallara F3", "Super Formula Lights", "Ray FF1600", "Formula Vee"],
-  oval: ["NASCAR Next Gen Camry", "ARCA Menards Chevrolet", "Legends Ford '34"],
+  coperte: ["Ferrari 296 GT3", "Porsche 911 GT3 R", "Lamborghini Huracán GT3 EVO", "BMW M4 GT3",
+       "Mercedes-AMG GT3 EVO", "Audi R8 LMS EVO II", "Porsche 718 GT4",
+       "Oreca 07 LMP2", "Acura ARX-06 GTP", "Ligier JS P320",
+       "NASCAR Next Gen Camry", "ARCA Menards Chevrolet", "Legends Ford '34"],
+  scoperte: ["Dallara F3", "Super Formula Lights", "Ray FF1600", "Formula Vee"],
 };
 
 const TUTTE = "Tutte le vetture";
@@ -187,6 +198,7 @@ const CSS = `
   --bianco:#FFFFFF; --grigio:#9BA3AF; --grigio2:#6B727D;
   --rosso:#8E1A20; --rosso2:#B32229; --rossoSoft:rgba(179,34,41,.12);
   --blu:#1D4FD7; --blu2:#3C6DF0; --bluSoft:rgba(29,79,215,.12);
+  --ambra:#C9924A; --ambraSoft:rgba(201,146,74,.14);
   background:var(--nero); color:var(--bianco); min-height:100%;
   font-family:'Titillium Web',system-ui,sans-serif; -webkit-font-smoothing:antialiased; line-height:1.5;
 }
@@ -307,6 +319,15 @@ const CSS = `
 .campo input{width:100%;background:var(--nero);border:1px solid var(--bordo);color:var(--bianco);
   padding:11px 12px;font-family:'Titillium Web',sans-serif;font-size:14px;border-radius:2px}
 .campo input:focus{outline:none;border-color:var(--grigio)}
+.campo select,.campo textarea{width:100%;background:var(--nero);border:1px solid var(--bordo);color:var(--bianco);
+  padding:11px 12px;font-family:'Titillium Web',sans-serif;font-size:14px;border-radius:2px}
+.campo textarea{resize:vertical;min-height:88px;line-height:1.5}
+.campo select:focus,.campo textarea:focus{outline:none;border-color:var(--grigio)}
+.checkgrid{display:flex;flex-wrap:wrap;gap:8px;margin-top:4px}
+.checkgrid label{display:flex;align-items:center;gap:7px;border:1px solid var(--bordo);padding:8px 12px;
+  font-size:13px;cursor:pointer;border-radius:2px;color:var(--grigio)}
+.checkgrid label:has(input:checked){border-color:var(--blu2);color:var(--blu2);background:var(--bluSoft)}
+.checkgrid input{accent-color:var(--blu2)}
 .hintbox{border-left:2px solid var(--bordo);padding-left:12px;margin-top:18px;color:var(--grigio2);font-size:12.5px;line-height:1.6}
 
 /* ---- app ---- */
@@ -326,8 +347,9 @@ const CSS = `
 .frow label{font-family:'Roboto Mono',monospace;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;
   color:var(--grigio2);width:104px;flex:none}
 .frow.hi label{color:var(--blu2)}
-.frow select{flex:1;background:var(--nero);color:var(--bianco);border:1px solid var(--bordo);
+.frow select,.frow input{flex:1;background:var(--nero);color:var(--bianco);border:1px solid var(--bordo);
   padding:8px 10px;font-family:'Roboto Mono',monospace;font-size:13px;border-radius:2px}
+.frow input::placeholder{color:var(--grigio2)}
 
 .lista{display:grid;gap:14px;grid-template-columns:1fr;margin:20px 0 40px}
 @media(min-width:780px){.lista{grid-template-columns:1fr 1fr}}
@@ -346,6 +368,21 @@ const CSS = `
 .fit{margin-top:14px;border:1px solid rgba(29,79,215,.35);background:var(--bluSoft);padding:9px 11px;font-size:13px}
 .fit b{color:var(--blu2)}
 .fit.no{border-color:var(--bordo);background:var(--nero);color:var(--grigio2)}
+.stato{display:inline-flex;align-items:center;font-family:'Roboto Mono',monospace;font-size:10.5px;
+  letter-spacing:.1em;text-transform:uppercase;padding:4px 9px;border:1px solid transparent;border-radius:2px}
+.stato-consigliato{background:var(--blu);color:#fff}
+.stato-neutro{background:var(--bluSoft);color:var(--blu2);border-color:rgba(29,79,215,.35)}
+.stato-avviso{background:var(--ambraSoft);color:var(--ambra);border-color:rgba(201,146,74,.4)}
+.notaBox{border:1px solid var(--bordo);background:var(--nero2);padding:14px 16px;margin-top:10px;font-size:13px;line-height:1.6}
+.notaBox b{color:var(--bianco)}
+.notaBox.ambra{border-color:rgba(201,146,74,.4);background:var(--ambraSoft)}
+.notaBox.ambra b{color:var(--ambra)}
+.notaBox.rossa{border-color:rgba(179,34,41,.5);background:var(--rossoSoft)}
+.notaBox.rossa b{color:var(--rosso2)}
+.altList{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.altList button{background:var(--nero);border:1px solid var(--bordo);color:var(--bianco);
+  font-family:'Roboto Mono',monospace;font-size:11.5px;padding:6px 10px;cursor:pointer;border-radius:2px}
+.altList button:hover{border-color:var(--blu2);color:var(--blu2)}
 .chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:14px}
 .chip{font-family:'Roboto Mono',monospace;font-size:10.5px;letter-spacing:.06em;border:1px solid var(--bordo);
   color:var(--grigio2);padding:4px 8px}
@@ -388,6 +425,60 @@ const CSS = `
 const iniz = (n) => n.split(" ").map((x) => x[0]).join("");
 const perSett = (ir, gg) => Math.round((ir / gg) * 7);
 
+/* ---- forbice iRating coach ↔ allievo -----------------------------------
+   Sotto i 3.000 iR dell'allievo il coach deve stare almeno il 50% sopra,
+   oltre i 3.000 basta il 25%. In entrambi i casi un coach oltre il triplo
+   dell'allievo è considerato troppo lontano per essere davvero utile. */
+
+function iRAllievo(miaIr, mia) {
+  const n = Number(miaIr);
+  return n > 0 ? n : FASCE_MEDIO[mia];
+}
+
+function statoForbice(coachIr, allievoIr) {
+  const soglia = allievoIr <= 3000 ? allievoIr * 1.5 : allievoIr * 1.25;
+  const tetto = allievoIr * 3;
+  if (coachIr > tetto) return "avviso";
+  if (coachIr >= soglia) return "consigliato";
+  return "neutro";
+}
+
+// almeno 3 allievi in quella fascia, con guadagno positivo: il dato reale
+// batte sempre l'iRating grezzo e fa salire lo stato di un gradino
+function storicoBuono(coach, fascia) {
+  const d = coach.fasce[fascia];
+  return !!d && d[2] >= 3 && d[0] > 0;
+}
+
+const SALE_DI_GRADINO = { avviso: "neutro", neutro: "consigliato", consigliato: "consigliato" };
+
+function calcolaStato(coach, allievoIr, mia) {
+  const base = statoForbice(coach.ir, allievoIr);
+  return storicoBuono(coach, mia) ? SALE_DI_GRADINO[base] : base;
+}
+
+const STATO_LABEL = { consigliato: "Consigliato", neutro: "Neutro", avviso: "Avviso" };
+
+// la fascia in cui il coach ha il ritmo settimanale migliore, con almeno 3
+// allievi: è il dato che conta di più, anche contro la sua dichiarazione
+function migliorFascia(coach) {
+  const candidate = FASCE
+    .filter((fa) => coach.fasce[fa.k] && coach.fasce[fa.k][2] >= 3)
+    .map((fa) => ({ k: fa.k, ritmo: perSett(coach.fasce[fa.k][0], coach.fasce[fa.k][1]) }));
+  if (candidate.length === 0) return null;
+  return candidate.reduce((a, b) => (b.ritmo > a.ritmo ? b : a)).k;
+}
+
+function fraseDichiarazione(coach) {
+  const dichiarata = FASCE_FRASE[coach.fasciaDichiarata];
+  const migliore = migliorFascia(coach);
+  if (!migliore)
+    return `Dichiara di rivolgersi a piloti ${dichiarata}, ma non ha ancora abbastanza allievi tracciati per confermarlo.`;
+  if (migliore === coach.fasciaDichiarata)
+    return `Dichiara di rivolgersi a piloti ${dichiarata} — e i dati lo confermano.`;
+  return `Dichiara di rivolgersi a piloti ${dichiarata}, ma i risultati migliori li ottiene con piloti ${FASCE_FRASE[migliore]}.`;
+}
+
 function Media({ id, ratio = "16 / 9", nota, tipo = "video" }) {
   const src = MEDIA[id];
   if (src)
@@ -429,7 +520,7 @@ function Spark({ curva, start, w = 110, h = 36 }) {
 
 /* ---------------------------------- HOME ---------------------------------- */
 
-function Home({ vaiLogin }) {
+function Home({ vaiLogin, vaiCandidatura }) {
   return (
     <>
       {/* HERO */}
@@ -449,7 +540,7 @@ function Home({ vaiLogin }) {
               <button className="b b-blu b-lg" onClick={() => vaiLogin("pilota")}>
                 Cerco un coach
               </button>
-              <button className="b b-ghost b-lg" onClick={() => vaiLogin("coach")}>
+              <button className="b b-ghost b-lg" onClick={vaiCandidatura}>
                 Voglio fare coaching
               </button>
             </div>
@@ -569,7 +660,7 @@ function Home({ vaiLogin }) {
                 fatture e uno storico dei risultati che vale più di qualsiasi presentazione. La
                 commissione è il 15%.
               </p>
-              <button className="b b-rosso" onClick={() => vaiLogin("coach")}>Entra come coach</button>
+              <button className="b b-rosso" onClick={vaiCandidatura}>Candidati come coach</button>
             </div>
           </div>
         </div>
@@ -699,12 +790,14 @@ function Login({ ruolo, setRuolo, entra }) {
 
 /* ------------------------------- AREA PILOTA ------------------------------- */
 
-function Cerca({ apri, mia, setMia }) {
+function Cerca({ apri, mia, setMia, miaIr, setMiaIr }) {
   const [cat, setCat] = useState("tutte");
   const [auto, setAuto] = useState(TUTTE);
   const [obi, setObi] = useState("tutti");
 
   const cambiaCat = (k) => { setCat(k); setAuto(TUTTE); };
+
+  const allievoIr = iRAllievo(miaIr, mia);
 
   const list = [...COACHES]
     .filter((c) => (cat === "tutte" || c.cat.includes(cat)) &&
@@ -717,6 +810,13 @@ function Cerca({ apri, mia, setMia }) {
       if (fa && fb) return perSett(fb[0], fb[1]) - perSett(fa[0], fa[1]);
       return 0;
     });
+
+  // coach della stessa categoria, in stato Consigliato: l'alternativa da
+  // proporre quando un altro coach è troppo lontano dal livello del pilota
+  const alternative = (c) =>
+    COACHES.filter((x) => x.id !== c.id &&
+      x.cat.some((k) => c.cat.includes(k)) &&
+      calcolaStato(x, allievoIr, mia) === "consigliato").slice(0, 3);
 
   return (
     <div className="w">
@@ -731,6 +831,12 @@ function Cerca({ apri, mia, setMia }) {
           <select id="f1" value={mia} onChange={(e) => setMia(e.target.value)}>
             {FASCE.map((f) => <option key={f.k} value={f.k}>{f.l}</option>)}
           </select>
+        </div>
+        <div className="frow hi">
+          <label htmlFor="f1b">iR esatto</label>
+          <input id="f1b" type="number" min="0" inputMode="numeric" value={miaIr}
+                 onChange={(e) => setMiaIr(e.target.value)}
+                 placeholder={`opzionale · senza, usiamo ${FASCE_MEDIO[mia]}`} />
         </div>
         <div className="frow">
           <label htmlFor="f0">Categoria</label>
@@ -755,46 +861,70 @@ function Cerca({ apri, mia, setMia }) {
 
       <p className="nota" style={{ marginTop: 0 }}>
         L'ordine cambia con la tua fascia: chi fa numeri enormi con i principianti non è detto che
-        li faccia con te.
+        li faccia con te. Consigliato / Neutro / Avviso confrontano il tuo iR con quello del coach.
       </p>
 
       <div className="lista">
         {list.map((c) => {
           const f = c.fasce[mia];
+          const stato = calcolaStato(c, allievoIr, mia);
           return (
-            <button key={c.id} className="cc" onClick={() => apri(c)}>
-              <div className="cctop">
-                <div className="avat">{iniz(c.nome)}</div>
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div className="ccnome">{c.nome}</div>
-                  <div className="ccsub">@{c.tag} · {c.ir} iR · licenza {c.lic}</div>
+            <div key={c.id}>
+              <button className="cc" onClick={() => apri(c)}>
+                <div className="cctop">
+                  <div className="avat">{iniz(c.nome)}</div>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div className="ccnome">{c.nome}</div>
+                    <div className="ccsub">@{c.tag} · {c.ir} iR · licenza {c.lic}</div>
+                  </div>
+                  <span className={`stato stato-${stato}`}>{STATO_LABEL[stato]}</span>
                 </div>
-              </div>
 
-              <div className="ccmetr">
-                <div>
-                  <div className="ccbig">+{c.irMed} iR</div>
-                  <div className="ccsm">mediana allievi · {c.gg} gg<br />{perSett(c.irMed, c.gg)} iR a settimana</div>
+                <div className="ccmetr">
+                  <div>
+                    <div className="ccbig">+{c.irMed} iR</div>
+                    <div className="ccsm">mediana allievi · {c.gg} gg<br />{perSett(c.irMed, c.gg)} iR a settimana</div>
+                  </div>
+                  <Spark curva={c.curva} start={c.start} />
                 </div>
-                <Spark curva={c.curva} start={c.start} />
-              </div>
 
-              {f ? (
-                <div className="fit">Con piloti come te: <b>+{f[0]} iR in {f[1]} gg</b> · {f[2]} allievi</div>
-              ) : (
-                <div className="fit no">Nessun dato nella tua fascia.</div>
-              )}
+                {f ? (
+                  <div className="fit">Con piloti come te: <b>+{f[0]} iR in {f[1]} gg</b> · {f[2]} allievi</div>
+                ) : (
+                  <div className="fit no">Nessun dato nella tua fascia.</div>
+                )}
 
-              <div className="chips">
-                {c.spec.map((s) => <span className="chip" key={s}>{s}</span>)}
-                {c.patto && <span className="chip p">Patto di risultato</span>}
-              </div>
+                <div className="chips">
+                  {c.spec.map((s) => <span className="chip" key={s}>{s}</span>)}
+                  {c.patto && <span className="chip p">Patto di risultato</span>}
+                </div>
 
-              <div className="ccfoot">
-                <span className="ccsm">{c.tracciati} allievi tracciati · agg. {c.agg}</span>
-                <span className="prezzo">{c.prezzo}€ <small>/h</small></span>
-              </div>
-            </button>
+                <div className="ccfoot">
+                  <span className="ccsm">{c.tracciati} allievi tracciati · agg. {c.agg}</span>
+                  <span className="prezzo">{c.prezzo}€ <small>/h</small></span>
+                </div>
+              </button>
+
+              {stato === "avviso" && (() => {
+                const alt = alternative(c);
+                return (
+                  <div className="notaBox ambra">
+                    <p>
+                      Lavora di solito con piloti <b>{FASCE_FRASE[c.fasciaDichiarata]}</b>. Potrebbe dare
+                      per scontati fondamentali che stai ancora costruendo.
+                    </p>
+                    {alt.length > 0 && (
+                      <>
+                        <p style={{ marginTop: 8 }}>Questi hanno risultati migliori con piloti come te:</p>
+                        <div className="altList">
+                          {alt.map((a) => <button key={a.id} onClick={() => apri(a)}>{a.nome}</button>)}
+                        </div>
+                      </>
+                    )}
+                  </div>
+                );
+              })()}
+            </div>
           );
         })}
       </div>
@@ -802,12 +932,17 @@ function Cerca({ apri, mia, setMia }) {
   );
 }
 
-function Scheda({ c, mia, chiudi, vaiPercorso }) {
+function Scheda({ c, mia, miaIr, chiudi, vaiPercorso, vediCoach }) {
   const [slot, setSlot] = useState(null);
   const [fatto, setFatto] = useState(false);
   const [apri, setApri] = useState(false);
   const f = c.fasce[mia];
   const fee = (c.prezzo * 0.15).toFixed(2);
+  const allievoIr = iRAllievo(miaIr, mia);
+  const stato = calcolaStato(c, allievoIr, mia);
+  const alternative = COACHES.filter((x) => x.id !== c.id &&
+    x.cat.some((k) => c.cat.includes(k)) &&
+    calcolaStato(x, allievoIr, mia) === "consigliato").slice(0, 3);
 
   if (fatto)
     return (
@@ -843,11 +978,29 @@ function Scheda({ c, mia, chiudi, vaiPercorso }) {
 
       <div className="cctop" style={{ marginTop: 8 }}>
         <div className="avat" style={{ width: 56, height: 56, fontSize: 20 }}>{iniz(c.nome)}</div>
-        <div>
+        <div style={{ flex: 1, minWidth: 0 }}>
           <h2 style={{ fontSize: 28 }}>{c.nome}</h2>
           <div className="ccsub">@{c.tag} · {c.ir} iR · licenza {c.lic} · {c.prezzo}€/h</div>
         </div>
+        <span className={`stato stato-${stato}`}>{STATO_LABEL[stato]}</span>
       </div>
+
+      {stato === "avviso" && (
+        <div className="notaBox ambra">
+          <p>
+            Lavora di solito con piloti <b>{FASCE_FRASE[c.fasciaDichiarata]}</b>. Potrebbe dare per
+            scontati fondamentali che stai ancora costruendo.
+          </p>
+          {alternative.length > 0 && (
+            <>
+              <p style={{ marginTop: 8 }}>Questi hanno risultati migliori con piloti come te:</p>
+              <div className="altList">
+                {alternative.map((a) => <button key={a.id} onClick={() => vediCoach(a)}>{a.nome}</button>)}
+              </div>
+            </>
+          )}
+        </div>
+      )}
 
       <div className="stit"><span>Risultati allievi · 90 giorni</span><span>agg. {c.agg}</span></div>
       <div className="blocco">
@@ -900,6 +1053,11 @@ function Scheda({ c, mia, chiudi, vaiPercorso }) {
           {f ? `Nella tua fascia il ritmo è di ${perSett(f[0], f[1])} iR a settimana su ${f[2]} allievi.`
              : "In questa fascia non ha storico: prenoti al buio, il prezzo dovrebbe rifletterlo."}
         </p>
+      </div>
+
+      <div className="stit"><span>Fascia dichiarata dal coach</span></div>
+      <div className="blocco">
+        <p className="nota" style={{ marginTop: 0 }}>{fraseDichiarazione(c)}</p>
       </div>
 
       {c.patto && (
@@ -1093,18 +1251,251 @@ function AreaCoach() {
   );
 }
 
+/* ------------------------------ CANDIDATURA COACH ------------------------------ */
+
+const FASCE_ORARIE = ["Feriali mattina", "Feriali pomeriggio", "Feriali sera", "Weekend giorno", "Weekend sera"];
+
+function Candidatura({ chiudi, vaiLoginCoach }) {
+  const [step, setStep] = useState(1); // 1 requisiti · 2 questionario · 3 conferma
+
+  // cancello 1: requisiti automatici, verificati (in produzione) via account iRacing
+  const [licenza, setLicenza] = useState("");
+  const [anni, setAnni] = useState("");
+  const [irMin, setIrMin] = useState("");
+  const rispostoRequisiti = licenza !== "" && anni !== "" && irMin !== "";
+  const requisitiOk = licenza === "A" && anni === "si" && irMin === "si";
+
+  // cancello 2: questionario, 12 domande, revisione manuale
+  const [r, setR] = useState({
+    categoria: "", fascia: "", ore: "", fasceOrarie: FASCE_ORARIE.slice(0, 0), software: "",
+    conduzione: "", postazione: "", q8: "", q9: "", q10: "", q11: "", q12: "",
+  });
+  const set = (k) => (e) => setR((prev) => ({ ...prev, [k]: e.target.value }));
+  const toggleOraria = (v) =>
+    setR((prev) => ({
+      ...prev,
+      fasceOrarie: prev.fasceOrarie.includes(v)
+        ? prev.fasceOrarie.filter((x) => x !== v)
+        : [...prev.fasceOrarie, v],
+    }));
+
+  const questionarioCompleto =
+    r.categoria && r.fascia && r.ore && r.fasceOrarie.length > 0 && r.software &&
+    r.conduzione && r.postazione && r.q8 && r.q9 && r.q10 && r.q11 && r.q12;
+
+  if (step === 3)
+    return (
+      <div className="w">
+        <button className="indietro" onClick={chiudi}>← Torna alla home</button>
+        <div className="ok">
+          <h2 style={{ fontSize: 24, color: "var(--blu2)" }}>Candidatura inviata</h2>
+          <p style={{ marginTop: 10, fontSize: 14.5, lineHeight: 1.6 }}>
+            Requisiti verificati, questionario ricevuto. Le risposte aperte le leggiamo a mano: se il
+            profilo torna, ti scriviamo per fissare la prova.
+          </p>
+        </div>
+        <div className="stit"><span>Stato candidatura</span></div>
+        <div className="blocco" style={{ marginBottom: 40 }}>
+          <div className="riga"><span>Requisiti automatici</span><b className="mn" style={{ color: "var(--blu2)" }}>superati</b></div>
+          <div className="riga"><span>Questionario</span><b className="mn" style={{ color: "var(--blu2)" }}>in revisione</b></div>
+          <div className="riga"><span>Prova reale · 30 minuti</span><span className="nn">in attesa di approvazione del questionario</span></div>
+          <p className="nota">
+            Appena il questionario è approvato lo stato passa a "in attesa di prova": una sessione da
+            30 minuti in cui fai coaching a un pilota vero, non a noi.
+          </p>
+        </div>
+      </div>
+    );
+
+  if (step === 2)
+    return (
+      <div className="w">
+        <button className="indietro" onClick={() => setStep(1)}>← Torna ai requisiti</button>
+        <div className="stit" style={{ marginTop: 8 }}><span>Candidatura coach · 2 di 3</span><span>Questionario</span></div>
+        <p className="p" style={{ marginTop: 0 }}>
+          12 domande. Le prime sono operative, le ultime aperte: al lancio le leggiamo di persona, non
+          c'è un punteggio automatico.
+        </p>
+
+        <div className="campo">
+          <label>1 · Categoria in cui vuoi fare coaching</label>
+          <select value={r.categoria} onChange={set("categoria")}>
+            <option value="">Seleziona…</option>
+            <option value="coperte">Ruote coperte</option>
+            <option value="scoperte">Ruote scoperte</option>
+            <option value="entrambe">Entrambe</option>
+          </select>
+        </div>
+        <div className="campo">
+          <label>2 · Fascia di iRating a cui ti rivolgi</label>
+          <select value={r.fascia} onChange={set("fascia")}>
+            <option value="">Seleziona…</option>
+            <option value="b1">Sotto 1.5k</option>
+            <option value="b2">1.5k – 2.5k</option>
+            <option value="b3">2.5k – 4k</option>
+            <option value="b4">Sopra 4k</option>
+            <option value="piu">Più di una</option>
+          </select>
+        </div>
+        <div className="campo">
+          <label>3 · Ore a settimana che puoi dedicare</label>
+          <select value={r.ore} onChange={set("ore")}>
+            <option value="">Seleziona…</option>
+            <option value="sotto3">Sotto 3</option>
+            <option value="3-6">3 – 6</option>
+            <option value="6-12">6 – 12</option>
+            <option value="oltre12">Oltre 12</option>
+          </select>
+        </div>
+        <div className="campo">
+          <label>4 · Fasce orarie in cui sei disponibile</label>
+          <div className="checkgrid">
+            {FASCE_ORARIE.map((v) => (
+              <label key={v}>
+                <input type="checkbox" checked={r.fasceOrarie.includes(v)} onChange={() => toggleOraria(v)} />
+                {v}
+              </label>
+            ))}
+          </div>
+        </div>
+        <div className="campo">
+          <label>5 · Software che usi per la telemetria</label>
+          <select value={r.software} onChange={set("software")}>
+            <option value="">Seleziona…</option>
+            <option value="motec">MoTeC</option>
+            <option value="atlas">Atlas</option>
+            <option value="ispeed">iSpeed</option>
+            <option value="altro">Altro</option>
+            <option value="nessuno">Nessuno</option>
+          </select>
+        </div>
+        <div className="campo">
+          <label>6 · Come conduci una sessione</label>
+          <select value={r.conduzione} onChange={set("conduzione")}>
+            <option value="">Seleziona…</option>
+            <option value="live">Voce live in gara</option>
+            <option value="telemetria">Analisi telemetria registrata</option>
+            <option value="entrambi">Entrambi</option>
+          </select>
+        </div>
+        <div className="campo">
+          <label>7 · Hai una postazione da cui condividere schermo e telemetria in tempo reale?</label>
+          <select value={r.postazione} onChange={set("postazione")}>
+            <option value="">Seleziona…</option>
+            <option value="si">Sì</option>
+            <option value="no">No</option>
+          </select>
+        </div>
+
+        <div className="campo">
+          <label>8 · Descrivi come struttureresti la prima sessione con un pilota che non conosci.</label>
+          <textarea value={r.q8} onChange={set("q8")} />
+        </div>
+        <div className="campo">
+          <label>9 · Un allievo dopo tre sessioni non è migliorato. Cosa fai?</label>
+          <textarea value={r.q9} onChange={set("q9")} />
+        </div>
+        <div className="campo">
+          <label>10 · Un allievo vuole lavorare sulla velocità in curva, ma dai suoi dati vedi che perde
+            soprattutto in staccata. Come gestisci la differenza tra quello che chiede e quello che gli serve?</label>
+          <textarea value={r.q10} onChange={set("q10")} />
+        </div>
+        <div className="campo">
+          <label>11 · Raccontaci un tuo limite come pilota e come l'hai affrontato.</label>
+          <textarea value={r.q11} onChange={set("q11")} />
+        </div>
+        <div className="campo">
+          <label>12 · Perché vuoi fare coaching su una piattaforma piccola e nuova invece che sul tuo Discord?</label>
+          <textarea value={r.q12} onChange={set("q12")} />
+        </div>
+
+        <div style={{ margin: "16px 0 40px" }}>
+          <button className="b b-rosso b-lg" style={{ width: "100%" }} disabled={!questionarioCompleto}
+                  onClick={() => setStep(3)}>
+            {questionarioCompleto ? "Invia candidatura" : "Rispondi a tutte le domande per continuare"}
+          </button>
+        </div>
+      </div>
+    );
+
+  return (
+    <div className="w">
+      <button className="indietro" onClick={chiudi}>← Torna alla home</button>
+      <div className="stit" style={{ marginTop: 8 }}><span>Candidatura coach · 1 di 3</span><span>Requisiti</span></div>
+      <p className="p" style={{ marginTop: 0 }}>
+        Tre condizioni verificate tramite il tuo account iRacing. Da sole determinano se puoi
+        candidarti: non bloccano una singola prenotazione, quello lo fa la forbice di livello con
+        ogni pilota.
+      </p>
+
+      <div className="filtri">
+        <div className="fhead"><span>REQUISITI</span><span>iRACING</span></div>
+        <div className="frow">
+          <label htmlFor="rl">Licenza</label>
+          <select id="rl" value={licenza} onChange={(e) => setLicenza(e.target.value)}>
+            <option value="">Seleziona…</option>
+            <option value="A">Licenza A</option>
+            <option value="altra">Licenza B, C o D</option>
+          </select>
+        </div>
+        <div className="frow">
+          <label htmlFor="ra">Account ≥ 3 anni</label>
+          <select id="ra" value={anni} onChange={(e) => setAnni(e.target.value)}>
+            <option value="">Seleziona…</option>
+            <option value="si">Sì, da almeno 3 anni</option>
+            <option value="no">No, meno di 3 anni</option>
+          </select>
+        </div>
+        <div className="frow">
+          <label htmlFor="ri">iRating ≥ 3.000</label>
+          <select id="ri" value={irMin} onChange={(e) => setIrMin(e.target.value)}>
+            <option value="">Seleziona…</option>
+            <option value="si">Sì, 3.000 o più</option>
+            <option value="no">No, sotto i 3.000</option>
+          </select>
+        </div>
+      </div>
+
+      {rispostoRequisiti && !requisitiOk && (
+        <div className="notaBox rossa">
+          <p>
+            <b>Non soddisfi ancora i requisiti minimi.</b> Servono licenza A, almeno 3 anni di account
+            iRacing e un iRating minimo di 3.000 per candidarsi come coach su CORDA. Puoi ricandidarti
+            appena li raggiungi.
+          </p>
+        </div>
+      )}
+
+      {requisitiOk && (
+        <div style={{ margin: "20px 0 40px" }}>
+          <button className="b b-rosso b-lg" style={{ width: "100%" }} onClick={() => setStep(2)}>
+            Continua al questionario
+          </button>
+        </div>
+      )}
+
+      <p className="nota">
+        Hai già un profilo attivo? <button className="apri" style={{ display: "inline", padding: 0 }}
+          onClick={vaiLoginCoach}>Accedi</button>
+      </p>
+    </div>
+  );
+}
+
 /* ---------------------------------- APP ---------------------------------- */
 
 export default function App() {
-  const [pagina, setPagina] = useState("home"); // home | login | app
+  const [pagina, setPagina] = useState("home"); // home | login | app | candidatura
   const [ruolo, setRuolo] = useState("pilota");
   const [tab, setTab] = useState("cerca");
   const [coach, setCoach] = useState(null);
   const [mia, setMia] = useState("b2");
+  const [miaIr, setMiaIr] = useState("");
 
   useEffect(() => { window.scrollTo(0, 0); }, [pagina, tab, coach]);
 
   const vaiLogin = (r) => { setRuolo(r); setPagina("login"); };
+  const vaiCandidatura = () => setPagina("candidatura");
   const entra = () => { setPagina("app"); setTab(ruolo === "coach" ? "dash" : "cerca"); setCoach(null); };
   const esci = () => { setPagina("home"); setCoach(null); };
 
@@ -1120,7 +1511,7 @@ export default function App() {
               <button onClick={() => document.getElementById("come")?.scrollIntoView({ behavior: "smooth" })}>
                 Come funziona
               </button>
-              <button onClick={() => vaiLogin("coach")}>Per i coach</button>
+              <button onClick={vaiCandidatura}>Per i coach</button>
             </nav>
           )}
           <div className="navcta">
@@ -1136,8 +1527,9 @@ export default function App() {
         </div>
       </header>
 
-      {pagina === "home" && <Home vaiLogin={vaiLogin} />}
+      {pagina === "home" && <Home vaiLogin={vaiLogin} vaiCandidatura={vaiCandidatura} />}
       {pagina === "login" && <Login ruolo={ruolo} setRuolo={setRuolo} entra={entra} />}
+      {pagina === "candidatura" && <Candidatura chiudi={esci} vaiLoginCoach={() => vaiLogin("coach")} />}
 
       {pagina === "app" && (
         <>
@@ -1156,8 +1548,9 @@ export default function App() {
           </div>
 
           {ruolo === "pilota" && tab === "cerca" && (coach
-            ? <Scheda c={coach} mia={mia} chiudi={() => setCoach(null)} vaiPercorso={() => { setCoach(null); setTab("percorso"); }} />
-            : <Cerca apri={setCoach} mia={mia} setMia={setMia} />)}
+            ? <Scheda c={coach} mia={mia} miaIr={miaIr} chiudi={() => setCoach(null)}
+                       vaiPercorso={() => { setCoach(null); setTab("percorso"); }} vediCoach={setCoach} />
+            : <Cerca apri={setCoach} mia={mia} setMia={setMia} miaIr={miaIr} setMiaIr={setMiaIr} />)}
           {ruolo === "pilota" && tab === "percorso" && <Percorso />}
           {ruolo === "coach" && <AreaCoach />}
         </>
