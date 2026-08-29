@@ -60,7 +60,7 @@ const COACHES = [
   },
   {
     id: 2, nome: "Elena Kovač", cat: ["coperte"], tag: "kovi", lic: "A", ir: 5610, prezzo: 60, fasciaDichiarata: "b3",
-    auto: ["Porsche 911 GT3 R", "BMW M4 GT3"], spec: ["Race craft", "Traffico"],
+    auto: ["Porsche 911 GT3 R (992)", "BMW M4 GT3 EVO"], spec: ["Race craft", "Traffico"],
     obiettivi: ["gara"], irMed: 508, gg: 34, tracciati: 11, agg: "2 ore fa",
     fasce: { b1: null, b2: [430, 30, 4], b3: [560, 32, 5], b4: [190, 44, 3] },
     curva: [3120, 3098, 3140, 3105, 3132, 3260, 3348, 3410, 3502, 3560, 3618, 3690, 3712], start: 4,
@@ -74,7 +74,7 @@ const COACHES = [
   },
   {
     id: 3, nome: "Davide Sanna", cat: ["coperte"], tag: "sanna_dvd", lic: "B", ir: 3240, prezzo: 35, fasciaDichiarata: "b1",
-    auto: ["Lamborghini Huracán GT3 EVO", "Audi R8 LMS EVO II"], spec: ["Setup", "Gomme"],
+    auto: ["Lamborghini Huracán GT3 EVO", "Audi R8 LMS EVO II GT3"], spec: ["Setup", "Gomme"],
     obiettivi: ["setup", "endurance"], irMed: 260, gg: 28, tracciati: 22, agg: "1 giorno fa",
     fasce: { b1: [340, 24, 9], b2: [250, 30, 10], b3: [120, 38, 3], b4: null },
     curva: [1640, 1652, 1630, 1648, 1690, 1742, 1780, 1812, 1868, 1890, 1922, 1948, 1960], start: 3,
@@ -102,7 +102,7 @@ const COACHES = [
   },
   {
     id: 5, nome: "Tom Reeves", cat: ["coperte"], tag: "reeves", lic: "A", ir: 6110, prezzo: 70, fasciaDichiarata: "b4",
-    auto: ["Oreca 07 LMP2", "Mercedes-AMG GT3 EVO", "BMW M4 GT3"], spec: ["Endurance", "Ritmo di stint"],
+    auto: ["Acura ARX-06 GTP", "Mercedes-AMG GT3 2020", "BMW M4 GT3 EVO"], spec: ["Endurance", "Ritmo di stint"],
     obiettivi: ["endurance", "gara"], irMed: 300, gg: 40, tracciati: 9, agg: "8 ore fa",
     fasce: { b1: null, b2: null, b3: [380, 36, 5], b4: [240, 42, 3] },
     curva: [3980, 3962, 3990, 4010, 4055, 4098, 4140, 4188, 4210, 4262, 4290, 4318, 4340], start: 3,
@@ -116,7 +116,7 @@ const COACHES = [
   },
   {
     id: 6, nome: "Niko Aaltonen", cat: ["coperte"], tag: "aalto", lic: "A", ir: 7020, prezzo: 85, fasciaDichiarata: "b4",
-    auto: ["Porsche 911 GT3 R", "Mercedes-AMG GT3 EVO"], spec: ["Qualifica", "Trail braking"],
+    auto: ["Porsche 911 GT3 R (992)", "Mercedes-AMG GT3 2020"], spec: ["Qualifica", "Trail braking"],
     obiettivi: ["quali", "tempo"], irMed: 210, gg: 35, tracciati: 6, agg: "3 giorni fa",
     fasce: { b1: null, b2: null, b3: [180, 38, 3], b4: [260, 32, 4] },
     curva: [4820, 4796, 4840, 4812, 4858, 4902, 4940, 4988, 5010, 5044, 5062, 5090, 5110], start: 4,
@@ -142,41 +142,87 @@ const COACHES = [
     rec: [{ chi: "G. Petrosino", auto: "Dallara F3 · Silverstone", ir: 402, gg: 29,
       txt: "Venivo dalle GT e frenavo come un camion. Mi ha rifatto il piede da zero." }],
   },
-  {
-    id: 8, nome: "Wade Carter", cat: ["coperte"], tag: "wcarter", lic: "B", ir: 2960, prezzo: 30, fasciaDichiarata: "b1",
-    auto: ["NASCAR Next Gen Camry", "ARCA Menards Chevrolet"], spec: ["Ovali", "Pack racing"],
-    obiettivi: ["gara", "licenza"], irMed: 470, gg: 30, tracciati: 12, agg: "9 ore fa",
-    fasce: { b1: [560, 26, 5], b2: [420, 30, 5], b3: [190, 40, 3], b4: null },
-    curva: [1420, 1408, 1436, 1414, 1448, 1502, 1566, 1620, 1684, 1730, 1788, 1836, 1872], start: 4,
-    patto: { ir: 250, gg: 60 },
-    bio: "Sugli ovali il 90% degli incidenti nasce da dove metti la macchina nel gruppo, non da quanto vai forte.",
-    metodo: ["Prima cosa: leggere l'aria e capire dove sei nel pack.", "Gestione dell'entrata in curva 1 in traffico.",
-      "Strategia di gomma e carburante sui long run.", "Analisi delle ultime cinque gare, giro per giro."],
-    slots: ["Gio 28 · 22:00", "Sab 30 · 21:00", "Dom 31 · 22:30"],
-    rec: [{ chi: "J. Nolan", auto: "ARCA · Charlotte", ir: 588, gg: 27,
-      txt: "Ho smesso di trovarmi sempre in mezzo ai casini al giro 30. Il resto è venuto da solo." }],
-  },
 ];
 
 const CATEGORIE = [
   { k: "tutte", l: "Tutte le categorie" },
-  { k: "coperte", l: "Ruote coperte · GT, prototipi, ovali" },
+  { k: "coperte", l: "Ruote coperte · GT, prototipi, turismo" },
   { k: "scoperte", l: "Ruote scoperte · Monoposto" },
 ];
 
+// vetture per macro-categoria, raggruppate per tipologia: i gruppi diventano
+// gli <optgroup> del filtro vettura
 const AUTO_PER_CAT = {
-  coperte: ["Ferrari 296 GT3", "Porsche 911 GT3 R", "Lamborghini Huracán GT3 EVO", "BMW M4 GT3",
-       "Mercedes-AMG GT3 EVO", "Audi R8 LMS EVO II", "Porsche 718 GT4",
-       "Oreca 07 LMP2", "Acura ARX-06 GTP", "Ligier JS P320",
-       "NASCAR Next Gen Camry", "ARCA Menards Chevrolet", "Legends Ford '34"],
-  scoperte: ["Dallara F3", "Super Formula Lights", "Ray FF1600", "Formula Vee"],
+  coperte: {
+    "GT3": [
+      "Ferrari 296 GT3", "Porsche 911 GT3 R (992)", "BMW M4 GT3 EVO",
+      "Mercedes-AMG GT3 2020", "Audi R8 LMS EVO II GT3", "Lamborghini Huracán GT3 EVO",
+      "Chevrolet Corvette Z06 GT3.R", "Ford Mustang GT3", "McLaren 720S GT3 EVO",
+      "Acura NSX GT3 EVO 22", "Aston Martin Vantage GT3 EVO",
+    ],
+    "GT4": [
+      "BMW M4 G82 GT4 Evo", "Ford Mustang GT4", "McLaren 570S GT4",
+      "Mercedes-AMG GT4", "Aston Martin Vantage GT4", "Porsche 718 Cayman GT4 Clubsport MR",
+    ],
+    "GTP": [
+      "Acura ARX-06 GTP", "BMW M Hybrid V8", "Cadillac V-Series.R GTP",
+      "Ferrari 499P", "Porsche 963 GTP",
+    ],
+    "Prototipi": [
+      "Dallara P217", "Ligier JS P320", "HPD ARX-01c", "Radical SR10",
+    ],
+    "GTE": [
+      "BMW M8 GTE", "Chevrolet Corvette C8.R GTE", "Ferrari 488 GTE",
+      "Ford GTE", "Porsche 911 RSR",
+    ],
+    "TCR": [
+      "Audi RS3 LMS Gen2 TCR", "Honda Civic Type R TCR",
+      "Hyundai Elantra N TCR", "Hyundai Veloster N TCR",
+    ],
+    "Cup e monomarca": [
+      "BMW M2 CS Racing", "Ferrari 296 Challenge", "Global Mazda MX-5 Cup",
+      "Porsche 911 Cup (992.2)", "Porsche Mission R", "Renault Clio",
+      "SCCA Spec Racer Ford", "Toyota GR86", "Legends Ford '34 Coupe",
+    ],
+    "Turismo e stock": [
+      "Cadillac CTS-V Racecar", "Kia Optima",
+      "Stock Car Brasil Chevrolet Cruze", "Stock Car Brasil Toyota Corolla",
+      "Supercars Chevrolet Camaro Gen 3", "Supercars Ford Mustang Gen 3",
+    ],
+    "Storiche": [
+      "Aston Martin DBR9 GT1", "Audi 90 GTO", "Chevrolet Corvette C6.R GT1",
+      "Ford GT GT2", "Nissan GTP ZX-T",
+    ],
+  },
+  scoperte: {
+    "Junior": [
+      "Formula Vee", "Ray FF1600", "USF 2000",
+      "Skip Barber Formula 2000", "FIA F4",
+    ],
+    "Formula 3": [
+      "Dallara F3", "Super Formula Lights", "Dallara IL-15",
+    ],
+    "Top Formula": [
+      "Dallara IR18", "Dallara iR-01", "Super Formula SF23 - Honda",
+      "Super Formula SF23 - Toyota", "Mercedes-AMG W13 E Performance",
+    ],
+    "Storiche": [
+      "Lotus 49", "Lotus 79",
+    ],
+  },
 };
 
 const TUTTE = "Tutte le vetture";
-const autoDi = (cat) =>
-  cat === "tutte"
-    ? Object.values(AUTO_PER_CAT).flat()
-    : AUTO_PER_CAT[cat] || [];
+
+// i gruppi (nome sotto-categoria + vetture) di una macro-categoria, o di
+// entrambe per "tutte" — usati sia per il filtro sia per l'elenco piatto
+const gruppiDi = (cat) => {
+  if (cat === "coperte") return Object.entries(AUTO_PER_CAT.coperte);
+  if (cat === "scoperte") return Object.entries(AUTO_PER_CAT.scoperte);
+  return [...Object.entries(AUTO_PER_CAT.coperte), ...Object.entries(AUTO_PER_CAT.scoperte)];
+};
+
+const autoDi = (cat) => gruppiDi(cat).flatMap(([, auto]) => auto);
 
 const OBIETTIVI = [
   { k: "tutti", l: "Qualsiasi obiettivo" },
@@ -848,7 +894,11 @@ function Cerca({ apri, mia, setMia, miaIr, setMiaIr }) {
           <label htmlFor="f2">Vettura</label>
           <select id="f2" value={auto} onChange={(e) => setAuto(e.target.value)}>
             <option>{TUTTE}</option>
-            {autoDi(cat).map((a) => <option key={a}>{a}</option>)}
+            {gruppiDi(cat).map(([nome, vetture], i) => (
+              <optgroup label={nome} key={`${nome}-${i}`}>
+                {vetture.map((a) => <option key={a}>{a}</option>)}
+              </optgroup>
+            ))}
           </select>
         </div>
         <div className="frow">
