@@ -243,6 +243,10 @@ const OBIETTIVI = [
 
 const MAX_OBIETTIVI = 4;
 
+// estremi dello slider del prezzo orario
+const PREZZO_MIN = 9.99;
+const PREZZO_MAX = 99;
+
 /* ---------------------------------- stile ---------------------------------- */
 
 const CSS = `
@@ -253,7 +257,9 @@ const CSS = `
   --bianco:#FFFFFF; --grigio:#9BA3AF; --grigio2:#6B727D;
   --rosso:#8E1A20; --rosso2:#B32229; --rossoSoft:rgba(179,34,41,.12);
   --blu:#1D4FD7; --blu2:#3C6DF0; --bluSoft:rgba(29,79,215,.12);
-  --ambra:#C9924A; --ambraSoft:rgba(201,146,74,.14);
+  --ambra:#E2472A; --ambraSoft:rgba(226,71,42,.14);
+  --verde:#1FAA59; --verdeSoft:rgba(31,170,89,.14);
+  --oro:#E3A63A; --oroSoft:rgba(227,166,58,.14);
   background:var(--nero); color:var(--bianco); min-height:100%;
   font-family:'Titillium Web',system-ui,sans-serif; -webkit-font-smoothing:antialiased; line-height:1.5;
 }
@@ -425,12 +431,12 @@ const CSS = `
 .fit.no{border-color:var(--bordo);background:var(--nero);color:var(--grigio2)}
 .stato{display:inline-flex;align-items:center;font-family:'Roboto Mono',monospace;font-size:10.5px;
   letter-spacing:.1em;text-transform:uppercase;padding:4px 9px;border:1px solid transparent;border-radius:2px}
-.stato-consigliato{background:var(--blu);color:#fff}
-.stato-neutro{background:var(--bluSoft);color:var(--blu2);border-color:rgba(29,79,215,.35)}
-.stato-avviso{background:var(--ambraSoft);color:var(--ambra);border-color:rgba(201,146,74,.4)}
+.stato-consigliato{background:var(--verde);color:#fff}
+.stato-neutro{background:var(--oro);color:#241A05}
+.stato-avviso{background:var(--ambra);color:#fff}
 .notaBox{border:1px solid var(--bordo);background:var(--nero2);padding:14px 16px;margin-top:10px;font-size:13px;line-height:1.6}
 .notaBox b{color:var(--bianco)}
-.notaBox.ambra{border-color:rgba(201,146,74,.4);background:var(--ambraSoft)}
+.notaBox.ambra{border-color:rgba(226,71,42,.4);background:var(--ambraSoft)}
 .notaBox.ambra b{color:var(--ambra)}
 .notaBox.rossa{border-color:rgba(179,34,41,.5);background:var(--rossoSoft)}
 .notaBox.rossa b{color:var(--rosso2)}
@@ -442,9 +448,27 @@ const CSS = `
 .chip{font-family:'Roboto Mono',monospace;font-size:10.5px;letter-spacing:.06em;border:1px solid var(--bordo);
   color:var(--grigio2);padding:4px 8px}
 .chip.p{border-color:rgba(179,34,41,.45);color:var(--rosso2)}
+.specbox{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.specbox-item{border:1px solid var(--bordo);background:var(--nero3);color:var(--bianco);
+  padding:8px 12px;font-size:12.5px;font-weight:600;border-radius:3px}
 .ccfoot{display:flex;justify-content:space-between;align-items:center;margin-top:16px;padding-top:14px;border-top:1px solid var(--bordo)}
 .prezzo{font-family:'Saira Condensed',sans-serif;font-weight:700;font-size:20px}
+.prezzo.lg{font-size:32px}
 .prezzo small{color:var(--grigio2);font-weight:500;font-size:12px}
+
+/* ---- slider prezzo a due cursori ---- */
+.rangewrap{position:relative;height:30px;margin-top:6px}
+.rangetrack{position:absolute;top:13px;left:0;right:0;height:4px;background:var(--bordo);border-radius:2px}
+.rangefill{position:absolute;top:13px;height:4px;background:var(--blu2);border-radius:2px}
+.rangewrap input[type="range"]{position:absolute;top:11px;left:0;width:100%;margin:0;background:transparent;
+  -webkit-appearance:none;appearance:none;pointer-events:none}
+.rangewrap input[type="range"]::-webkit-slider-runnable-track{height:8px;background:transparent}
+.rangewrap input[type="range"]::-moz-range-track{height:8px;background:transparent;border:none}
+.rangewrap input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;pointer-events:auto;
+  width:18px;height:18px;border-radius:50%;background:var(--blu2);border:2px solid var(--nero);
+  cursor:pointer;margin-top:-5px}
+.rangewrap input[type="range"]::-moz-range-thumb{pointer-events:auto;width:18px;height:18px;border-radius:50%;
+  background:var(--blu2);border:2px solid var(--nero);cursor:pointer}
 
 .blocco{border:1px solid var(--bordo);background:var(--nero2);padding:18px}
 .riga{display:flex;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid var(--bordo);font-size:14px;align-items:baseline}
@@ -849,8 +873,14 @@ function Cerca({ apri, mia, setMia, miaIr, setMiaIr }) {
   const [cat, setCat] = useState("tutte");
   const [auto, setAuto] = useState(TUTTE);
   const [obi, setObi] = useState(OBIETTIVI.map((o) => o.k).slice(0, 0));
+  const [prezzoMin, setPrezzoMin] = useState(PREZZO_MIN);
+  const [prezzoMax, setPrezzoMax] = useState(PREZZO_MAX);
 
   const cambiaCat = (k) => { setCat(k); setAuto(TUTTE); };
+
+  const cambiaPrezzoMin = (v) => setPrezzoMin(Math.min(v, prezzoMax - 1));
+  const cambiaPrezzoMax = (v) => setPrezzoMax(Math.max(v, prezzoMin + 1));
+  const pctPrezzo = (v) => ((v - PREZZO_MIN) / (PREZZO_MAX - PREZZO_MIN)) * 100;
 
   const toggleObi = (k) =>
     setObi((prev) => {
@@ -864,7 +894,8 @@ function Cerca({ apri, mia, setMia, miaIr, setMiaIr }) {
   const list = [...COACHES]
     .filter((c) => (cat === "tutte" || c.cat.includes(cat)) &&
                    (auto === TUTTE || c.auto.includes(auto)) &&
-                   (obi.length === 0 || obi.some((o) => c.obiettivi.includes(o))))
+                   (obi.length === 0 || obi.some((o) => c.obiettivi.includes(o))) &&
+                   (c.prezzo >= prezzoMin && c.prezzo <= prezzoMax))
     .sort((a, b) => {
       const fa = a.fasce[mia], fb = b.fasce[mia];
       if (fa && !fb) return -1;
@@ -937,6 +968,22 @@ function Cerca({ apri, mia, setMia, miaIr, setMiaIr }) {
             </p>
           </div>
         </div>
+        <div className="frow" style={{ alignItems: "flex-start" }}>
+          <label htmlFor="f4">Prezzo /h</label>
+          <div style={{ flex: 1 }}>
+            <div className="rangewrap" id="f4">
+              <div className="rangetrack" />
+              <div className="rangefill" style={{ left: `${pctPrezzo(prezzoMin)}%`, right: `${100 - pctPrezzo(prezzoMax)}%` }} />
+              <input type="range" min={PREZZO_MIN} max={PREZZO_MAX} step="0.01" value={prezzoMin}
+                     aria-label="Prezzo minimo" onChange={(e) => cambiaPrezzoMin(Number(e.target.value))} />
+              <input type="range" min={PREZZO_MIN} max={PREZZO_MAX} step="0.01" value={prezzoMax}
+                     aria-label="Prezzo massimo" onChange={(e) => cambiaPrezzoMax(Number(e.target.value))} />
+            </div>
+            <p className="nn" style={{ marginTop: 6 }}>
+              {prezzoMin.toFixed(2)}€ – {prezzoMax.toFixed(2)}€ /h
+            </p>
+          </div>
+        </div>
       </div>
 
       <p className="nota" style={{ marginTop: 0 }}>
@@ -965,7 +1012,6 @@ function Cerca({ apri, mia, setMia, miaIr, setMiaIr }) {
                     <div className="ccbig">+{c.irMed} iR</div>
                     <div className="ccsm">mediana allievi · {c.gg} gg<br />{perSett(c.irMed, c.gg)} iR a settimana</div>
                   </div>
-                  <Spark curva={c.curva} start={c.start} />
                 </div>
 
                 {f ? (
@@ -974,14 +1020,20 @@ function Cerca({ apri, mia, setMia, miaIr, setMiaIr }) {
                   <div className="fit no">Nessun dato nella tua fascia.</div>
                 )}
 
-                <div className="chips">
-                  {c.spec.map((s) => <span className="chip" key={s}>{s}</span>)}
-                  {c.patto && <span className="chip p">Patto di risultato</span>}
+                <div className="specbox">
+                  {c.obiettivi.map((k) => (
+                    <div className="specbox-item" key={k}>{OBIETTIVI.find((o) => o.k === k)?.l || k}</div>
+                  ))}
                 </div>
+                {c.patto && (
+                  <div className="chips" style={{ marginTop: 8 }}>
+                    <span className="chip p">Patto di risultato</span>
+                  </div>
+                )}
 
                 <div className="ccfoot">
                   <span className="ccsm">{c.tracciati} allievi tracciati · agg. {c.agg}</span>
-                  <span className="prezzo">{c.prezzo}€ <small>/h</small></span>
+                  <span className="prezzo lg">{c.prezzo}€ <small>/h</small></span>
                 </div>
               </button>
 
