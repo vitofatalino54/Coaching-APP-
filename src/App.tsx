@@ -1310,16 +1310,39 @@ function Scheda({ c, mia, miaIr, chiudi, vaiPercorso, vediCoach }) {
   );
 }
 
+// link Discord del coach — mock: da sostituire con l'invito reale quando c'è
+const DISCORD_DEFAULT = "https://discord.gg/corda-demo";
+const DISCORD_COACH = { 1: "https://discord.gg/corda-vela" };
+
 function Percorso({ vaiScheda }) {
   const [gareIds, setGareIds] = useState(PERCORSO.garePianificateIds);
   const [pickerAperto, setPickerAperto] = useState(false);
   const [ricaricaAperta, setRicaricaAperta] = useState(false);
+  const [prenotazioni, setPrenotazioni] = useState(PERCORSO.prenotazioni);
+  const [spostaAperto, setSpostaAperto] = useState(""); // id della prenotazione in modifica, "" = nessuna
+  const [sospendiAperto, setSospendiAperto] = useState(false);
+  const [sospesoMsg, setSospesoMsg] = useState(false);
 
   const toggleGara = (id) =>
     setGareIds((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
 
+  const cancellaSessione = (id) => setPrenotazioni((prev) => prev.filter((p) => p.id !== id));
+
+  // lo slot scelto ("Gio 28 · 20:30") sostituisce interamente l'orario: la data
+  // originale della prenotazione resta solo per l'ordinamento della lista
+  const spostaSessione = (id, slot) => {
+    setPrenotazioni((prev) => prev.map((p) => (p.id === id ? { ...p, orario: slot } : p)));
+    setSpostaAperto("");
+  };
+
+  const sospendiTutto = () => {
+    setPrenotazioni((prev) => prev.filter((p) => p.coachId !== coachAttuale?.id));
+    setSospendiAperto(false);
+    setSospesoMsg(true);
+  };
+
   const coachAttuale = COACHES.find((c) => c.id === PERCORSO.coachAttualeId);
-  const prossimeSessioni = [...PERCORSO.prenotazioni].sort((a, b) => a.data.localeCompare(b.data));
+  const prossimeSessioni = [...prenotazioni].sort((a, b) => a.data.localeCompare(b.data));
   const garePianificate = CALENDARIO_STAGIONE
     .filter((g) => gareIds.includes(g.id))
     .sort((a, b) => a.data.localeCompare(b.data));
@@ -1360,9 +1383,32 @@ function Percorso({ vaiScheda }) {
                 </div>
               </div>
             </div>
-            <div style={{ marginTop: 16 }}>
+            <div style={{ marginTop: 16, display: "flex", gap: 10, flexWrap: "wrap" }}>
               <button className="b b-blu" onClick={() => vaiScheda?.(coachAttuale)}>Vai al suo profilo</button>
+              <button className="b b-ghost" onClick={() => setSospendiAperto(true)}>Sospendi</button>
+              <a className="b b-ghost" href={DISCORD_COACH[coachAttuale.id] || DISCORD_DEFAULT}
+                 target="_blank" rel="noopener noreferrer">
+                Contatta su Discord
+              </a>
             </div>
+
+            {sospendiAperto && (
+              <div className="notaBox rossa" style={{ marginTop: 14 }}>
+                <p>
+                  <b>Sospendere il coaching con {coachAttuale.nome}?</b> Tutte le sessioni prenotate
+                  con lui verranno cancellate. Il vostro storico resta comunque visibile.
+                </p>
+                <div style={{ display: "flex", gap: 10, marginTop: 10 }}>
+                  <button className="b b-rosso" onClick={sospendiTutto}>Conferma sospensione</button>
+                  <button className="b b-ghost" onClick={() => setSospendiAperto(false)}>Annulla</button>
+                </div>
+              </div>
+            )}
+            {sospesoMsg && (
+              <p className="nota">
+                Tutte le sessioni prenotate con {coachAttuale.nome} sono state cancellate.
+              </p>
+            )}
           </>
         ) : (
           <p className="nota" style={{ marginTop: 0 }}>Non hai ancora un coach attivo.</p>
@@ -1426,9 +1472,33 @@ function Percorso({ vaiScheda }) {
         {prossimeSessioni.map((p) => {
           const co = COACHES.find((c) => c.id === p.coachId);
           return (
-            <div className="riga" key={p.id}>
-              <span><span className="dot" style={{ background: "var(--blu2)" }} />{fmtData(p.data)} · {p.orario}</span>
-              <span className="nn">{co?.nome}</span>
+            <div key={p.id}>
+              <div className="riga" style={{ flexDirection: "column", alignItems: "stretch", gap: 8 }}>
+                <div style={{ display: "flex", justifyContent: "space-between" }}>
+                  <span>
+                    <span className="dot" style={{ background: "var(--blu2)" }} />
+                    {p.orario.includes("·") ? p.orario : `${fmtData(p.data)} · ${p.orario}`}
+                  </span>
+                  <span className="nn">{co?.nome}</span>
+                </div>
+                <div style={{ display: "flex", gap: 16 }}>
+                  <button className="apri" style={{ padding: 0 }}
+                          onClick={() => setSpostaAperto(spostaAperto === p.id ? "" : p.id)}>
+                    Sposta
+                  </button>
+                  <button className="apri" style={{ padding: 0, color: "var(--ambra)" }}
+                          onClick={() => cancellaSessione(p.id)}>
+                    Cancella
+                  </button>
+                </div>
+              </div>
+              {spostaAperto === p.id && co && (
+                <div className="slotgrid" style={{ marginTop: 0, marginBottom: 14 }}>
+                  {co.slots.map((s) => (
+                    <button key={s} className="slotchip" onClick={() => spostaSessione(p.id, s)}>{s}</button>
+                  ))}
+                </div>
+              )}
             </div>
           );
         })}
