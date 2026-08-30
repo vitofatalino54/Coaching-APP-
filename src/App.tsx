@@ -348,6 +348,10 @@ const CSS = `
   /* hover dei bottoni primari, disaccoppiato da --blu2/--rosso2: in Papaya
      --blu2 deve restare chiaro per i numeri, quindi l'hover non puo' leggerlo */
   --bluHover:#3C6DF0; --rossoHover:#B32229;
+  /* colore del solo "numero-eroe" (es. il grande +iR in Home): di norma segue
+     --blu2 come tutti i dati verificati; nei temi dove va dosato (Papaya,
+     Oro&Bordeaux) viene ridefinito qui sotto su un valore dedicato */
+  --eroe:var(--blu2);
   background:var(--nero); color:var(--bianco); min-height:100%;
   font-family:'Titillium Web',system-ui,sans-serif; -webkit-font-smoothing:antialiased; line-height:1.5;
 }
@@ -385,7 +389,47 @@ const CSS = `
   --ambra:#E23B3B; --ambraSoft:rgba(226,59,59,.14);
   --distr:#B32229; --distr2:#8E1A20; --distrSoft:rgba(179,34,41,.12);
 }
-.crd[data-theme="papaya"] .numero-eroe{color:var(--rosso2)}
+.crd[data-theme="papaya"]{ --eroe:var(--rosso2); }
+
+/* ---- TEMA C — "Oro & Bordeaux": marchio e numero-eroe usano due tinte
+   diverse (a differenza di Teal/Papaya, qui non coincidono). L'oro resta
+   raro: sui bottoni prende un tono smorzato (--blu), sui numeri normali
+   non compare affatto (--blu2 resta quasi bianco), e va solo sul singolo
+   numero-eroe via --eroe. Il bordeaux fa da superficie/marchio (--rosso),
+   con un tono piu' acceso per i piccoli testi (--rosso2), perche' il
+   bordeaux pieno è troppo scuro per restare leggibile su nero. */
+.crd[data-theme="oro-bordeaux"]{
+  --nero:#141414; --nero2:#1E1B1C; --nero3:#262122; --bordo:#302A2B;
+  --bianco:#FCFCFC; --grigio:#9A9A9A; --grigio2:#5E5E5E;
+  --rosso:#55142A; --rosso2:#C2456B; --rossoSoft:rgba(194,69,107,.14);
+  --blu:#D99F0F; --blu2:#FCFCFC; --bluSoft:rgba(254,190,20,.12);
+  --bluHover:#FEBE14; --rossoHover:#6E2038;
+  --verde:#3FB768; --verdeSoft:rgba(63,183,104,.14);
+  --oro:#9A9A9A; --oroSoft:rgba(154,154,154,.14);
+  --ambra:#E5643E; --ambraSoft:rgba(229,100,62,.14);
+  --distr:#C0392B; --distr2:#9C2E22; --distrSoft:rgba(192,57,43,.12);
+  --eroe:#FEBE14;
+}
+
+/* ---- TEMA D — "Menta & Navy": accento pressoche' unico (menta) su fondo
+   navy, stessa logica a due toni di Teal (--rosso/--blu piu' smorzati,
+   --rosso2/--blu2 piu' accesi per testo/bordi). Il Consigliato condivide
+   la stessa menta, come da richiesta ("il colore eroe"). La menta e' chiara:
+   sui bottoni pieni il testo deve restare scuro (regola dedicata sotto),
+   non bianco come negli altri temi. */
+.crd[data-theme="menta-navy"]{
+  --nero:#0A0F1E; --nero2:#122046; --nero3:#1A2C5A; --bordo:#26386B;
+  --bianco:#FBFBFB; --grigio:#ABABAB; --grigio2:#6B7488;
+  --rosso:#6FC98A; --rosso2:#96DFA8; --rossoSoft:rgba(150,223,168,.12);
+  --blu:#6FC98A; --blu2:#96DFA8; --bluSoft:rgba(150,223,168,.12);
+  --bluHover:#96DFA8; --rossoHover:#96DFA8;
+  --verde:#96DFA8; --verdeSoft:rgba(150,223,168,.14);
+  --oro:#ABABAB; --oroSoft:rgba(171,171,171,.14);
+  --ambra:#F2A93B; --ambraSoft:rgba(242,169,59,.14);
+  --distr:#E0454A; --distr2:#C93D42; --distrSoft:rgba(224,69,74,.12);
+}
+.crd[data-theme="menta-navy"] .b-blu,
+.crd[data-theme="menta-navy"] .b-rosso{color:var(--nero)}
 
 .crd *{box-sizing:border-box}
 .crd h1,.crd h2,.crd h3{font-family:'Saira Condensed',system-ui,sans-serif;font-weight:700;line-height:1.08;margin:0;letter-spacing:-.02em}
@@ -470,9 +514,10 @@ const CSS = `
 @media(min-width:900px){.duo{grid-template-columns:1fr 1fr;gap:52px}}
 .metric{border:1px solid var(--bordo);background:var(--nero2);padding:22px}
 .metric .big{font-family:'Saira Condensed',sans-serif;font-size:52px;font-weight:800;letter-spacing:-.03em;line-height:1}
-/* il numero-eroe (es. il grande +iR) resta sul colore dato in Attuale/Teal;
-   solo in Papaya prende il marchio, mentre i numeri "normali" restano chiari */
-.numero-eroe{color:var(--blu2)}
+/* il numero-eroe (es. il grande +iR) segue --eroe: coincide col dato
+   verificato in Attuale/Teal/Menta&Navy, prende un tono dedicato e dosato
+   in Papaya e Oro&Bordeaux (vedi definizioni di --eroe nei blocchi tema) */
+.numero-eroe{color:var(--eroe)}
 .metric .sm{font-family:'Roboto Mono',monospace;font-size:12px;color:var(--grigio2);margin-top:8px;letter-spacing:.06em}
 .check{list-style:none;padding:0;margin:20px 0 0}
 .check li{position:relative;padding-left:24px;margin-bottom:12px;color:var(--grigio);font-size:15px;line-height:1.55}
@@ -2291,7 +2336,7 @@ export default function App() {
   const [notificheEmail, setNotificheEmail] = useState(true); // punto 1: preferenza disattivabile
   const [bannerChiuso, setBannerChiuso] = useState({}); // { [coachId]: conteggio al momento della chiusura del banner }
   const [iracingCollegato, setIracingCollegato] = useState(false); // punto 2
-  const [tema, setTema] = useState("attuale"); // attuale | teal | papaya — A/B dei temi colore
+  const [tema, setTema] = useState("attuale"); // attuale | teal | papaya | oro-bordeaux | menta-navy — A/B dei temi colore
 
   useEffect(() => { window.scrollTo(0, 0); }, [pagina, tab, coach, chatCoachId]);
 
@@ -2348,6 +2393,8 @@ export default function App() {
               <option value="attuale">Tema: Attuale</option>
               <option value="teal">Tema: Teal</option>
               <option value="papaya">Tema: Papaya</option>
+              <option value="oro-bordeaux">Tema: Oro & Bordeaux</option>
+              <option value="menta-navy">Tema: Menta & Navy</option>
             </select>
             {pagina === "app" ? (
               <button className="b b-ghost" onClick={esci}>Esci</button>
