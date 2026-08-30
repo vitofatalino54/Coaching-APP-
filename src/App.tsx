@@ -401,9 +401,9 @@ const CSS = `
 .crd[data-theme="oro-bordeaux"]{
   --nero:#141414; --nero2:#1E1B1C; --nero3:#262122; --bordo:#302A2B;
   --bianco:#FCFCFC; --grigio:#9A9A9A; --grigio2:#5E5E5E;
-  --rosso:#55142A; --rosso2:#C2456B; --rossoSoft:rgba(194,69,107,.14);
+  --rosso:#3F0E1D; --rosso2:#A8385A; --rossoSoft:rgba(168,56,90,.14);
   --blu:#D99F0F; --blu2:#FCFCFC; --bluSoft:rgba(254,190,20,.12);
-  --bluHover:#FEBE14; --rossoHover:#6E2038;
+  --bluHover:#FEBE14; --rossoHover:#56172F;
   --verde:#3FB768; --verdeSoft:rgba(63,183,104,.14);
   --oro:#9A9A9A; --oroSoft:rgba(154,154,154,.14);
   --ambra:#E5643E; --ambraSoft:rgba(229,100,62,.14);
