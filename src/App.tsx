@@ -334,6 +334,11 @@ const PREZZO_MAX = 99;
 const CSS = `
 @import url('https://fonts.googleapis.com/css2?family=Saira+Condensed:wght@500;600;700;800;900&family=Titillium+Web:wght@400;600;700&family=Roboto+Mono:wght@400;500&display=swap');
 
+/* azzera il margine di default del browser su body: senza, i 20px di
+   padding laterale di .w si sommavano a un margine invisibile, riducendo
+   lo spazio reale disponibile proprio dove serve di piu' (mobile stretto) */
+html,body{margin:0;padding:0}
+
 .crd{
   --nero:#0A0B0D; --nero2:#121418; --nero3:#1A1D23; --bordo:#282C34;
   --bianco:#FFFFFF; --grigio:#9BA3AF; --grigio2:#6B727D;
@@ -439,7 +444,10 @@ const CSS = `
 
 /* ---- barra ---- */
 .nav{position:sticky;top:0;z-index:40;background:rgba(10,11,13,.94);backdrop-filter:blur(10px);border-bottom:1px solid var(--bordo)}
-.navin{display:flex;align-items:center;gap:18px;height:62px}
+/* flex-wrap qui e' innocuo su desktop (il contenuto entra sempre su una riga
+   entro i 1080px di .w): serve solo da rete di sicurezza per il breakpoint
+   mobile qui sotto, che forza --navcta a andare a capo su riga propria */
+.navin{display:flex;align-items:center;gap:10px 18px;flex-wrap:wrap;min-height:62px}
 .brand{font-family:'Saira Condensed',sans-serif;font-weight:800;font-size:21px;letter-spacing:.14em;cursor:pointer;
   background:none;border:0;color:var(--bianco);padding:0}
 .brand i{color:var(--rosso2);font-style:normal}
@@ -447,8 +455,8 @@ const CSS = `
 @media(min-width:820px){.navlinks{display:flex}}
 .navlinks button{background:none;border:0;color:var(--grigio);font-size:14px;cursor:pointer;font-family:inherit;padding:4px 0}
 .navlinks button:hover{color:var(--bianco)}
-.navcta{margin-left:auto;display:flex;gap:8px;align-items:center}
-.temaSelect{background:var(--nero2);border:1px solid var(--bordo);color:var(--grigio);
+.navcta{margin-left:auto;display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:flex-end}
+.temaSelect{background:var(--nero2);border:1px solid var(--bordo);color:var(--grigio);max-width:100%;
   font-family:'Roboto Mono',monospace;font-size:11px;padding:6px 8px;border-radius:2px;cursor:pointer}
 
 /* ---- bottoni ---- */
@@ -585,9 +593,23 @@ const CSS = `
 .frow > label{font-family:'Roboto Mono',monospace;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;
   color:var(--grigio2);width:104px;flex:none}
 .frow.hi > label{color:var(--blu2)}
-.frow select,.frow input{flex:1;background:var(--nero);color:var(--bianco);border:1px solid var(--bordo);
+.frow select,.frow input{flex:1;min-width:0;background:var(--nero);color:var(--bianco);border:1px solid var(--bordo);
   padding:8px 10px;font-family:'Roboto Mono',monospace;font-size:13px;border-radius:2px}
 .frow input::placeholder{color:var(--grigio2)}
+
+/* ---- fix layout mobile: niente contenitori piu' larghi del viewport ----
+   Sotto ai 640px le righe dei filtri (etichetta | controllo) si impilano,
+   la barra "Tema"/Esci va a capo su riga propria invece di affollare
+   l'header, e i controlli toccabili salgono a un'altezza comoda al dito. */
+@media(max-width:640px){
+  .navcta{flex-basis:100%}
+  .frow{flex-direction:column;align-items:stretch;gap:6px}
+  .frow > label{width:auto}
+  .frow select,.frow input,.temaSelect{min-height:44px}
+  .checkgrid label{min-height:44px;padding:10px 14px}
+  .b{min-height:44px;display:inline-flex;align-items:center;justify-content:center}
+  .emailBanner{position:static;top:auto}
+}
 
 .lista{display:grid;gap:14px;grid-template-columns:1fr;margin:20px 0 40px}
 @media(min-width:780px){.lista{grid-template-columns:1fr 1fr}}
