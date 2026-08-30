@@ -548,6 +548,12 @@ const CSS = `
 .orebar{height:8px;background:var(--bordo);border-radius:4px;overflow:hidden;margin-top:14px}
 .orebarfill{height:100%;background:var(--blu2)}
 .lockbox{border:1px dashed var(--bordo);background:var(--nero2);padding:22px}
+.azsess{font-family:'Roboto Mono',monospace;font-size:11.5px;letter-spacing:.04em;
+  border:1px solid var(--bordo);background:var(--nero);padding:6px 12px;cursor:pointer;border-radius:2px}
+.azsess.sposta{color:var(--blu2)}
+.azsess.sposta:hover{border-color:var(--blu2)}
+.azsess.cancella{color:var(--ambra)}
+.azsess.cancella:hover{border-color:var(--ambra)}
 @media (prefers-reduced-motion:reduce){.crd *{transition:none!important}}
 `;
 
@@ -1320,19 +1326,28 @@ function Percorso({ vaiScheda }) {
   const [ricaricaAperta, setRicaricaAperta] = useState(false);
   const [prenotazioni, setPrenotazioni] = useState(PERCORSO.prenotazioni);
   const [spostaAperto, setSpostaAperto] = useState(""); // id della prenotazione in modifica, "" = nessuna
+  const [spostaScelto, setSpostaScelto] = useState(""); // slot scelto, in attesa di conferma
+  const [cancellaConferma, setCancellaConferma] = useState(""); // id della prenotazione da confermare
   const [sospendiAperto, setSospendiAperto] = useState(false);
   const [sospesoMsg, setSospesoMsg] = useState(false);
 
   const toggleGara = (id) =>
     setGareIds((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
 
-  const cancellaSessione = (id) => setPrenotazioni((prev) => prev.filter((p) => p.id !== id));
+  const chiediCancella = (id) => setCancellaConferma(id);
+  const annullaCancella = () => setCancellaConferma("");
+  const confermaCancella = (id) => {
+    setPrenotazioni((prev) => prev.filter((p) => p.id !== id));
+    setCancellaConferma("");
+  };
+
+  const chiudiSposta = () => { setSpostaAperto(""); setSpostaScelto(""); };
 
   // lo slot scelto ("Gio 28 · 20:30") sostituisce interamente l'orario: la data
   // originale della prenotazione resta solo per l'ordinamento della lista
-  const spostaSessione = (id, slot) => {
+  const confermaSposta = (id, slot) => {
     setPrenotazioni((prev) => prev.map((p) => (p.id === id ? { ...p, orario: slot } : p)));
-    setSpostaAperto("");
+    chiudiSposta();
   };
 
   const sospendiTutto = () => {
@@ -1471,32 +1486,50 @@ function Percorso({ vaiScheda }) {
         {prossimeSessioni.length === 0 && <p className="nota" style={{ marginTop: 0 }}>Nessuna sessione in calendario.</p>}
         {prossimeSessioni.map((p) => {
           const co = COACHES.find((c) => c.id === p.coachId);
+          const dataOrario = p.orario.includes("·") ? p.orario : `${fmtData(p.data)} · ${p.orario}`;
           return (
             <div key={p.id}>
               <div className="riga" style={{ flexDirection: "column", alignItems: "stretch", gap: 8 }}>
                 <div style={{ display: "flex", justifyContent: "space-between" }}>
-                  <span>
-                    <span className="dot" style={{ background: "var(--blu2)" }} />
-                    {p.orario.includes("·") ? p.orario : `${fmtData(p.data)} · ${p.orario}`}
-                  </span>
+                  <span><span className="dot" style={{ background: "var(--blu2)" }} />{dataOrario}</span>
                   <span className="nn">{co?.nome}</span>
                 </div>
-                <div style={{ display: "flex", gap: 16 }}>
-                  <button className="apri" style={{ padding: 0 }}
-                          onClick={() => setSpostaAperto(spostaAperto === p.id ? "" : p.id)}>
+                <div style={{ display: "flex", gap: 10 }}>
+                  <button className="azsess sposta"
+                          onClick={() => (spostaAperto === p.id ? chiudiSposta() : (setSpostaAperto(p.id), setSpostaScelto("")))}>
                     Sposta
                   </button>
-                  <button className="apri" style={{ padding: 0, color: "var(--ambra)" }}
-                          onClick={() => cancellaSessione(p.id)}>
+                  <button className="azsess cancella" onClick={() => chiediCancella(p.id)}>
                     Cancella
                   </button>
                 </div>
               </div>
-              {spostaAperto === p.id && co && (
+
+              {cancellaConferma === p.id && (
+                <div className="notaBox rossa" style={{ marginTop: 0, marginBottom: 14 }}>
+                  <p><b>Cancellare la sessione di {dataOrario}?</b> Non potrai annullarlo da qui.</p>
+                  <div style={{ display: "flex", gap: 10, marginTop: 10 }}>
+                    <button className="b b-rosso" onClick={() => confermaCancella(p.id)}>Conferma cancellazione</button>
+                    <button className="b b-ghost" onClick={annullaCancella}>Annulla</button>
+                  </div>
+                </div>
+              )}
+
+              {spostaAperto === p.id && co && !spostaScelto && (
                 <div className="slotgrid" style={{ marginTop: 0, marginBottom: 14 }}>
                   {co.slots.map((s) => (
-                    <button key={s} className="slotchip" onClick={() => spostaSessione(p.id, s)}>{s}</button>
+                    <button key={s} className="slotchip" onClick={() => setSpostaScelto(s)}>{s}</button>
                   ))}
+                </div>
+              )}
+
+              {spostaAperto === p.id && spostaScelto && (
+                <div className="notaBox ambra" style={{ marginTop: 0, marginBottom: 14 }}>
+                  <p><b>Spostare la sessione a {spostaScelto}?</b> Era fissata per {dataOrario}.</p>
+                  <div style={{ display: "flex", gap: 10, marginTop: 10 }}>
+                    <button className="b b-blu" onClick={() => confermaSposta(p.id, spostaScelto)}>Conferma spostamento</button>
+                    <button className="b b-ghost" onClick={chiudiSposta}>Annulla</button>
+                  </div>
                 </div>
               )}
             </div>
