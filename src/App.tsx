@@ -166,6 +166,11 @@ const CALENDARIO_STAGIONE = [
   { id: "s8", data: "2026-10-25", pista: "Charlotte", auto: "Ferrari 296 GT3" },
 ];
 
+// il pilota mostrato nella demo (appbar, "Pilota" nella stanza sessione, ecc.).
+// ir è autodichiarato finché l'account iRacing non è collegato: da quel
+// momento lo stesso numero diventa verificato via API (punto 2)
+const PILOTA_DEMO = { nome: "L. Moretti", ir: 1842 };
+
 const PERCORSO = {
   oreAcquistate: 20,
   oreResidue: 6,
@@ -182,12 +187,14 @@ const PERCORSO = {
     { id: "p2", data: "2026-09-19", coachId: 1, orario: "21:00" },
   ],
   garePianificateIds: ["s1", "s3", "s5"],
+  // origine: "coach" = consiglio scritto dal coach in sessione, "chat" = riga
+  // di chat che il pilota si è segnato — restano distinguibili in lista (punto 4)
   note: [
-    { id: "n1", coachId: 1, data: "2026-08-30", pista: "Monza",
+    { id: "n1", coachId: 1, data: "2026-08-30", pista: "Monza", origine: "coach",
       testo: "Prima variante: stai ancora frenando dritta.", fatto: false },
-    { id: "n2", coachId: 1, data: "2026-08-30", pista: "Monza",
+    { id: "n2", coachId: 1, data: "2026-08-30", pista: "Monza", origine: "coach",
       testo: "Lesmo 1: entri lunga per compensare il sottosterzo.", fatto: false },
-    { id: "n3", coachId: 1, data: "2026-08-23", pista: null,
+    { id: "n3", coachId: 1, data: "2026-08-23", pista: null, origine: "coach",
       testo: "Parabolica: qui vai bene, non toccare niente.", fatto: true },
   ],
 };
@@ -206,10 +213,18 @@ const CHAT_THREADS = {
 
 // quanti messaggi del coach non sono ancora stati letti — il badge "nuovo
 // messaggio" richiesto dalla spec; chatLetti tiene i thread già aperti in sessione
-function nonLettiDi(coachId, chatLetti) {
-  if (!coachId || chatLetti[coachId]) return 0;
-  return (CHAT_THREADS[coachId] || []).filter((m) => m.da === "coach" && !m.letto).length;
+// non letti = messaggi del coach oltre a quanti ne erano gia' arrivati l'ultima
+// volta che il pilota ha aperto quel thread (snapshot, non un flag per
+// messaggio): cosi' un nuovo messaggio dopo la chiusura torna a contare
+function nonLettiDi(coachId, msgs, lettiSnapshot) {
+  if (!coachId) return 0;
+  const daCoach = (msgs[coachId] || []).filter((m) => m.da === "coach").length;
+  return Math.max(0, daCoach - (lettiSnapshot[coachId] || 0));
 }
+
+// gancio per le push notification quando ci sara' l'app companion — oggi non fa
+// nulla, va collegato quando esiste un client capace di riceverle (punto 1)
+function inviaPushNotifica(coachId, testo) {}
 
 const CATEGORIE = [
   { k: "tutte", l: "Tutte le categorie" },
@@ -464,7 +479,8 @@ const CSS = `
 .appbarin button{background:none;border:0;border-bottom:2px solid transparent;color:var(--grigio);
   padding:14px 12px;cursor:pointer;font-family:'Saira Condensed',sans-serif;font-weight:600;font-size:14px;white-space:nowrap}
 .appbarin button[data-on="1"]{color:var(--bianco);border-bottom-color:var(--rosso2)}
-.appbarin .esci{margin-left:auto;color:var(--grigio2);font-size:13px;font-weight:500}
+.appbarin .esci{margin-left:auto;color:var(--grigio2);font-size:13px;font-weight:500;
+  white-space:nowrap;flex:none}
 
 .filtri{border:1px solid var(--bordo);background:var(--nero2);margin:22px 0}
 .fhead{padding:10px 14px;border-bottom:1px solid var(--bordo);font-family:'Roboto Mono',monospace;
@@ -599,6 +615,34 @@ const CSS = `
 .citarow:last-child{border-bottom:0}
 .stanzaVideo{aspect-ratio:16/9;border:1px dashed var(--bordo);background:var(--nero2);
   display:flex;align-items:center;justify-content:center;text-align:center;padding:24px}
+
+/* ---- notifiche email (mock) e preferenze ---- */
+.prefEmail{display:flex;align-items:flex-start;gap:9px;margin-top:16px;font-size:12.5px;
+  color:var(--grigio2);line-height:1.5;cursor:pointer}
+.prefEmail input{margin-top:3px;accent-color:var(--blu2);flex:none}
+.emailBanner{position:sticky;top:62px;z-index:30;background:var(--blu);color:#fff}
+.emailBannerin{display:flex;align-items:center;gap:12px;padding:10px 20px;font-size:13.5px}
+.emailBannerin b{font-weight:700}
+.emailBanner button{background:none;border:0;color:#fff;cursor:pointer;font:inherit}
+.emailBanner .apriBanner{text-decoration:underline;font-weight:600;margin-left:auto}
+.emailBanner .chiudiBanner{font-size:16px;opacity:.85;padding:0 2px}
+.emailBanner .chiudiBanner:hover{opacity:1}
+
+/* ---- provenienza nota: dal coach o salvata dalla chat (punto 4) ---- */
+.origineTag{font-family:'Roboto Mono',monospace;font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;
+  border:1px solid var(--bordo);padding:2px 6px;border-radius:2px;color:var(--grigio2)}
+.origineTag.coach{border-color:rgba(29,79,215,.35);color:var(--blu2)}
+
+/* ---- iRating non verificato in header (punto 2) ---- */
+.irTag{font-family:'Roboto Mono',monospace;font-size:9.5px;letter-spacing:.06em;text-transform:uppercase;
+  color:var(--oro);border:1px solid rgba(227,166,58,.4);padding:1px 6px;border-radius:2px;margin-left:7px}
+
+/* ---- "con chi hai lavorato prima": impila su mobile, affianca da tablet in su (punto 3) ---- */
+.storicoRiga{display:flex;flex-direction:column;gap:4px;padding:10px 0;
+  border-bottom:1px solid var(--bordo);font-size:14px}
+.storicoRiga:last-child{border-bottom:0}
+@media(min-width:640px){.storicoRiga{flex-direction:row;justify-content:space-between;align-items:baseline;gap:14px}}
+
 @media (prefers-reduced-motion:reduce){.crd *{transition:none!important}}
 `;
 
@@ -1377,9 +1421,9 @@ function Scheda({ c, mia, miaIr, chiudi, vaiPercorso, vediCoach, apriChat, nonLe
 
 /* ---------------------------------- CHAT ---------------------------------- */
 
-function Chat({ coachId, chiudi, note, setNote }) {
+function Chat({ coachId, chiudi, note, setNote, messaggi: tuttiMessaggi, setMessaggi, notificheEmail, setNotificheEmail }) {
   const co = COACHES.find((c) => c.id === coachId);
-  const [messaggi, setMessaggi] = useState(CHAT_THREADS[coachId] || []);
+  const messaggi = tuttiMessaggi[coachId] || [];
   const [bozza, setBozza] = useState("");
   const [citaAperto, setCitaAperto] = useState(false);
   const [salvate, setSalvate] = useState(messaggi.map((m) => m.id).slice(0, 0));
@@ -1389,13 +1433,15 @@ function Chat({ coachId, chiudi, note, setNote }) {
   const invia = () => {
     const testo = bozza.trim();
     if (!testo) return;
-    setMessaggi((prev) => [...prev, { id: `local-${prev.length}-${Date.now()}`, da: "pilota", testo, quando: new Date().toISOString(), letto: true }]);
+    setMessaggi(coachId, (prev) => [...prev, { id: `local-${prev.length}-${Date.now()}`, da: "pilota", testo, quando: new Date().toISOString(), letto: true }]);
     setBozza("");
   };
 
+  // origine "chat": resta distinta dai consigli scritti dal coach in sessione
+  // (punto 4) — non si mescolano nella lista note
   const salvaComeNota = (m) => {
     setNote((prev) => [
-      { id: `n-${Date.now()}`, coachId, data: new Date().toISOString().slice(0, 10), pista: null, testo: m.testo, fatto: false },
+      { id: `n-${Date.now()}`, coachId, data: new Date().toISOString().slice(0, 10), pista: null, testo: m.testo, fatto: false, origine: "chat" },
       ...prev,
     ]);
     setSalvate((prev) => [...prev, m.id]);
@@ -1462,6 +1508,11 @@ function Chat({ coachId, chiudi, note, setNote }) {
         I messaggi restano dentro CORDA e seguono le stesse regole di privacy e conservazione del
         resto dei tuoi dati.
       </p>
+
+      <label className="prefEmail">
+        <input type="checkbox" checked={notificheEmail} onChange={(e) => setNotificheEmail(e.target.checked)} />
+        Ricevi un'email quando arriva un nuovo messaggio e non sei online. Puoi disattivarlo quando vuoi.
+      </label>
     </div>
   );
 }
@@ -1477,6 +1528,7 @@ function Chat({ coachId, chiudi, note, setNote }) {
    parti, storage, obblighi GDPR aggiuntivi — si valuta a parte). */
 function StanzaSessione({ prenotazione, coach, chiudi, onTermina, vaiScheda }) {
   const [terminata, setTerminata] = useState(false);
+  const [confermaTermina, setConfermaTermina] = useState(false);
   const dataOrario = prenotazione.orario.includes("·")
     ? prenotazione.orario
     : `${fmtData(prenotazione.data)} · ${prenotazione.orario}`;
@@ -1528,7 +1580,7 @@ function StanzaSessione({ prenotazione, coach, chiudi, onTermina, vaiScheda }) {
       <div className="blocco" style={{ marginTop: 16 }}>
         <div className="riga"><span>Coach</span><span>{coach?.nome}</span></div>
         <div className="riga"><span>Sessione</span><span>{dataOrario}</span></div>
-        <div className="riga"><span>Pilota</span><span>L. Moretti</span></div>
+        <div className="riga"><span>Pilota</span><span>{PILOTA_DEMO.nome}</span></div>
       </div>
 
       <p className="nota">
@@ -1536,14 +1588,29 @@ function StanzaSessione({ prenotazione, coach, chiudi, onTermina, vaiScheda }) {
         resta comunque tracciata in CORDA.
       </p>
 
+      {confermaTermina && (
+        <div className="notaBox rossa" style={{ marginTop: 14 }}>
+          <p>
+            <b>Terminare la sessione?</b> Partiranno il conteggio sessioni, la richiesta di nota al
+            coach e la richiesta di recensione.
+          </p>
+          <div style={{ display: "flex", gap: 10, marginTop: 10 }}>
+            <button className="b b-rosso" onClick={termina}>Conferma</button>
+            <button className="b b-ghost" onClick={() => setConfermaTermina(false)}>Annulla</button>
+          </div>
+        </div>
+      )}
+
       <div style={{ margin: "20px 0 40px" }}>
-        <button className="b b-rosso b-lg" style={{ width: "100%" }} onClick={termina}>Termina sessione</button>
+        <button className="b b-rosso b-lg" style={{ width: "100%" }} onClick={() => setConfermaTermina(true)}>
+          Termina sessione
+        </button>
       </div>
     </div>
   );
 }
 
-function Percorso({ vaiScheda, apriChat, nonLettiDi, note, setNote }) {
+function Percorso({ vaiScheda, apriChat, nonLettiDi, note, setNote, iracingCollegato, setIracingCollegato, simulaMessaggioCoach }) {
   const [gareIds, setGareIds] = useState(PERCORSO.garePianificateIds);
   const [pickerAperto, setPickerAperto] = useState(false);
   const [ricaricaAperta, setRicaricaAperta] = useState(false);
@@ -1670,6 +1737,12 @@ function Percorso({ vaiScheda, apriChat, nonLettiDi, note, setNote }) {
                 Tutte le sessioni prenotate con {coachAttuale.nome} sono state cancellate.
               </p>
             )}
+            <p className="nota">
+              <button className="msgAzione" style={{ fontSize: 11.5 }}
+                      onClick={() => simulaMessaggioCoach?.(coachAttuale.id, "Ti andrebbe di anticipare la sessione a domani?")}>
+                ↻ Simula un messaggio in arrivo dal coach (demo)
+              </button>
+            </p>
           </>
         ) : (
           <p className="nota" style={{ marginTop: 0 }}>Non hai ancora un coach attivo.</p>
@@ -1684,7 +1757,7 @@ function Percorso({ vaiScheda, apriChat, nonLettiDi, note, setNote }) {
               const co = COACHES.find((c) => c.id === s.coachId);
               if (!co) return null;
               return (
-                <div className="riga" key={i}>
+                <div className="storicoRiga" key={i}>
                   <span>{co.nome} <span className="nn">· {s.periodo}</span></span>
                   <span>
                     <b className="mn" style={{ color: "var(--blu2)" }}>+{s.irGuadagnato} iR</b>{" "}
@@ -1698,16 +1771,29 @@ function Percorso({ vaiScheda, apriChat, nonLettiDi, note, setNote }) {
         </>
       )}
 
-      {/* 3. dati iRacing — strato 2, non ancora collegato */}
+      {/* 3. dati iRacing — strato 2 */}
       <div className="stit"><span>I tuoi dati iRacing</span></div>
-      <div className="lockbox">
-        <div className="eyebrow">Da collegare</div>
-        <p style={{ marginTop: 10, color: "var(--grigio)", fontSize: 14.5, lineHeight: 1.6 }}>
-          Collega il tuo account iRacing per sbloccare qui la tua curva iRating, le ultime gare —
-          con il confronto prima/dopo ogni sessione di coaching — e la tua licenza e Safety Rating.
-        </p>
-        <button className="b b-blu" style={{ marginTop: 14 }}>Collega il tuo account iRacing</button>
-      </div>
+      {iracingCollegato ? (
+        <div className="blocco">
+          <div className="riga"><span>Account iRacing</span><b className="mn" style={{ color: "var(--verde)" }}>Collegato</b></div>
+          <p className="nota">
+            Il tuo iR in alto ora è verificato via API. Curva iRating, ultime gare con overlay
+            coaching e licenza/Safety Rating arriveranno qui appena l'integrazione è pronta.
+          </p>
+        </div>
+      ) : (
+        <div className="lockbox">
+          <div className="eyebrow">Da collegare</div>
+          <p style={{ marginTop: 10, color: "var(--grigio)", fontSize: 14.5, lineHeight: 1.6 }}>
+            Collega il tuo account iRacing per sbloccare qui la tua curva iRating, le ultime gare —
+            con il confronto prima/dopo ogni sessione di coaching — e la tua licenza e Safety Rating.
+            Il tuo iR qui sopra è per ora autodichiarato: appena colleghi l'account diventa verificato.
+          </p>
+          <button className="b b-blu" style={{ marginTop: 14 }} onClick={() => setIracingCollegato?.(true)}>
+            Collega il tuo account iRacing
+          </button>
+        </div>
+      )}
 
       {/* 4. ore acquistate */}
       <div className="stit"><span>Ore di coaching</span></div>
@@ -1827,6 +1913,9 @@ function Percorso({ vaiScheda, apriChat, nonLettiDi, note, setNote }) {
             <div className="recens" key={n.id}>
               <div className="recmeta">
                 <span>{co?.nome}</span><span>{fmtData(n.data)}</span>{n.pista && <span>· {n.pista}</span>}
+                <span className={`origineTag ${n.origine === "coach" ? "coach" : ""}`}>
+                  {n.origine === "coach" ? "Dal coach" : "Da chat"}
+                </span>
               </div>
               <p>{n.testo}</p>
             </div>
@@ -2146,7 +2235,11 @@ export default function App() {
   const [miaIr, setMiaIr] = useState("");
   const [note, setNote] = useState(PERCORSO.note);
   const [chatCoachId, setChatCoachId] = useState(""); // "" = nessuna chat aperta
-  const [chatLetti, setChatLetti] = useState({}); // { [coachId]: true } — thread già aperti in sessione
+  const [chatMessaggi, setChatMessaggiRaw] = useState(CHAT_THREADS); // { [coachId]: [...] }, condiviso: non si perde uscendo dalla chat
+  const [chatLettiSnapshot, setChatLettiSnapshot] = useState({}); // { [coachId]: n. messaggi coach già letti l'ultima apertura }
+  const [notificheEmail, setNotificheEmail] = useState(true); // punto 1: preferenza disattivabile
+  const [bannerChiuso, setBannerChiuso] = useState({}); // { [coachId]: conteggio al momento della chiusura del banner }
+  const [iracingCollegato, setIracingCollegato] = useState(false); // punto 2
 
   useEffect(() => { window.scrollTo(0, 0); }, [pagina, tab, coach, chatCoachId]);
 
@@ -2154,11 +2247,33 @@ export default function App() {
   const vaiCandidatura = () => setPagina("candidatura");
   const entra = () => { setPagina("app"); setTab(ruolo === "coach" ? "dash" : "cerca"); setCoach(null); };
   const esci = () => { setPagina("home"); setCoach(null); };
+
+  const aggiornaMessaggi = (coachId, updater) =>
+    setChatMessaggiRaw((prev) => ({ ...prev, [coachId]: updater(prev[coachId] || []) }));
+
   const apriChat = (coachId) => {
     setChatCoachId(coachId);
-    setChatLetti((prev) => ({ ...prev, [coachId]: true }));
+    const totaleCoach = (chatMessaggi[coachId] || []).filter((m) => m.da === "coach").length;
+    setChatLettiSnapshot((prev) => ({ ...prev, [coachId]: totaleCoach }));
   };
-  const nonLettiPer = (coachId) => nonLettiDi(coachId, chatLetti);
+  const nonLettiPer = (coachId) => nonLettiDi(coachId, chatMessaggi, chatLettiSnapshot);
+
+  // demo: simula l'arrivo di un messaggio dal coach mentre il pilota non ha
+  // quella chat aperta — serve a mostrare badge + email raggruppata (punto 1)
+  const simulaMessaggioCoach = (coachId, testo) => {
+    aggiornaMessaggi(coachId, (prev) => [
+      ...prev,
+      { id: `sim-${Date.now()}`, da: "coach", testo, quando: new Date().toISOString(), letto: false },
+    ]);
+    inviaPushNotifica(coachId, testo); // gancio per dopo, oggi non fa nulla
+  };
+
+  // il coach con un'email (mock) ancora da mostrare: notifiche attive, non
+  // letto sopra quanto già chiuso per quel thread — un solo banner alla volta
+  const coachDaNotificare = notificheEmail
+    ? COACHES.find((c) => nonLettiPer(c.id) > (bannerChiuso[c.id] || 0))
+    : undefined;
+  const chiudiBanner = (coachId) => setBannerChiuso((prev) => ({ ...prev, [coachId]: nonLettiPer(coachId) }));
 
   return (
     <div className="crd">
@@ -2204,12 +2319,36 @@ export default function App() {
               ) : (
                 <button data-on="1">Area coach</button>
               )}
-              <span className="esci mn">{ruolo === "coach" ? "MARCO BERTOLINI" : "L. MORETTI · 1.842 iR"}</span>
+              <span className="esci mn">
+                {ruolo === "coach" ? "MARCO BERTOLINI" : (
+                  <>
+                    {PILOTA_DEMO.nome} ·{" "}
+                    {PILOTA_DEMO.ir ? (
+                      <>{PILOTA_DEMO.ir} iR{!iracingCollegato && <span className="irTag">Non verificato</span>}</>
+                    ) : "collega per vedere il tuo iR"}
+                  </>
+                )}
+              </span>
             </div>
           </div>
 
+          {ruolo === "pilota" && coachDaNotificare && (
+            <div className="emailBanner">
+              <div className="w emailBannerin">
+                <span>
+                  📧 <b>(demo)</b> Email inviata: hai {nonLettiPer(coachDaNotificare.id)} nuov
+                  {nonLettiPer(coachDaNotificare.id) === 1 ? "o messaggio" : "i messaggi"} da {coachDaNotificare.nome}.
+                </span>
+                <button className="apriBanner" onClick={() => { apriChat(coachDaNotificare.id); setTab("percorso"); }}>Apri</button>
+                <button className="chiudiBanner" onClick={() => chiudiBanner(coachDaNotificare.id)} aria-label="Chiudi">×</button>
+              </div>
+            </div>
+          )}
+
           {ruolo === "pilota" && chatCoachId && (
-            <Chat coachId={chatCoachId} chiudi={() => setChatCoachId("")} note={note} setNote={setNote} />
+            <Chat coachId={chatCoachId} chiudi={() => setChatCoachId("")} note={note} setNote={setNote}
+                  messaggi={chatMessaggi} setMessaggi={aggiornaMessaggi}
+                  notificheEmail={notificheEmail} setNotificheEmail={setNotificheEmail} />
           )}
           {ruolo === "pilota" && !chatCoachId && tab === "cerca" && (coach
             ? <Scheda c={coach} mia={mia} miaIr={miaIr} chiudi={() => setCoach(null)}
@@ -2218,7 +2357,9 @@ export default function App() {
             : <Cerca apri={setCoach} mia={mia} setMia={setMia} miaIr={miaIr} setMiaIr={setMiaIr} />)}
           {ruolo === "pilota" && !chatCoachId && tab === "percorso" && (
             <Percorso vaiScheda={(co) => { setCoach(co); setTab("cerca"); }}
-                      apriChat={apriChat} nonLettiDi={nonLettiPer} note={note} setNote={setNote} />
+                      apriChat={apriChat} nonLettiDi={nonLettiPer} note={note} setNote={setNote}
+                      iracingCollegato={iracingCollegato} setIracingCollegato={setIracingCollegato}
+                      simulaMessaggioCoach={simulaMessaggioCoach} />
           )}
           {ruolo === "coach" && <AreaCoach />}
         </>
