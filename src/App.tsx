@@ -192,6 +192,25 @@ const PERCORSO = {
   ],
 };
 
+/* --------------------------- chat coach ↔ pilota (mock) ---------------------------
+   Un thread per relazione coach<->pilota, tenuto in CORDA — l'alternativa a spostare
+   la logistica su Discord. Solo testo per ora: niente allegati/vocali/reazioni. */
+
+const CHAT_THREADS = {
+  1: [
+    { id: "m1", da: "coach", testo: "Ciao! Tutto pronto per la sessione di sabato?", quando: "2026-08-29T18:20:00", letto: false },
+    { id: "m2", da: "pilota", testo: "Sì, però possiamo spostarla a domenica sera?", quando: "2026-08-29T18:32:00", letto: true },
+    { id: "m3", da: "coach", testo: "Va bene, domenica 20:00. Porta la Ferrari, lavoriamo ancora sulla prima variante di Monza.", quando: "2026-08-29T18:40:00", letto: false },
+  ],
+};
+
+// quanti messaggi del coach non sono ancora stati letti — il badge "nuovo
+// messaggio" richiesto dalla spec; chatLetti tiene i thread già aperti in sessione
+function nonLettiDi(coachId, chatLetti) {
+  if (!coachId || chatLetti[coachId]) return 0;
+  return (CHAT_THREADS[coachId] || []).filter((m) => m.da === "coach" && !m.letto).length;
+}
+
 const CATEGORIE = [
   { k: "tutte", l: "Tutte le categorie" },
   { k: "coperte", l: "Ruote coperte · GT, prototipi, turismo" },
@@ -554,6 +573,32 @@ const CSS = `
 .azsess.sposta:hover{border-color:var(--blu2)}
 .azsess.cancella{color:var(--ambra)}
 .azsess.cancella:hover{border-color:var(--ambra)}
+.azsess.avvia{color:var(--verde)}
+.azsess.avvia:hover{border-color:var(--verde)}
+.badge{display:inline-flex;align-items:center;justify-content:center;min-width:16px;height:16px;
+  padding:0 4px;margin-left:7px;border-radius:8px;background:var(--ambra);color:#fff;
+  font-family:'Roboto Mono',monospace;font-size:10px;font-weight:600;vertical-align:middle}
+.chatBox{border:1px solid var(--bordo);background:var(--nero2);padding:16px;margin-top:20px;
+  display:flex;flex-direction:column;gap:10px;max-height:60vh;overflow-y:auto}
+.msg{max-width:78%;padding:9px 12px;border-radius:3px;font-size:14px;line-height:1.5}
+.msg p{margin:0}
+.msg .msgOra{display:flex;align-items:center;gap:8px;margin-top:5px;
+  font-family:'Roboto Mono',monospace;font-size:10px;opacity:.75}
+.msg.loro{align-self:flex-start;background:var(--nero3);color:var(--bianco);border:1px solid var(--bordo)}
+.msg.mio{align-self:flex-end;background:var(--blu);color:#fff}
+.msgAzione{background:none;border:0;padding:0;cursor:pointer;font-family:'Roboto Mono',monospace;
+  font-size:10px;text-decoration:underline;color:inherit;opacity:.9}
+.msgAzione.fatta{text-decoration:none;cursor:default}
+.chatInput{display:flex;gap:10px;margin-top:14px}
+.chatInput input{flex:1;background:var(--nero);border:1px solid var(--bordo);color:var(--bianco);
+  padding:11px 12px;font-family:'Titillium Web',sans-serif;font-size:14px;border-radius:2px}
+.chatInput input:focus{outline:none;border-color:var(--grigio)}
+.citarow{display:flex;justify-content:space-between;gap:12px;width:100%;text-align:left;
+  background:none;border:0;color:inherit;font:inherit;cursor:pointer;padding:10px 0;
+  border-bottom:1px solid var(--bordo)}
+.citarow:last-child{border-bottom:0}
+.stanzaVideo{aspect-ratio:16/9;border:1px dashed var(--bordo);background:var(--nero2);
+  display:flex;align-items:center;justify-content:center;text-align:center;padding:24px}
 @media (prefers-reduced-motion:reduce){.crd *{transition:none!important}}
 `;
 
@@ -561,6 +606,12 @@ const CSS = `
 
 const iniz = (n) => n.split(" ").map((x) => x[0]).join("");
 const perSett = (ir, gg) => Math.round((ir / gg) * 7);
+
+// funzione identità: il parametro senza annotazione di tipo torna utile per far
+// leggere/scrivere a TS un oggetto reale in uno stato inizializzato con
+// useState(null), senza `as`/generici — sintassi che romperebbe il parsing di
+// Babel quando questo file gira nell'artifact (solo preset "react", niente TS)
+const anyOf = (x) => x;
 
 const fmtData = (iso) => {
   const s = new Date(iso + "T00:00:00").toLocaleDateString("it-IT", { weekday: "short", day: "numeric", month: "short" });
@@ -1127,7 +1178,7 @@ function Cerca({ apri, mia, setMia, miaIr, setMiaIr }) {
   );
 }
 
-function Scheda({ c, mia, miaIr, chiudi, vaiPercorso, vediCoach }) {
+function Scheda({ c, mia, miaIr, chiudi, vaiPercorso, vediCoach, apriChat, nonLettiDi }) {
   const [slot, setSlot] = useState(null);
   const [fatto, setFatto] = useState(false);
   const [apri, setApri] = useState(false);
@@ -1135,6 +1186,7 @@ function Scheda({ c, mia, miaIr, chiudi, vaiPercorso, vediCoach }) {
   const fee = (c.prezzo * 0.15).toFixed(2);
   const allievoIr = iRAllievo(miaIr, mia);
   const stato = calcolaStato(c, allievoIr, mia);
+  const nonLetti = nonLettiDi?.(c.id) || 0;
   const alternative = COACHES.filter((x) => x.id !== c.id &&
     x.cat.some((k) => c.cat.includes(k)) &&
     calcolaStato(x, allievoIr, mia) === "consigliato").slice(0, 3);
@@ -1178,6 +1230,13 @@ function Scheda({ c, mia, miaIr, chiudi, vaiPercorso, vediCoach }) {
           <div className="ccsub">@{c.tag} · {c.ir} iR · licenza {c.lic} · {c.prezzo}€/h</div>
         </div>
         <span className={`stato stato-${stato}`}>{STATO_LABEL[stato]}</span>
+      </div>
+
+      <div style={{ marginTop: 14 }}>
+        <button className="b b-ghost" onClick={() => apriChat?.(c.id)}>
+          Messaggia
+          {nonLetti > 0 && <span className="badge">{nonLetti}</span>}
+        </button>
       </div>
 
       {stato === "avviso" && (
@@ -1316,11 +1375,175 @@ function Scheda({ c, mia, miaIr, chiudi, vaiPercorso, vediCoach }) {
   );
 }
 
-// link Discord del coach — mock: da sostituire con l'invito reale quando c'è
-const DISCORD_DEFAULT = "https://discord.gg/corda-demo";
-const DISCORD_COACH = { 1: "https://discord.gg/corda-vela" };
+/* ---------------------------------- CHAT ---------------------------------- */
 
-function Percorso({ vaiScheda }) {
+function Chat({ coachId, chiudi, note, setNote }) {
+  const co = COACHES.find((c) => c.id === coachId);
+  const [messaggi, setMessaggi] = useState(CHAT_THREADS[coachId] || []);
+  const [bozza, setBozza] = useState("");
+  const [citaAperto, setCitaAperto] = useState(false);
+  const [salvate, setSalvate] = useState(messaggi.map((m) => m.id).slice(0, 0));
+
+  const noteCoach = note.filter((n) => n.coachId === coachId);
+
+  const invia = () => {
+    const testo = bozza.trim();
+    if (!testo) return;
+    setMessaggi((prev) => [...prev, { id: `local-${prev.length}-${Date.now()}`, da: "pilota", testo, quando: new Date().toISOString(), letto: true }]);
+    setBozza("");
+  };
+
+  const salvaComeNota = (m) => {
+    setNote((prev) => [
+      { id: `n-${Date.now()}`, coachId, data: new Date().toISOString().slice(0, 10), pista: null, testo: m.testo, fatto: false },
+      ...prev,
+    ]);
+    setSalvate((prev) => [...prev, m.id]);
+  };
+
+  const citaNota = (n) => {
+    setBozza((prev) => (prev ? prev + "\n" : "") + `↳ Nota del ${fmtData(n.data)}: "${n.testo}"`);
+    setCitaAperto(false);
+  };
+
+  return (
+    <div className="w">
+      <button className="indietro" onClick={chiudi}>← Torna indietro</button>
+
+      <div className="cctop" style={{ marginTop: 8 }}>
+        <div className="avat">{iniz(co?.nome || "?")}</div>
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div className="ccnome">{co?.nome || "Coach"}</div>
+          <div className="ccsub">Chat privata · resta dentro CORDA</div>
+        </div>
+      </div>
+
+      <div className="chatBox">
+        {messaggi.length === 0 && (
+          <p className="nota" style={{ marginTop: 0 }}>Nessun messaggio ancora. Scrivi per iniziare la conversazione.</p>
+        )}
+        {messaggi.map((m) => (
+          <div className={`msg ${m.da === "pilota" ? "mio" : "loro"}`} key={m.id}>
+            <p>{m.testo}</p>
+            <span className="msgOra">
+              {new Date(m.quando).toLocaleTimeString("it-IT", { hour: "2-digit", minute: "2-digit" })}
+              {m.da === "coach" && !salvate.includes(m.id) && (
+                <button className="msgAzione" onClick={() => salvaComeNota(m)}>Salva come nota</button>
+              )}
+              {m.da === "coach" && salvate.includes(m.id) && <span className="msgAzione fatta">Salvato tra le note</span>}
+            </span>
+          </div>
+        ))}
+      </div>
+
+      {noteCoach.length > 0 && (
+        <div style={{ marginTop: 10 }}>
+          <button className="apri" onClick={() => setCitaAperto((v) => !v)}>
+            {citaAperto ? "▾ Chiudi" : "▸ Cita una nota"}
+          </button>
+          {citaAperto && (
+            <div className="blocco" style={{ marginTop: 6 }}>
+              {noteCoach.map((n) => (
+                <button className="citarow" key={n.id} onClick={() => citaNota(n)}>
+                  <span>{n.testo}</span><span className="nn">{fmtData(n.data)}</span>
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      <div className="chatInput">
+        <input type="text" value={bozza} onChange={(e) => setBozza(e.target.value)}
+               placeholder="Scrivi un messaggio…" onKeyDown={(e) => e.key === "Enter" && invia()} />
+        <button className="b b-blu" onClick={invia}>Invia</button>
+      </div>
+      <p className="nota">
+        I messaggi restano dentro CORDA e seguono le stesse regole di privacy e conservazione del
+        resto dei tuoi dati.
+      </p>
+    </div>
+  );
+}
+
+/* ------------------------------ STANZA SESSIONE ------------------------------
+   Il bottone "Avvia sessione" apre questa pagina: la cornice CORDA attorno a una
+   videochiamata. Il fornitore WebRTC (LiveKit / Daily / Whereby — [DA CONFERMARE])
+   non è ancora scelto, quindi qui c'è solo il placeholder + il legame con la
+   prenotazione. Quello che conta davvero, e che costruiamo già ora, è cosa
+   succede a fine sessione: è lì che la sessione lascia traccia in CORDA anche se
+   il coach preferisce condurla altrove.
+   Niente registrazione: fuori scope per questo giro (consenso di entrambe le
+   parti, storage, obblighi GDPR aggiuntivi — si valuta a parte). */
+function StanzaSessione({ prenotazione, coach, chiudi, onTermina, vaiScheda }) {
+  const [terminata, setTerminata] = useState(false);
+  const dataOrario = prenotazione.orario.includes("·")
+    ? prenotazione.orario
+    : `${fmtData(prenotazione.data)} · ${prenotazione.orario}`;
+
+  const termina = () => {
+    onTermina();
+    setTerminata(true);
+  };
+
+  if (terminata)
+    return (
+      <div className="w">
+        <div className="ok" style={{ marginTop: 26 }}>
+          <h2 style={{ fontSize: 22, color: "var(--blu2)" }}>Sessione registrata</h2>
+          <p style={{ marginTop: 10, fontSize: 14.5, lineHeight: 1.6 }}>
+            Anche se la videochiamata è avvenuta altrove, partendo da qui la sessione resta
+            tracciata in CORDA.
+          </p>
+        </div>
+        <div className="blocco">
+          <div className="riga"><span>Conteggio sessioni</span><b className="mn" style={{ color: "var(--blu2)" }}>aggiornato</b></div>
+          <div className="riga"><span>Richiesta di nota</span><b className="mn" style={{ color: "var(--blu2)" }}>inviata a {coach?.nome}</b></div>
+          <div className="riga"><span>Richiesta di recensione</span><b className="mn" style={{ color: "var(--blu2)" }}>avviata</b></div>
+        </div>
+        <div style={{ margin: "20px 0 40px", display: "flex", gap: 10, flexWrap: "wrap" }}>
+          <button className="b b-blu" onClick={() => { chiudi(); vaiScheda?.(coach); }}>
+            Prenota la prossima sessione
+          </button>
+          <button className="b b-ghost" onClick={chiudi}>Torna al percorso</button>
+        </div>
+      </div>
+    );
+
+  return (
+    <div className="w">
+      <button className="indietro" onClick={chiudi}>← Torna al percorso</button>
+      <div className="stit" style={{ marginTop: 8 }}><span>Sessione con {coach?.nome}</span><span>{dataOrario}</span></div>
+
+      <div className="stanzaVideo">
+        <div>
+          <div className="eyebrow">Stanza video · fornitore da confermare</div>
+          <p style={{ marginTop: 10, color: "var(--grigio)", fontSize: 14.5, lineHeight: 1.6, maxWidth: "40ch", margin: "10px auto 0" }}>
+            Qui comparirà la stanza video/voce/condivisione schermo, incorporata da un fornitore
+            WebRTC specializzato (LiveKit, Daily o Whereby — scelta ancora da confermare).
+          </p>
+        </div>
+      </div>
+
+      <div className="blocco" style={{ marginTop: 16 }}>
+        <div className="riga"><span>Coach</span><span>{coach?.nome}</span></div>
+        <div className="riga"><span>Sessione</span><span>{dataOrario}</span></div>
+        <div className="riga"><span>Pilota</span><span>L. Moretti</span></div>
+      </div>
+
+      <p className="nota">
+        Il coach può comunque condurre la sessione dal suo Discord se preferisce: partendo da qui,
+        resta comunque tracciata in CORDA.
+      </p>
+
+      <div style={{ margin: "20px 0 40px" }}>
+        <button className="b b-rosso b-lg" style={{ width: "100%" }} onClick={termina}>Termina sessione</button>
+      </div>
+    </div>
+  );
+}
+
+function Percorso({ vaiScheda, apriChat, nonLettiDi, note, setNote }) {
   const [gareIds, setGareIds] = useState(PERCORSO.garePianificateIds);
   const [pickerAperto, setPickerAperto] = useState(false);
   const [ricaricaAperta, setRicaricaAperta] = useState(false);
@@ -1330,6 +1553,10 @@ function Percorso({ vaiScheda }) {
   const [cancellaConferma, setCancellaConferma] = useState(""); // id della prenotazione da confermare
   const [sospendiAperto, setSospendiAperto] = useState(false);
   const [sospesoMsg, setSospesoMsg] = useState(false);
+  // la prenotazione della stanza aperta, o null se nessuna — il cast JSDoc dà a
+  // TS la forma vera dell'oggetto invece di bloccarlo su "null"
+  const [sessioneAttiva, setSessioneAttiva] = useState(null);
+  const [sessioniTotali, setSessioniTotali] = useState(PERCORSO.sessioniTotali);
 
   const toggleGara = (id) =>
     setGareIds((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
@@ -1363,6 +1590,25 @@ function Percorso({ vaiScheda }) {
     .sort((a, b) => a.data.localeCompare(b.data));
   const oreUsate = PERCORSO.oreAcquistate - PERCORSO.oreResidue;
 
+  // prenotazione "congelata" al click su Avvia sessione: resta stabile anche se
+  // onTermina la toglie nel frattempo da prenotazioni, cosi' la schermata di
+  // conferma non sparisce sotto i piedi dell'utente
+  if (sessioneAttiva) {
+    const s = anyOf(sessioneAttiva);
+    return (
+      <StanzaSessione
+        prenotazione={s}
+        coach={COACHES.find((c) => c.id === s.coachId)}
+        chiudi={() => setSessioneAttiva(null)}
+        onTermina={() => {
+          setSessioniTotali((n) => n + 1);
+          setPrenotazioni((prev) => prev.filter((p) => p.id !== s.id));
+        }}
+        vaiScheda={vaiScheda}
+      />
+    );
+  }
+
   return (
     <div className="w">
       {/* 1. riga-titolo: sintesi del percorso — solo dati CORDA finché non c'è iRacing */}
@@ -1371,7 +1617,7 @@ function Percorso({ vaiScheda }) {
         <div className="eyebrow">Da quando fai coaching</div>
         <div style={{ display: "flex", gap: 32, flexWrap: "wrap", marginTop: 12, alignItems: "baseline" }}>
           <div>
-            <div className="kval" style={{ fontSize: 34 }}>{PERCORSO.sessioniTotali}</div>
+            <div className="kval" style={{ fontSize: 34 }}>{sessioniTotali}</div>
             <div className="ccsm">sessioni</div>
           </div>
           <div>
@@ -1400,11 +1646,11 @@ function Percorso({ vaiScheda }) {
             </div>
             <div style={{ marginTop: 16, display: "flex", gap: 10, flexWrap: "wrap" }}>
               <button className="b b-blu" onClick={() => vaiScheda?.(coachAttuale)}>Vai al suo profilo</button>
+              <button className="b b-ghost" onClick={() => apriChat?.(coachAttuale.id)}>
+                Messaggia
+                {nonLettiDi?.(coachAttuale.id) > 0 && <span className="badge">{nonLettiDi(coachAttuale.id)}</span>}
+              </button>
               <button className="b b-ghost" onClick={() => setSospendiAperto(true)}>Sospendi</button>
-              <a className="b b-ghost" href={DISCORD_COACH[coachAttuale.id] || DISCORD_DEFAULT}
-                 target="_blank" rel="noopener noreferrer">
-                Contatta su Discord
-              </a>
             </div>
 
             {sospendiAperto && (
@@ -1494,7 +1740,10 @@ function Percorso({ vaiScheda }) {
                   <span><span className="dot" style={{ background: "var(--blu2)" }} />{dataOrario}</span>
                   <span className="nn">{co?.nome}</span>
                 </div>
-                <div style={{ display: "flex", gap: 10 }}>
+                <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+                  <button className="azsess avvia" onClick={() => setSessioneAttiva(anyOf(p))}>
+                    Avvia sessione
+                  </button>
                   <button className="azsess sposta"
                           onClick={() => (spostaAperto === p.id ? chiudiSposta() : (setSpostaAperto(p.id), setSpostaScelto("")))}>
                     Sposta
@@ -1571,8 +1820,8 @@ function Percorso({ vaiScheda }) {
       {/* 6. note & consigli del coach — archivio in lettura */}
       <div className="stit"><span>Note & consigli del coach</span></div>
       <div className="blocco" style={{ marginBottom: 40 }}>
-        {PERCORSO.note.length === 0 && <p className="nota" style={{ marginTop: 0 }}>Ancora nessuna nota.</p>}
-        {PERCORSO.note.map((n) => {
+        {note.length === 0 && <p className="nota" style={{ marginTop: 0 }}>Ancora nessuna nota.</p>}
+        {note.map((n) => {
           const co = COACHES.find((c) => c.id === n.coachId);
           return (
             <div className="recens" key={n.id}>
@@ -1895,13 +2144,21 @@ export default function App() {
   const [coach, setCoach] = useState(null);
   const [mia, setMia] = useState("b2");
   const [miaIr, setMiaIr] = useState("");
+  const [note, setNote] = useState(PERCORSO.note);
+  const [chatCoachId, setChatCoachId] = useState(""); // "" = nessuna chat aperta
+  const [chatLetti, setChatLetti] = useState({}); // { [coachId]: true } — thread già aperti in sessione
 
-  useEffect(() => { window.scrollTo(0, 0); }, [pagina, tab, coach]);
+  useEffect(() => { window.scrollTo(0, 0); }, [pagina, tab, coach, chatCoachId]);
 
   const vaiLogin = (r) => { setRuolo(r); setPagina("login"); };
   const vaiCandidatura = () => setPagina("candidatura");
   const entra = () => { setPagina("app"); setTab(ruolo === "coach" ? "dash" : "cerca"); setCoach(null); };
   const esci = () => { setPagina("home"); setCoach(null); };
+  const apriChat = (coachId) => {
+    setChatCoachId(coachId);
+    setChatLetti((prev) => ({ ...prev, [coachId]: true }));
+  };
+  const nonLettiPer = (coachId) => nonLettiDi(coachId, chatLetti);
 
   return (
     <div className="crd">
@@ -1951,12 +2208,17 @@ export default function App() {
             </div>
           </div>
 
-          {ruolo === "pilota" && tab === "cerca" && (coach
+          {ruolo === "pilota" && chatCoachId && (
+            <Chat coachId={chatCoachId} chiudi={() => setChatCoachId("")} note={note} setNote={setNote} />
+          )}
+          {ruolo === "pilota" && !chatCoachId && tab === "cerca" && (coach
             ? <Scheda c={coach} mia={mia} miaIr={miaIr} chiudi={() => setCoach(null)}
-                       vaiPercorso={() => { setCoach(null); setTab("percorso"); }} vediCoach={setCoach} />
+                       vaiPercorso={() => { setCoach(null); setTab("percorso"); }} vediCoach={setCoach}
+                       apriChat={apriChat} nonLettiDi={nonLettiPer} />
             : <Cerca apri={setCoach} mia={mia} setMia={setMia} miaIr={miaIr} setMiaIr={setMiaIr} />)}
-          {ruolo === "pilota" && tab === "percorso" && (
-            <Percorso vaiScheda={(co) => { setCoach(co); setTab("cerca"); }} />
+          {ruolo === "pilota" && !chatCoachId && tab === "percorso" && (
+            <Percorso vaiScheda={(co) => { setCoach(co); setTab("cerca"); }}
+                      apriChat={apriChat} nonLettiDi={nonLettiPer} note={note} setNote={setNote} />
           )}
           {ruolo === "coach" && <AreaCoach />}
         </>
@@ -1964,3 +2226,4 @@ export default function App() {
     </div>
   );
 }
+
