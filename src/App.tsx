@@ -342,9 +342,51 @@ const CSS = `
   --ambra:#E2472A; --ambraSoft:rgba(226,71,42,.14);
   --verde:#1FAA59; --verdeSoft:rgba(31,170,89,.14);
   --oro:#E3A63A; --oroSoft:rgba(227,166,58,.14);
+  /* azione distruttiva: variabile a parte, cosi' non si confonde con il
+     marchio ne' con l'avviso — nel tema Attuale coincide col rosso di sempre */
+  --distr:#8E1A20; --distr2:#B32229; --distrSoft:rgba(179,34,41,.12);
+  /* hover dei bottoni primari, disaccoppiato da --blu2/--rosso2: in Papaya
+     --blu2 deve restare chiaro per i numeri, quindi l'hover non puo' leggerlo */
+  --bluHover:#3C6DF0; --rossoHover:#B32229;
   background:var(--nero); color:var(--bianco); min-height:100%;
   font-family:'Titillium Web',system-ui,sans-serif; -webkit-font-smoothing:antialiased; line-height:1.5;
 }
+
+/* ============================ TEMI ALTERNATIVI (A/B) ============================
+   Solo variabili: nessuna regola di struttura tocca queste due liste. Il tema
+   "attuale" resta quello definito sopra in .crd{}, invariato — questi blocchi
+   si attivano solo con l'attributo data-theme sul contenitore .crd. */
+
+/* ---- TEMA A — "Teal" (ispirato Mercedes): un solo accento, dato+marchio+
+   primario coincidono. Distruttivo resta un rosso a parte, per non confondersi. */
+.crd[data-theme="teal"]{
+  --nero:#0A0A0A; --nero2:#141618; --nero3:#1B1E20; --bordo:#262A2C;
+  --bianco:#FFFFFF; --grigio:#9BA3A6; --grigio2:#63696B;
+  --rosso:#00A897; --rosso2:#00D2BE; --rossoSoft:rgba(0,210,190,.12);
+  --blu:#00A897; --blu2:#00D2BE; --bluSoft:rgba(0,210,190,.12);
+  --bluHover:#00D2BE; --rossoHover:#00D2BE;
+  --verde:#00D2BE; --verdeSoft:rgba(0,210,190,.14);
+  --oro:#9BA3A6; --oroSoft:rgba(155,163,166,.14);
+  --ambra:#F5A623; --ambraSoft:rgba(245,166,35,.14);
+  --distr:#E0454A; --distr2:#C93D42; --distrSoft:rgba(224,69,74,.12);
+}
+
+/* ---- TEMA B — "Papaya" (ispirato McLaren): marchio forte, ma dosato. Solo il
+   numero-eroe (.numero-eroe) prende il papaya — i numeri normali (--blu2)
+   restano chiari, cosi' il dato continua a leggersi come "misurato". */
+.crd[data-theme="papaya"]{
+  --nero:#010101; --nero2:#121212; --nero3:#1A1A1A; --bordo:#262626;
+  --bianco:#FFFFFF; --grigio:#9A9A9A; --grigio2:#5E5E5E;
+  --rosso:#D96C00; --rosso2:#FF8000; --rossoSoft:rgba(255,128,0,.12);
+  --blu:#D96C00; --blu2:#F2F2F2; --bluSoft:rgba(255,128,0,.12);
+  --bluHover:#FF9933; --rossoHover:#FF9933;
+  --verde:#2FBF71; --verdeSoft:rgba(47,191,113,.14);
+  --oro:#9A9A9A; --oroSoft:rgba(154,154,154,.14);
+  --ambra:#E23B3B; --ambraSoft:rgba(226,59,59,.14);
+  --distr:#B32229; --distr2:#8E1A20; --distrSoft:rgba(179,34,41,.12);
+}
+.crd[data-theme="papaya"] .numero-eroe{color:var(--rosso2)}
+
 .crd *{box-sizing:border-box}
 .crd h1,.crd h2,.crd h3{font-family:'Saira Condensed',system-ui,sans-serif;font-weight:700;line-height:1.08;margin:0;letter-spacing:-.02em}
 .mn{font-family:'Roboto Mono',ui-monospace,monospace;font-variant-numeric:tabular-nums}
@@ -361,16 +403,20 @@ const CSS = `
 @media(min-width:820px){.navlinks{display:flex}}
 .navlinks button{background:none;border:0;color:var(--grigio);font-size:14px;cursor:pointer;font-family:inherit;padding:4px 0}
 .navlinks button:hover{color:var(--bianco)}
-.navcta{margin-left:auto;display:flex;gap:8px}
+.navcta{margin-left:auto;display:flex;gap:8px;align-items:center}
+.temaSelect{background:var(--nero2);border:1px solid var(--bordo);color:var(--grigio);
+  font-family:'Roboto Mono',monospace;font-size:11px;padding:6px 8px;border-radius:2px;cursor:pointer}
 
 /* ---- bottoni ---- */
 .b{font-family:'Saira Condensed',sans-serif;font-weight:600;font-size:14px;letter-spacing:.01em;
   padding:11px 18px;border:1px solid transparent;cursor:pointer;border-radius:3px;transition:background .15s,border-color .15s}
 .b:focus-visible{outline:2px solid var(--bianco);outline-offset:2px}
 .b-rosso{background:var(--rosso);color:#fff}
-.b-rosso:hover{background:var(--rosso2)}
+.b-rosso:hover{background:var(--rossoHover)}
 .b-blu{background:var(--blu);color:#fff}
-.b-blu:hover{background:var(--blu2)}
+.b-blu:hover{background:var(--bluHover)}
+.b-distr{background:var(--distr);color:#fff}
+.b-distr:hover{background:var(--distr2)}
 .b-ghost{background:transparent;border-color:var(--bordo);color:var(--bianco)}
 .b-ghost:hover{border-color:var(--grigio)}
 .b-lg{padding:15px 26px;font-size:16px;width:100%}
@@ -381,7 +427,7 @@ const CSS = `
   repeating-linear-gradient(135deg,transparent,transparent 9px,rgba(255,255,255,.022) 9px,rgba(255,255,255,.022) 18px),var(--nero2);
   display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:18px;text-align:center}
 .slot code{font-family:'Roboto Mono',monospace;font-size:12px;letter-spacing:.16em;color:var(--rosso2);
-  border:1px solid rgba(179,34,41,.4);padding:3px 9px}
+  border:1px solid var(--rosso2);padding:3px 9px}
 .slot p{margin:0;font-size:12.5px;color:var(--grigio2);max-width:34ch;line-height:1.45}
 .slot span{font-family:'Roboto Mono',monospace;font-size:10.5px;color:var(--bordo);letter-spacing:.1em}
 .slot video,.slot img{width:100%;height:100%;object-fit:cover;display:block}
@@ -423,7 +469,10 @@ const CSS = `
 .duo{display:grid;gap:34px;grid-template-columns:1fr;align-items:center}
 @media(min-width:900px){.duo{grid-template-columns:1fr 1fr;gap:52px}}
 .metric{border:1px solid var(--bordo);background:var(--nero2);padding:22px}
-.metric .big{font-family:'Saira Condensed',sans-serif;font-size:52px;font-weight:800;color:var(--blu2);letter-spacing:-.03em;line-height:1}
+.metric .big{font-family:'Saira Condensed',sans-serif;font-size:52px;font-weight:800;letter-spacing:-.03em;line-height:1}
+/* il numero-eroe (es. il grande +iR) resta sul colore dato in Attuale/Teal;
+   solo in Papaya prende il marchio, mentre i numeri "normali" restano chiari */
+.numero-eroe{color:var(--blu2)}
 .metric .sm{font-family:'Roboto Mono',monospace;font-size:12px;color:var(--grigio2);margin-top:8px;letter-spacing:.06em}
 .check{list-style:none;padding:0;margin:20px 0 0}
 .check li{position:relative;padding-left:24px;margin-bottom:12px;color:var(--grigio);font-size:15px;line-height:1.55}
@@ -509,7 +558,7 @@ const CSS = `
 .ccmetr{display:flex;align-items:flex-end;gap:14px;margin-top:16px}
 .ccbig{font-family:'Saira Condensed',sans-serif;font-weight:800;font-size:30px;color:var(--blu2);letter-spacing:-.02em;line-height:1}
 .ccsm{font-family:'Roboto Mono',monospace;font-size:11px;color:var(--grigio2);line-height:1.5}
-.fit{margin-top:14px;border:1px solid rgba(29,79,215,.35);background:var(--bluSoft);padding:9px 11px;font-size:13px}
+.fit{margin-top:14px;border:1px solid var(--blu2);background:var(--bluSoft);padding:9px 11px;font-size:13px}
 .fit b{color:var(--blu2)}
 .fit.no{border-color:var(--bordo);background:var(--nero);color:var(--grigio2)}
 .stato{display:inline-flex;align-items:center;font-family:'Roboto Mono',monospace;font-size:10.5px;
@@ -519,10 +568,12 @@ const CSS = `
 .stato-avviso{background:var(--ambra);color:#fff}
 .notaBox{border:1px solid var(--bordo);background:var(--nero2);padding:14px 16px;margin-top:10px;font-size:13px;line-height:1.6}
 .notaBox b{color:var(--bianco)}
-.notaBox.ambra{border-color:rgba(226,71,42,.4);background:var(--ambraSoft)}
+.notaBox.ambra{border-color:var(--ambra);background:var(--ambraSoft)}
 .notaBox.ambra b{color:var(--ambra)}
-.notaBox.rossa{border-color:rgba(179,34,41,.5);background:var(--rossoSoft)}
+.notaBox.rossa{border-color:var(--rosso2);background:var(--rossoSoft)}
 .notaBox.rossa b{color:var(--rosso2)}
+.notaBox.distr{border-color:var(--distr);background:var(--distrSoft)}
+.notaBox.distr b{color:var(--distr2)}
 .altList{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
 .altList button{background:var(--nero);border:1px solid var(--bordo);color:var(--bianco);
   font-family:'Roboto Mono',monospace;font-size:11.5px;padding:6px 10px;cursor:pointer;border-radius:2px}
@@ -530,7 +581,7 @@ const CSS = `
 .chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:14px}
 .chip{font-family:'Roboto Mono',monospace;font-size:10.5px;letter-spacing:.06em;border:1px solid var(--bordo);
   color:var(--grigio2);padding:4px 8px}
-.chip.p{border-color:rgba(179,34,41,.45);color:var(--rosso2)}
+.chip.p{border-color:var(--rosso2);color:var(--rosso2)}
 .specbox{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
 .specbox-item{border:1px solid var(--bordo);background:var(--nero3);color:var(--bianco);
   padding:8px 12px;font-size:12.5px;font-weight:600;border-radius:3px}
@@ -567,7 +618,7 @@ const CSS = `
 .slotchip[data-on="1"]{border-color:var(--blu2);background:var(--bluSoft);color:var(--blu2)}
 .slotgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px}
 .ok{border:1px solid var(--blu);background:var(--bluSoft);padding:20px;margin:22px 0}
-.avviso{border:1px solid rgba(179,34,41,.5);background:var(--rossoSoft);padding:14px;font-size:13.5px;line-height:1.55;margin-bottom:16px}
+.avviso{border:1px solid var(--rosso2);background:var(--rossoSoft);padding:14px;font-size:13.5px;line-height:1.55;margin-bottom:16px}
 .kpigrid{display:grid;gap:14px;grid-template-columns:1fr}
 @media(min-width:620px){.kpigrid{grid-template-columns:1fr 1fr}}
 .kbox{border:1px solid var(--bordo);background:var(--nero2);padding:18px}
@@ -587,8 +638,8 @@ const CSS = `
   border:1px solid var(--bordo);background:var(--nero);padding:6px 12px;cursor:pointer;border-radius:2px}
 .azsess.sposta{color:var(--blu2)}
 .azsess.sposta:hover{border-color:var(--blu2)}
-.azsess.cancella{color:var(--ambra)}
-.azsess.cancella:hover{border-color:var(--ambra)}
+.azsess.cancella{color:var(--distr2)}
+.azsess.cancella:hover{border-color:var(--distr2)}
 .azsess.avvia{color:var(--verde)}
 .azsess.avvia:hover{border-color:var(--verde)}
 .badge{display:inline-flex;align-items:center;justify-content:center;min-width:16px;height:16px;
@@ -631,11 +682,11 @@ const CSS = `
 /* ---- provenienza nota: dal coach o salvata dalla chat (punto 4) ---- */
 .origineTag{font-family:'Roboto Mono',monospace;font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;
   border:1px solid var(--bordo);padding:2px 6px;border-radius:2px;color:var(--grigio2)}
-.origineTag.coach{border-color:rgba(29,79,215,.35);color:var(--blu2)}
+.origineTag.coach{border-color:var(--blu2);color:var(--blu2)}
 
 /* ---- iRating non verificato in header (punto 2) ---- */
 .irTag{font-family:'Roboto Mono',monospace;font-size:9.5px;letter-spacing:.06em;text-transform:uppercase;
-  color:var(--oro);border:1px solid rgba(227,166,58,.4);padding:1px 6px;border-radius:2px;margin-left:7px}
+  color:var(--oro);border:1px solid var(--oro);padding:1px 6px;border-radius:2px;margin-left:7px}
 
 /* ---- "con chi hai lavorato prima": impila su mobile, affianca da tablet in su (punto 3) ---- */
 .storicoRiga{display:flex;flex-direction:column;gap:4px;padding:10px 0;
@@ -863,7 +914,7 @@ function Home({ vaiLogin, vaiCandidatura }) {
           </div>
           <div className="metric">
             <div className="eyebrow">Esempio reale di un allievo</div>
-            <div className="big" style={{ marginTop: 14 }}>+564 iR</div>
+            <div className="big numero-eroe" style={{ marginTop: 14 }}>+564 iR</div>
             <div className="sm">IN 22 GIORNI · 179 iR A SETTIMANA · 19 GARE</div>
             <div style={{ marginTop: 20 }}>
               <Media id="I01" ratio="4 / 3" tipo="immagine"
@@ -1361,7 +1412,7 @@ function Scheda({ c, mia, miaIr, chiudi, vaiPercorso, vediCoach, apriChat, nonLe
       {c.patto && (
         <>
           <div className="stit"><span>Patto di risultato</span></div>
-          <div className="blocco" style={{ borderColor: "rgba(179,34,41,.5)" }}>
+          <div className="blocco" style={{ borderColor: "var(--rosso2)" }}>
             <div className="riga">
               <span>Obiettivo dichiarato dal coach</span>
               <b className="mn" style={{ color: "var(--rosso2)" }}>+{c.patto.ir} iR in {c.patto.gg} giorni</b>
@@ -1589,13 +1640,13 @@ function StanzaSessione({ prenotazione, coach, chiudi, onTermina, vaiScheda }) {
       </p>
 
       {confermaTermina && (
-        <div className="notaBox rossa" style={{ marginTop: 14 }}>
+        <div className="notaBox distr" style={{ marginTop: 14 }}>
           <p>
             <b>Terminare la sessione?</b> Partiranno il conteggio sessioni, la richiesta di nota al
             coach e la richiesta di recensione.
           </p>
           <div style={{ display: "flex", gap: 10, marginTop: 10 }}>
-            <button className="b b-rosso" onClick={termina}>Conferma</button>
+            <button className="b b-distr" onClick={termina}>Conferma</button>
             <button className="b b-ghost" onClick={() => setConfermaTermina(false)}>Annulla</button>
           </div>
         </div>
@@ -1721,13 +1772,13 @@ function Percorso({ vaiScheda, apriChat, nonLettiDi, note, setNote, iracingColle
             </div>
 
             {sospendiAperto && (
-              <div className="notaBox rossa" style={{ marginTop: 14 }}>
+              <div className="notaBox distr" style={{ marginTop: 14 }}>
                 <p>
                   <b>Sospendere il coaching con {coachAttuale.nome}?</b> Tutte le sessioni prenotate
                   con lui verranno cancellate. Il vostro storico resta comunque visibile.
                 </p>
                 <div style={{ display: "flex", gap: 10, marginTop: 10 }}>
-                  <button className="b b-rosso" onClick={sospendiTutto}>Conferma sospensione</button>
+                  <button className="b b-distr" onClick={sospendiTutto}>Conferma sospensione</button>
                   <button className="b b-ghost" onClick={() => setSospendiAperto(false)}>Annulla</button>
                 </div>
               </div>
@@ -1841,10 +1892,10 @@ function Percorso({ vaiScheda, apriChat, nonLettiDi, note, setNote, iracingColle
               </div>
 
               {cancellaConferma === p.id && (
-                <div className="notaBox rossa" style={{ marginTop: 0, marginBottom: 14 }}>
+                <div className="notaBox distr" style={{ marginTop: 0, marginBottom: 14 }}>
                   <p><b>Cancellare la sessione di {dataOrario}?</b> Non potrai annullarlo da qui.</p>
                   <div style={{ display: "flex", gap: 10, marginTop: 10 }}>
-                    <button className="b b-rosso" onClick={() => confermaCancella(p.id)}>Conferma cancellazione</button>
+                    <button className="b b-distr" onClick={() => confermaCancella(p.id)}>Conferma cancellazione</button>
                     <button className="b b-ghost" onClick={annullaCancella}>Annulla</button>
                   </div>
                 </div>
@@ -2240,6 +2291,7 @@ export default function App() {
   const [notificheEmail, setNotificheEmail] = useState(true); // punto 1: preferenza disattivabile
   const [bannerChiuso, setBannerChiuso] = useState({}); // { [coachId]: conteggio al momento della chiusura del banner }
   const [iracingCollegato, setIracingCollegato] = useState(false); // punto 2
+  const [tema, setTema] = useState("attuale"); // attuale | teal | papaya — A/B dei temi colore
 
   useEffect(() => { window.scrollTo(0, 0); }, [pagina, tab, coach, chatCoachId]);
 
@@ -2276,7 +2328,7 @@ export default function App() {
   const chiudiBanner = (coachId) => setBannerChiuso((prev) => ({ ...prev, [coachId]: nonLettiPer(coachId) }));
 
   return (
-    <div className="crd">
+    <div className="crd" data-theme={tema}>
       <style>{CSS}</style>
 
       <header className="nav">
@@ -2291,6 +2343,12 @@ export default function App() {
             </nav>
           )}
           <div className="navcta">
+            <select className="temaSelect" value={tema} onChange={(e) => setTema(e.target.value)}
+                    aria-label="Tema colore (test A/B)">
+              <option value="attuale">Tema: Attuale</option>
+              <option value="teal">Tema: Teal</option>
+              <option value="papaya">Tema: Papaya</option>
+            </select>
             {pagina === "app" ? (
               <button className="b b-ghost" onClick={esci}>Esci</button>
             ) : (
