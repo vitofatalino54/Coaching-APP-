@@ -166,10 +166,13 @@ const CALENDARIO_STAGIONE = [
   { id: "s8", data: "2026-10-25", pista: "Charlotte", auto: "Ferrari 296 GT3" },
 ];
 
-// il pilota mostrato nella demo (appbar, "Pilota" nella stanza sessione, ecc.).
-// ir è autodichiarato finché l'account iRacing non è collegato: da quel
-// momento lo stesso numero diventa verificato via API (punto 2)
-const PILOTA_DEMO = { nome: "L. Moretti", ir: 1842 };
+// il pilota mostrato nella demo (header, "Pilota" nella stanza sessione, Scheda
+// Pilota, ecc.). Tutto qui sotto arriva dall'account iRacing collegato: senza
+// collegamento non c'è iR verificato, e il matching non puo' calcolarsi — non
+// esiste piu' un valore autodichiarato da mostrare nel frattempo.
+const PILOTA_DEMO = {
+  nome: "L. Moretti", ir: 1842, licenza: "A 3.87", anniPiattaforma: 3,
+};
 
 const PERCORSO = {
   oreAcquistate: 20,
@@ -328,6 +331,13 @@ const MAX_OBIETTIVI = 4;
 // estremi dello slider del prezzo orario
 const PREZZO_MIN = 9.99;
 const PREZZO_MAX = 99;
+
+// logistica della Scheda Pilota: lingua e fuso, stessa idea di FASCE_ORARIE
+const LINGUE = [
+  { k: "it", l: "Italiano" }, { k: "en", l: "English" }, { k: "es", l: "Español" },
+  { k: "de", l: "Deutsch" }, { k: "fr", l: "Français" },
+];
+const FUSI = ["Europe/Rome", "Europe/London", "America/New_York", "America/Los_Angeles", "Australia/Sydney"];
 
 /* ---------------------------------- stile ---------------------------------- */
 
@@ -559,7 +569,11 @@ html,body{margin:0;padding:0}
 .tabs button[data-on="1"][data-r="pilota"]{background:var(--blu);color:#fff}
 .tabs button[data-on="1"][data-r="coach"]{background:var(--rosso);color:#fff}
 .campo{margin-bottom:14px}
-.campo label{display:block;font-family:'Roboto Mono',monospace;font-size:10.5px;letter-spacing:.16em;
+/* diretto, non discendente: senza, questa regola scavalcava anche le label
+   dei checkbox dentro un .checkgrid annidato in un .campo (font monospace
+   piu' largo del previsto, mai emerso finche' il testo dei checkbox non e'
+   stato abbastanza lungo da sforare il contenitore) */
+.campo > label{display:block;font-family:'Roboto Mono',monospace;font-size:10.5px;letter-spacing:.16em;
   text-transform:uppercase;color:var(--grigio2);margin-bottom:6px}
 .campo input{width:100%;background:var(--nero);border:1px solid var(--bordo);color:var(--bianco);
   padding:11px 12px;font-family:'Titillium Web',sans-serif;font-size:14px;border-radius:2px}
@@ -583,6 +597,9 @@ html,body{margin:0;padding:0}
 .appbarin button[data-on="1"]{color:var(--bianco);border-bottom-color:var(--rosso2)}
 .appbarin .esci{margin-left:auto;color:var(--grigio2);font-size:13px;font-weight:500;
   white-space:nowrap;flex:none}
+/* "Scheda Pilota" prende lo spazio a destra lasciato libero dall'identita',
+   ora spostata nell'header (punto 1) */
+.appbarin .schedaTab{margin-left:auto}
 
 .filtri{border:1px solid var(--bordo);background:var(--nero2);margin:22px 0}
 .fhead{padding:10px 14px;border-bottom:1px solid var(--bordo);font-family:'Roboto Mono',monospace;
@@ -751,9 +768,17 @@ html,body{margin:0;padding:0}
   border:1px solid var(--bordo);padding:2px 6px;border-radius:2px;color:var(--grigio2)}
 .origineTag.coach{border-color:var(--blu2);color:var(--blu2)}
 
-/* ---- iRating non verificato in header (punto 2) ---- */
+/* ---- iRating verificato/da verificare nell'identita' in header ---- */
 .irTag{font-family:'Roboto Mono',monospace;font-size:9.5px;letter-spacing:.06em;text-transform:uppercase;
   color:var(--oro);border:1px solid var(--oro);padding:1px 6px;border-radius:2px;margin-left:7px}
+.irTag.ok{color:var(--verde);border-color:var(--verde)}
+
+/* ---- identita' pilota, spostata nell'header accanto al logo: e' anche la
+   scorciatoia per la Scheda Pilota ---- */
+.identita{background:none;border:0;color:var(--grigio);cursor:pointer;font-family:'Roboto Mono',monospace;
+  font-size:12.5px;padding:4px 0;text-align:left;white-space:nowrap}
+.identita:hover{color:var(--bianco)}
+.identita b{color:var(--bianco);font-weight:500}
 
 /* ---- "con chi hai lavorato prima": impila su mobile, affianca da tablet in su (punto 3) ---- */
 .storicoRiga{display:flex;flex-direction:column;gap:4px;padding:10px 0;
@@ -788,6 +813,14 @@ const fmtData = (iso) => {
 function iRAllievo(miaIr, mia) {
   const n = Number(miaIr);
   return n > 0 ? n : FASCE_MEDIO[mia];
+}
+
+// da iR verificato a fascia: stessi confini usati per etichettare FASCE
+function fasciaDaIr(ir) {
+  if (ir < 1500) return "b1";
+  if (ir < 2500) return "b2";
+  if (ir < 4000) return "b3";
+  return "b4";
 }
 
 function statoForbice(coachIr, allievoIr) {
@@ -1145,7 +1178,7 @@ function Login({ ruolo, setRuolo, entra }) {
 
 /* ------------------------------- AREA PILOTA ------------------------------- */
 
-function Cerca({ apri, mia, setMia, miaIr, setMiaIr }) {
+function Cerca({ apri, mia, miaIr, iracingCollegato, setIracingCollegato }) {
   const [cat, setCat] = useState("tutte");
   const [auto, setAuto] = useState(TUTTE);
   const [obi, setObi] = useState(OBIETTIVI.map((o) => o.k).slice(0, 0));
@@ -1173,6 +1206,10 @@ function Cerca({ apri, mia, setMia, miaIr, setMiaIr }) {
                    (obi.length === 0 || obi.some((o) => c.obiettivi.includes(o))) &&
                    (c.prezzo >= prezzoMin && c.prezzo <= prezzoMax))
     .sort((a, b) => {
+      // senza iR verificato non c'e' una fascia reale su cui ordinare: niente
+      // di meglio da fare che lasciare l'ordine invariato, invece di ordinare
+      // su una fascia assunta
+      if (!iracingCollegato) return 0;
       const fa = a.fasce[mia], fb = b.fasce[mia];
       if (fa && !fb) return -1;
       if (!fa && fb) return 1;
@@ -1193,20 +1230,22 @@ function Cerca({ apri, mia, setMia, miaIr, setMiaIr }) {
         <span>Trova il tuo coach</span><span>{list.length} risultati</span>
       </div>
 
+      {!iracingCollegato && (
+        <div className="lockbox" style={{ marginBottom: 20 }}>
+          <div className="eyebrow">iRating non ancora verificato</div>
+          <p style={{ marginTop: 10, color: "var(--grigio)", fontSize: 14.5, lineHeight: 1.6 }}>
+            Collega iRacing per vedere i coach giusti per la tua fascia. Puoi comunque guardarti
+            intorno: gli stati Consigliato/Neutro/Avviso restano spenti finché l'account non è
+            collegato.
+          </p>
+          <button className="b b-blu" style={{ marginTop: 14 }} onClick={() => setIracingCollegato?.(true)}>
+            Collega il tuo account iRacing
+          </button>
+        </div>
+      )}
+
       <div className="filtri">
         <div className="fhead"><span>FILTRI</span><span>iRACING</span></div>
-        <div className="frow hi">
-          <label htmlFor="f1">Il tuo iR</label>
-          <select id="f1" value={mia} onChange={(e) => setMia(e.target.value)}>
-            {FASCE.map((f) => <option key={f.k} value={f.k}>{f.l}</option>)}
-          </select>
-        </div>
-        <div className="frow hi">
-          <label htmlFor="f1b">iR esatto</label>
-          <input id="f1b" type="number" min="0" inputMode="numeric" value={miaIr}
-                 onChange={(e) => setMiaIr(e.target.value)}
-                 placeholder={`opzionale · senza, usiamo ${FASCE_MEDIO[mia]}`} />
-        </div>
         <div className="frow">
           <label htmlFor="f0">Categoria</label>
           <select id="f0" value={cat} onChange={(e) => cambiaCat(e.target.value)}>
@@ -1263,14 +1302,15 @@ function Cerca({ apri, mia, setMia, miaIr, setMiaIr }) {
       </div>
 
       <p className="nota" style={{ marginTop: 0 }}>
-        L'ordine cambia con la tua fascia: chi fa numeri enormi con i principianti non è detto che
-        li faccia con te. Consigliato / Neutro / Avviso confrontano il tuo iR con quello del coach.
+        {iracingCollegato
+          ? "L'ordine cambia con la tua fascia: chi fa numeri enormi con i principianti non è detto che li faccia con te. Consigliato / Neutro / Avviso confrontano il tuo iR con quello del coach."
+          : "Consigliato / Neutro / Avviso confrontano il tuo iR con quello del coach: collega l'account per vederli."}
       </p>
 
       <div className="lista">
         {list.map((c) => {
-          const f = c.fasce[mia];
-          const stato = calcolaStato(c, allievoIr, mia);
+          const f = iracingCollegato ? c.fasce[mia] : undefined;
+          const stato = iracingCollegato ? calcolaStato(c, allievoIr, mia) : "neutro";
           return (
             <div key={c.id}>
               <button className="cc" onClick={() => apri(c)}>
@@ -1293,7 +1333,9 @@ function Cerca({ apri, mia, setMia, miaIr, setMiaIr }) {
                 {f ? (
                   <div className="fit">Con piloti come te: <b>+{f[0]} iR in {f[1]} gg</b> · {f[2]} allievi</div>
                 ) : (
-                  <div className="fit no">Nessun dato nella tua fascia.</div>
+                  <div className="fit no">
+                    {iracingCollegato ? "Nessun dato nella tua fascia." : "Collega iRacing per il confronto nella tua fascia."}
+                  </div>
                 )}
 
                 <div className="specbox">
@@ -1340,14 +1382,14 @@ function Cerca({ apri, mia, setMia, miaIr, setMiaIr }) {
   );
 }
 
-function Scheda({ c, mia, miaIr, chiudi, vaiPercorso, vediCoach, apriChat, nonLettiDi }) {
+function Scheda({ c, mia, miaIr, iracingCollegato, chiudi, vaiPercorso, vediCoach, apriChat, nonLettiDi }) {
   const [slot, setSlot] = useState(null);
   const [fatto, setFatto] = useState(false);
   const [apri, setApri] = useState(false);
-  const f = c.fasce[mia];
+  const f = iracingCollegato ? c.fasce[mia] : undefined;
   const fee = (c.prezzo * 0.15).toFixed(2);
   const allievoIr = iRAllievo(miaIr, mia);
-  const stato = calcolaStato(c, allievoIr, mia);
+  const stato = iracingCollegato ? calcolaStato(c, allievoIr, mia) : "neutro";
   const nonLetti = nonLettiDi?.(c.id) || 0;
   const alternative = COACHES.filter((x) => x.id !== c.id &&
     x.cat.some((k) => c.cat.includes(k)) &&
@@ -1452,7 +1494,7 @@ function Scheda({ c, mia, miaIr, chiudi, vaiPercorso, vediCoach, apriChat, nonLe
       <div className="blocco">
         {FASCE.map((fa) => {
           const d = c.fasce[fa.k];
-          const on = fa.k === mia;
+          const on = iracingCollegato && fa.k === mia;
           return (
             <div className="riga" key={fa.k}
                  style={on ? { background: "var(--bluSoft)", margin: "0 -18px", padding: "10px 18px" } : undefined}>
@@ -1466,8 +1508,11 @@ function Scheda({ c, mia, miaIr, chiudi, vaiPercorso, vediCoach, apriChat, nonLe
           );
         })}
         <p className="nota">
-          {f ? `Nella tua fascia il ritmo è di ${perSett(f[0], f[1])} iR a settimana su ${f[2]} allievi.`
-             : "In questa fascia non ha storico: prenoti al buio, il prezzo dovrebbe rifletterlo."}
+          {!iracingCollegato
+            ? "Collega il tuo account iRacing per vedere il ritmo tipico nella tua fascia."
+            : f
+              ? `Nella tua fascia il ritmo è di ${perSett(f[0], f[1])} iR a settimana su ${f[2]} allievi.`
+              : "In questa fascia non ha storico: prenoti al buio, il prezzo dovrebbe rifletterlo."}
         </p>
       </div>
 
@@ -1724,6 +1769,319 @@ function StanzaSessione({ prenotazione, coach, chiudi, onTermina, vaiScheda }) {
           Termina sessione
         </button>
       </div>
+    </div>
+  );
+}
+
+/* ---------------------------- Scheda Pilota --------------------------------
+   Chi sei, non come stai andando: statica, è quello che il coach vede quando
+   siete abbinati (a differenza de "Il mio percorso", che è dinamica ed è solo
+   per il pilota). Due strati come "Il mio percorso": obiettivi/logistica/
+   postazione/nota sono dati CORDA, disponibili subito; identità verificata,
+   iRating, licenza e Safety Rating arrivano dall'account iRacing collegato.
+   Lo stato qui dentro è locale al componente, come i filtri di Cerca: si
+   azzera se lasci la scheda e ci torni — stessa scelta già fatta altrove. */
+
+// sintesi di sola lettura: quello che vede il coach quando siete abbinati —
+// email e dati di fatturazione non compaiono qui perché non fanno parte del
+// profilo che il coach vede, restano un dato di account privato
+function AnteprimaScheda({
+  iracingCollegato, vetture, obiettivi, irTarget, fasceOrarie, lingua, fuso, volante, cellaDiCarico, base, notaCoach,
+}) {
+  return (
+    <div className="blocco">
+      <div className="eyebrow">Quello che vede il coach quando siete abbinati</div>
+
+      <div className="stit" style={{ marginTop: 18 }}><span>Identità verificata</span></div>
+      {iracingCollegato ? (
+        <div className="riga"><span>iRating</span><b className="mn" style={{ color: "var(--blu2)" }}>{PILOTA_DEMO.ir} · verificato</b></div>
+      ) : <p className="nn">Non ancora collegato — il coach non vede un iRating verificato.</p>}
+
+      <div className="stit" style={{ marginTop: 18 }}><span>Cosa guido</span></div>
+      <div className="chips">
+        {vetture.length > 0
+          ? vetture.map((v) => <span className="chip" key={v}>{v}</span>)
+          : <span className="nn">Nessuna vettura indicata</span>}
+      </div>
+
+      <div className="stit" style={{ marginTop: 18 }}><span>Obiettivi</span></div>
+      <div className="chips">
+        {obiettivi.length > 0
+          ? obiettivi.map((k) => <span className="chip" key={k}>{OBIETTIVI.find((o) => o.k === k)?.l}</span>)
+          : <span className="nn">Nessun obiettivo indicato</span>}
+        {irTarget && <span className="chip">Target: +{irTarget} iR</span>}
+      </div>
+
+      <div className="stit" style={{ marginTop: 18 }}><span>Logistica</span></div>
+      <div className="chips">
+        {fasceOrarie.length > 0
+          ? fasceOrarie.map((f) => <span className="chip" key={f}>{f}</span>)
+          : <span className="nn">Nessuna fascia indicata</span>}
+      </div>
+      <p className="nn" style={{ marginTop: 8 }}>
+        {LINGUE.find((l) => l.k === lingua)?.l} · {fuso}
+      </p>
+
+      {(volante || cellaDiCarico || base) && (
+        <>
+          <div className="stit" style={{ marginTop: 18 }}><span>Postazione</span></div>
+          <p className="nn">{[volante, cellaDiCarico, base].filter(Boolean).join(" · ")}</p>
+        </>
+      )}
+
+      {notaCoach && (
+        <>
+          <div className="stit" style={{ marginTop: 18 }}><span>Nota per il coach</span></div>
+          <p className="nota" style={{ marginTop: 0 }}>"{notaCoach}"</p>
+        </>
+      )}
+
+      <p className="nota" style={{ marginTop: 20 }}>
+        Email e dati di fatturazione restano privati: il coach non li vede mai da qui.
+      </p>
+    </div>
+  );
+}
+
+function SchedaPilota({ vaiPercorso, iracingCollegato, setIracingCollegato }) {
+  const [anteprima, setAnteprima] = useState(false);
+
+  // 2. cosa guido — dichiarate dal pilota, alimentano il matching
+  const [vetture, setVetture] = useState(["Ferrari 296 GT3"]);
+  const [vetturaDaAggiungere, setVetturaDaAggiungere] = useState(TUTTE);
+  const aggiungiVettura = () => {
+    if (vetturaDaAggiungere !== TUTTE && !vetture.includes(vetturaDaAggiungere))
+      setVetture((prev) => [...prev, vetturaDaAggiungere]);
+  };
+  const rimuoviVettura = (v) => setVetture((prev) => prev.filter((x) => x !== v));
+
+  // 3. obiettivi — stessa tassonomia e stesso limite del filtro coach
+  const [obiettivi, setObiettivi] = useState(["gomme", "passo_gara"]);
+  const toggleObiettivo = (k) =>
+    setObiettivi((prev) => {
+      if (prev.includes(k)) return prev.filter((x) => x !== k);
+      if (prev.length >= MAX_OBIETTIVI) return prev;
+      return [...prev, k];
+    });
+  const [irTarget, setIrTarget] = useState("");
+
+  // 4. logistica per l'abbinamento
+  const [fasceOrarie, setFasceOrarie] = useState(["Weekend giorno", "Weekend sera"]);
+  const toggleFasciaOraria = (v) =>
+    setFasceOrarie((prev) => (prev.includes(v) ? prev.filter((x) => x !== v) : [...prev, v]));
+  const [lingua, setLingua] = useState("it");
+  const [fuso, setFuso] = useState("Europe/Rome");
+
+  // 5. postazione, opzionale
+  const [volante, setVolante] = useState("");
+  const [cellaDiCarico, setCellaDiCarico] = useState("");
+  const [base, setBase] = useState("");
+
+  // 6. nota libera per il coach
+  const [notaCoach, setNotaCoach] = useState("");
+
+  // 7. mini-riepilogo: rimanda a "Il mio percorso", non lo duplica
+  const coachAttuale = COACHES.find((c) => c.id === PERCORSO.coachAttualeId);
+
+  if (anteprima)
+    return (
+      <div className="w">
+        <div className="stit" style={{ marginTop: 26 }}>
+          <span>Scheda Pilota</span><span>Anteprima</span>
+        </div>
+        <div style={{ margin: "16px 0" }}>
+          <button className="b b-ghost" onClick={() => setAnteprima(false)}>← Torna a modificare</button>
+        </div>
+        <AnteprimaScheda
+          iracingCollegato={iracingCollegato} vetture={vetture} obiettivi={obiettivi} irTarget={irTarget}
+          fasceOrarie={fasceOrarie} lingua={lingua} fuso={fuso} volante={volante}
+          cellaDiCarico={cellaDiCarico && `pedali con cella di carico: ${cellaDiCarico}`} base={base}
+          notaCoach={notaCoach}
+        />
+      </div>
+    );
+
+  return (
+    <div className="w">
+      <div className="stit" style={{ marginTop: 26 }}>
+        <span>Scheda Pilota</span><span>{PILOTA_DEMO.nome}</span>
+      </div>
+      <p className="nota" style={{ marginTop: 0 }}>
+        Chi sei, cosa guidi e cosa vuoi dal coaching — è quello che il coach vede quando siete
+        abbinati. Per i tuoi progressi c'è "Il mio percorso".
+      </p>
+
+      <div style={{ margin: "16px 0" }}>
+        <button className="b b-ghost" onClick={() => setAnteprima(true)}>
+          👁 Anteprima come la vede il coach
+        </button>
+      </div>
+
+      {/* 1. identità verificata — strato 2 */}
+      <div className="stit"><span>Identità verificata</span></div>
+      {iracingCollegato ? (
+        <div className="blocco">
+          <div className="riga"><span>Account iRacing</span><b className="mn" style={{ color: "var(--verde)" }}>Collegato</b></div>
+          <div className="riga"><span>iRating</span><b className="mn" style={{ color: "var(--blu2)" }}>{PILOTA_DEMO.ir}</b></div>
+          <div className="riga"><span>Licenza</span><b className="mn">{PILOTA_DEMO.licenza}</b></div>
+          <div className="riga"><span>Su CORDA da</span><b className="mn">{PILOTA_DEMO.anniPiattaforma} anni</b></div>
+        </div>
+      ) : (
+        <div className="lockbox">
+          <div className="eyebrow">Da collegare</div>
+          <p style={{ marginTop: 10, color: "var(--grigio)", fontSize: 14.5, lineHeight: 1.6 }}>
+            Collega il tuo account iRacing per verificare identità, iRating, licenza e Safety
+            Rating: è quello che il coach vede quando siete abbinati, ed è quello che fa
+            funzionare il matching con Consigliato/Neutro/Avviso.
+          </p>
+          <button className="b b-blu" style={{ marginTop: 14 }} onClick={() => setIracingCollegato?.(true)}>
+            Collega il tuo account iRacing
+          </button>
+        </div>
+      )}
+
+      {/* 2. cosa guido — strato 1, in parte dichiarato */}
+      <div className="stit"><span>Cosa guido</span></div>
+      <div className="campo">
+        <label>Aggiungi una vettura</label>
+        <div style={{ display: "flex", gap: 8 }}>
+          <select value={vetturaDaAggiungere} onChange={(e) => setVetturaDaAggiungere(e.target.value)}>
+            <option>{TUTTE}</option>
+            {gruppiDi("tutte").map(([nome, auto], i) => (
+              <optgroup label={nome} key={`${nome}-${i}`}>
+                {auto.map((a) => <option key={a}>{a}</option>)}
+              </optgroup>
+            ))}
+          </select>
+          <button className="b b-ghost" type="button" onClick={aggiungiVettura} style={{ flex: "none" }}>
+            Aggiungi
+          </button>
+        </div>
+      </div>
+      {vetture.length > 0 && (
+        <div className="chips" style={{ marginBottom: 6 }}>
+          {vetture.map((v) => (
+            <span className="chip" key={v} style={{ cursor: "pointer" }} onClick={() => rimuoviVettura(v)}
+                  title="Tocca per togliere">{v} ×</span>
+          ))}
+        </div>
+      )}
+      <p className="nn">Alimenta il matching con i coach della tua categoria.</p>
+
+      {/* 3. obiettivi — strato 1 */}
+      <div className="stit"><span>Obiettivi</span></div>
+      <div className="campo">
+        <label>Cosa vuoi dal coaching · fino a {MAX_OBIETTIVI}</label>
+        <div className="checkgrid">
+          {OBIETTIVI.map((o) => {
+            const on = obiettivi.includes(o.k);
+            return (
+              <label key={o.k}>
+                <input type="checkbox" checked={on} disabled={!on && obiettivi.length >= MAX_OBIETTIVI}
+                       onChange={() => toggleObiettivo(o.k)} />
+                {o.l}
+              </label>
+            );
+          })}
+        </div>
+        <p className="nn" style={{ marginTop: 8 }}>
+          {obiettivi.length === 0 ? `Nessuno selezionato · fino a ${MAX_OBIETTIVI}` : `${obiettivi.length}/${MAX_OBIETTIVI} selezionati`}
+        </p>
+      </div>
+      <div className="campo">
+        <label>iRating obiettivo · opzionale</label>
+        <input type="number" min="0" inputMode="numeric" value={irTarget}
+               onChange={(e) => setIrTarget(e.target.value)} placeholder="es. 3000" />
+      </div>
+
+      {/* 4. logistica — strato 1, critica per l'abbinamento */}
+      <div className="stit"><span>Logistica per l'abbinamento</span></div>
+      <div className="campo">
+        <label>Fasce orarie disponibili</label>
+        <div className="checkgrid">
+          {FASCE_ORARIE.map((v) => (
+            <label key={v}>
+              <input type="checkbox" checked={fasceOrarie.includes(v)} onChange={() => toggleFasciaOraria(v)} />
+              {v}
+            </label>
+          ))}
+        </div>
+      </div>
+      <div className="campo">
+        <label>Lingua preferita</label>
+        <select value={lingua} onChange={(e) => setLingua(e.target.value)}>
+          {LINGUE.map((l) => <option key={l.k} value={l.k}>{l.l}</option>)}
+        </select>
+      </div>
+      <div className="campo">
+        <label>Fuso orario</label>
+        <select value={fuso} onChange={(e) => setFuso(e.target.value)}>
+          {FUSI.map((f) => <option key={f} value={f}>{f}</option>)}
+        </select>
+      </div>
+
+      {/* 5. postazione — strato 1, opzionale */}
+      <div className="stit"><span>Postazione <span className="nn">· opzionale</span></span></div>
+      <div className="campo">
+        <label>Volante / base</label>
+        <select value={volante} onChange={(e) => setVolante(e.target.value)}>
+          <option value="">Preferisco non dirlo</option>
+          <option value="Logitech G29/G923">Logitech G29/G923</option>
+          <option value="Thrustmaster T300/TX">Thrustmaster T300/TX</option>
+          <option value="Fanatec CSL DD">Fanatec CSL DD</option>
+          <option value="Fanatec Podium DD">Fanatec Podium DD</option>
+          <option value="Simucube 2">Simucube 2</option>
+          <option value="Altro">Altro</option>
+        </select>
+      </div>
+      <div className="campo">
+        <label>Pedali con cella di carico</label>
+        <select value={cellaDiCarico} onChange={(e) => setCellaDiCarico(e.target.value)}>
+          <option value="">Non lo so</option>
+          <option value="sì">Sì</option>
+          <option value="no">No</option>
+        </select>
+      </div>
+      <div className="campo">
+        <label>Base</label>
+        <select value={base} onChange={(e) => setBase(e.target.value)}>
+          <option value="">Preferisco non dirlo</option>
+          <option value="Scrivania / postazione da tavolo">Scrivania / postazione da tavolo</option>
+          <option value="Rig fisso dedicato">Rig fisso dedicato</option>
+          <option value="Altro">Altro</option>
+        </select>
+      </div>
+
+      {/* 6. nota per il coach — strato 1 */}
+      <div className="stit"><span>Nota per il coach</span></div>
+      <div className="campo">
+        <label>Cosa vuoi migliorare</label>
+        <textarea value={notaCoach} onChange={(e) => setNotaCoach(e.target.value)}
+                  placeholder="Es. Vorrei lavorare soprattutto sulla gestione gomme in gara lunga." />
+      </div>
+
+      {/* 7. mini-riepilogo percorso — rimanda, non duplica */}
+      <div className="stit"><span>Il tuo percorso</span></div>
+      <div className="metric" style={{ marginBottom: 20 }}>
+        <div style={{ display: "flex", gap: 32, flexWrap: "wrap", alignItems: "baseline" }}>
+          <div>
+            <div className="kval" style={{ fontSize: 34 }}>{PERCORSO.sessioniTotali}</div>
+            <div className="ccsm">sessioni</div>
+          </div>
+          <div>
+            <div className="kval" style={{ fontSize: 20 }}>{coachAttuale ? coachAttuale.nome : "—"}</div>
+            <div className="ccsm">coach attuale</div>
+          </div>
+        </div>
+        <button className="b b-ghost" style={{ marginTop: 16 }} onClick={vaiPercorso}>
+          Vai al tuo percorso completo →
+        </button>
+      </div>
+
+      <p className="nota" style={{ marginBottom: 40 }}>
+        Il coach abbinato può vedere identità verificata, vetture, obiettivi, logistica,
+        postazione e nota. Email e dati di fatturazione restano privati.
+      </p>
     </div>
   );
 }
@@ -2349,8 +2707,6 @@ export default function App() {
   const [ruolo, setRuolo] = useState("pilota");
   const [tab, setTab] = useState("cerca");
   const [coach, setCoach] = useState(null);
-  const [mia, setMia] = useState("b2");
-  const [miaIr, setMiaIr] = useState("");
   const [note, setNote] = useState(PERCORSO.note);
   const [chatCoachId, setChatCoachId] = useState(""); // "" = nessuna chat aperta
   const [chatMessaggi, setChatMessaggiRaw] = useState(CHAT_THREADS); // { [coachId]: [...] }, condiviso: non si perde uscendo dalla chat
@@ -2359,6 +2715,13 @@ export default function App() {
   const [bannerChiuso, setBannerChiuso] = useState({}); // { [coachId]: conteggio al momento della chiusura del banner }
   const [iracingCollegato, setIracingCollegato] = useState(false); // punto 2
   const [tema, setTema] = useState("attuale"); // attuale | teal | papaya | oro-bordeaux | menta-navy — A/B dei temi colore
+
+  // iR del pilota per il matching: non e' piu' un filtro manuale, arriva
+  // dall'account iRacing collegato (mock). Senza collegamento non c'e' un
+  // iR verificato, quindi Cerca/Scheda spengono gli stati Consigliato/
+  // Neutro/Avviso invece di calcolarli su un valore assunto
+  const mia = iracingCollegato ? fasciaDaIr(PILOTA_DEMO.ir) : "b2";
+  const miaIr = iracingCollegato ? String(PILOTA_DEMO.ir) : "";
 
   useEffect(() => { window.scrollTo(0, 0); }, [pagina, tab, coach, chatCoachId]);
 
@@ -2401,6 +2764,14 @@ export default function App() {
       <header className="nav">
         <div className="w navin">
           <button className="brand" onClick={esci}>CORD<i>A</i></button>
+          {pagina === "app" && ruolo === "pilota" && (
+            <button className="identita" onClick={() => { setTab("scheda"); setCoach(null); }}>
+              <b>{PILOTA_DEMO.nome}</b>{" "}
+              {iracingCollegato
+                ? <>· {PILOTA_DEMO.ir} iR <span className="irTag ok">Verificato</span></>
+                : <span className="irTag">Collega iRacing</span>}
+            </button>
+          )}
           {pagina === "home" && (
             <nav className="navlinks">
               <button onClick={() => document.getElementById("come")?.scrollIntoView({ behavior: "smooth" })}>
@@ -2442,20 +2813,15 @@ export default function App() {
                 <>
                   <button data-on={tab === "cerca" ? "1" : "0"} onClick={() => { setTab("cerca"); setCoach(null); }}>Cerca coach</button>
                   <button data-on={tab === "percorso" ? "1" : "0"} onClick={() => { setTab("percorso"); setCoach(null); }}>Il mio percorso</button>
+                  <button className="schedaTab" data-on={tab === "scheda" ? "1" : "0"}
+                          onClick={() => { setTab("scheda"); setCoach(null); }}>Scheda Pilota</button>
                 </>
               ) : (
-                <button data-on="1">Area coach</button>
+                <>
+                  <button data-on="1">Area coach</button>
+                  <span className="esci mn">MARCO BERTOLINI</span>
+                </>
               )}
-              <span className="esci mn">
-                {ruolo === "coach" ? "MARCO BERTOLINI" : (
-                  <>
-                    {PILOTA_DEMO.nome} ·{" "}
-                    {PILOTA_DEMO.ir ? (
-                      <>{PILOTA_DEMO.ir} iR{!iracingCollegato && <span className="irTag">Non verificato</span>}</>
-                    ) : "collega per vedere il tuo iR"}
-                  </>
-                )}
-              </span>
             </div>
           </div>
 
@@ -2478,15 +2844,20 @@ export default function App() {
                   notificheEmail={notificheEmail} setNotificheEmail={setNotificheEmail} />
           )}
           {ruolo === "pilota" && !chatCoachId && tab === "cerca" && (coach
-            ? <Scheda c={coach} mia={mia} miaIr={miaIr} chiudi={() => setCoach(null)}
+            ? <Scheda c={coach} mia={mia} miaIr={miaIr} iracingCollegato={iracingCollegato} chiudi={() => setCoach(null)}
                        vaiPercorso={() => { setCoach(null); setTab("percorso"); }} vediCoach={setCoach}
                        apriChat={apriChat} nonLettiDi={nonLettiPer} />
-            : <Cerca apri={setCoach} mia={mia} setMia={setMia} miaIr={miaIr} setMiaIr={setMiaIr} />)}
+            : <Cerca apri={setCoach} mia={mia} miaIr={miaIr}
+                      iracingCollegato={iracingCollegato} setIracingCollegato={setIracingCollegato} />)}
           {ruolo === "pilota" && !chatCoachId && tab === "percorso" && (
             <Percorso vaiScheda={(co) => { setCoach(co); setTab("cerca"); }}
                       apriChat={apriChat} nonLettiDi={nonLettiPer} note={note} setNote={setNote}
                       iracingCollegato={iracingCollegato} setIracingCollegato={setIracingCollegato}
                       simulaMessaggioCoach={simulaMessaggioCoach} />
+          )}
+          {ruolo === "pilota" && !chatCoachId && tab === "scheda" && (
+            <SchedaPilota vaiPercorso={() => setTab("percorso")}
+                          iracingCollegato={iracingCollegato} setIracingCollegato={setIracingCollegato} />
           )}
           {ruolo === "coach" && <AreaCoach />}
         </>
