@@ -55,6 +55,7 @@ const COACHES = [
     metodo: ["Sessione 0: giro tuo, senza correzioni.", "Confronto telemetria curva per curva.",
       "Due curve alla volta, mai di più.", "Compito scritto tra una lezione e l'altra."],
     offerte: [{ ore: 4, prezzo: 170 }, { ore: 8, prezzo: 320 }, { ore: 12, prezzo: 450 }],
+    fuso: "Europe/Rome", fasceOrarie: ["Feriali sera", "Weekend giorno", "Weekend sera"],
     slots: ["Gio 28 · 20:30", "Ven 29 · 21:00", "Sab 30 · 18:00", "Dom 31 · 20:00"],
     rec: [{ chi: "L. Moretti", auto: "Huracán GT3 · Monza", ir: 564, gg: 22,
       txt: "Mi ha smontato la staccata della prima variante e ricostruita in due sessioni." }],
@@ -70,6 +71,7 @@ const COACHES = [
     metodo: ["Analisi delle tue ultime cinque gare.", "Doppiaggi e difesa pulita.",
       "In gara insieme, io in macchina con te.", "Debrief a caldo dopo la bandiera."],
     offerte: [{ ore: 4, prezzo: 225 }, { ore: 8, prezzo: 420 }, { ore: 12, prezzo: 600 }],
+    fuso: "Europe/Rome", fasceOrarie: ["Feriali pomeriggio", "Feriali sera", "Weekend sera"],
     slots: ["Gio 28 · 16:00", "Sab 30 · 15:30", "Dom 31 · 17:00"],
     rec: [{ chi: "A. Rinaldi", auto: "M4 GT3 · Nürburgring", ir: 612, gg: 28,
       txt: "Ho smesso di buttare via gare al primo giro. Sembra poco, vale mezzo campionato." }],
@@ -85,6 +87,7 @@ const COACHES = [
     metodo: ["Partiamo dal tuo feedback, non dai numeri.", "Una modifica per volta, con run di controllo.",
       "Foglio di lavoro pista per pista.", "Alla fine il setup lo sai rifare senza di me."],
     offerte: [{ ore: 4, prezzo: 130 }, { ore: 8, prezzo: 250 }, { ore: 12, prezzo: 360 }],
+    fuso: "Europe/Rome", fasceOrarie: ["Feriali sera", "Weekend sera"],
     slots: ["Ven 29 · 21:30", "Sab 30 · 22:00", "Lun 1 · 21:00"],
     rec: [{ chi: "F. Curci", auto: "Huracán GT3 · Monza", ir: 284, gg: 31,
       txt: "Due sessioni e ho capito che il problema era il differenziale, non il posteriore." }],
@@ -100,6 +103,7 @@ const COACHES = [
     metodo: ["Prima le basi: sguardo, riferimenti, rilascio del freno.", "Niente dati finché il giro non è pulito.",
       "Obiettivo: chiudere gare intere senza incidenti.", "Poi, e solo poi, cerchiamo il tempo."],
     offerte: [{ ore: 4, prezzo: 95 }, { ore: 8, prezzo: 180 }, { ore: 12, prezzo: 264 }],
+    fuso: "Europe/Rome", fasceOrarie: ["Weekend giorno", "Weekend sera"],
     slots: ["Sab 30 · 10:30", "Sab 30 · 12:00", "Dom 31 · 11:00"],
     rec: [{ chi: "M. Loprete", auto: "296 GT3 · Watkins Glen", ir: 806, gg: 24,
       txt: "Ero fermo in D da sei mesi. In cinque settimane sono passato in C." }],
@@ -115,6 +119,7 @@ const COACHES = [
     metodo: ["Simulazione di stint completo.", "Deviazione tra i giri, non il giro migliore.",
       "Procedure pit e cambi guida.", "Piano gara scritto per il tuo evento."],
     offerte: [{ ore: 4, prezzo: 265 }, { ore: 8, prezzo: 500 }, { ore: 12, prezzo: 720 }],
+    fuso: "America/New_York", fasceOrarie: ["Weekend giorno", "Weekend sera"],
     slots: ["Sab 30 · 20:00", "Dom 31 · 19:00"],
     rec: [{ chi: "Team Aversa", auto: "AMG GT3 · Sebring 12h", ir: 226, gg: 44,
       txt: "Ci ha riscritto le procedure di pit. Finita la 12h senza un danno." }],
@@ -130,6 +135,7 @@ const COACHES = [
     metodo: ["Solo giro secco.", "Confronto sui canali freno e sterzo.",
       "Tre curve chiave per pista.", "Sessione singola, torni quando serve."],
     offerte: [{ ore: 4, prezzo: 320 }, { ore: 8, prezzo: 600 }, { ore: 12, prezzo: 860 }],
+    fuso: "Europe/London", fasceOrarie: ["Feriali sera", "Weekend sera"],
     slots: ["Ven 29 · 19:00", "Dom 31 · 18:30"],
     rec: [{ chi: "R. Halme", auto: "911 GT3 R · Road Atlanta", ir: 188, gg: 30,
       txt: "Tre curve, una sessione, quattro decimi. Caro, ma sa dove guardare." }],
@@ -145,6 +151,7 @@ const COACHES = [
     metodo: ["Partiamo dalla Ray, sempre, anche se corri in F3.", "Un solo canale alla volta: prima il freno.",
       "Niente aero finché il piede non è pulito.", "Test settimanale sulla stessa pista, per misurare."],
     offerte: [{ ore: 4, prezzo: 150 }, { ore: 8, prezzo: 290 }, { ore: 12, prezzo: 420 }],
+    fuso: "Europe/Rome", fasceOrarie: ["Feriali pomeriggio", "Weekend giorno"],
     slots: ["Ven 29 · 19:30", "Sab 30 · 17:00", "Dom 31 · 21:30"],
     rec: [{ chi: "G. Petrosino", auto: "Dallara F3 · Silverstone", ir: 402, gg: 29,
       txt: "Venivo dalle GT e frenavo come un camion. Mi ha rifatto il piede da zero." }],
@@ -354,6 +361,39 @@ const LINGUE = [
   { k: "de", l: "Deutsch" }, { k: "fr", l: "Français" },
 ];
 const FUSI = ["Europe/Rome", "Europe/London", "America/New_York", "America/Los_Angeles", "Australia/Sydney"];
+// scarto in ore da UTC di ogni fuso — un solo valore fisso per fuso, niente
+// calendario delle date legali reali: basta a mostrare "orario del coach"
+// come annotazione nel calendario di allocazione, senza la complessita' di
+// una conversione fusi-orari completa per un dato puramente informativo
+const FUSI_OFFSET = { "Europe/Rome": 2, "Europe/London": 1, "America/New_York": -4, "America/Los_Angeles": -7, "Australia/Sydney": 10 };
+const FUSO_PILOTA_DEFAULT = "Europe/Rome"; // la Scheda Pilota lo rende personalizzabile, ma quel valore e' locale al componente e non arriva qui
+
+/* -------------------- calendario di allocazione ore: configurazione --------------------
+   Ponte verso il vero calendario del coach (non ancora costruito): la disponibilita'
+   si deriva dalle fasce orarie dichiarate (le stesse del questionario candidatura),
+   non da uno slot-by-slot reale. orariDiFascia() e' l'UNICO punto che va sostituito
+   quando esistera' un calendario coach vero — il resto del componente lavora già
+   per slot orari singoli e non deve cambiare. */
+const ORA_CALENDARIO_INIZIO = 8; // 08:00
+const ORA_CALENDARIO_FINE = 22; // fino a 21:00-22:00, ultimo slot prenotabile alle 21:00
+const GIORNI_SETTIMANA = ["Lun", "Mar", "Mer", "Gio", "Ven", "Sab", "Dom"];
+
+// a quale fascia dichiarata appartiene un'ora di un certo giorno — bridge
+// mock: quando esistera' la disponibilita' reale del coach, questa funzione
+// si sostituisce con una vera lettura del suo calendario, senza toccare il
+// resto del componente (che ragiona gia' per singolo slot ora+giorno)
+function fasciaDiOrario(dataJs, ora) {
+  const weekend = dataJs.getDay() === 0 || dataJs.getDay() === 6;
+  if (!weekend) {
+    if (ora >= 8 && ora < 12) return "Feriali mattina";
+    if (ora >= 12 && ora < 18) return "Feriali pomeriggio";
+    if (ora >= 18 && ora < 23) return "Feriali sera";
+  } else {
+    if (ora >= 9 && ora < 18) return "Weekend giorno";
+    if (ora >= 18 && ora < 23) return "Weekend sera";
+  }
+  return null;
+}
 
 /* ---------------------------------- stile ---------------------------------- */
 
@@ -748,6 +788,41 @@ html,body{margin:0;padding:0;-webkit-text-size-adjust:100%;text-size-adjust:100%
 .offerteGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-top:14px}
 .offertaCard{border:1px solid var(--bordo);background:var(--nero);padding:14px;text-align:center}
 .lockbox{border:1px dashed var(--bordo);background:var(--nero2);padding:22px}
+
+/* ---- calendario di allocazione: griglia settimanale (largo) + agenda a
+   giorno singolo (mobile) sullo stesso stato — vedi CalendarioAllocazione.
+   Di default la griglia e' visibile e l'agenda no; sotto i 640px si scambia,
+   stessa logica di visibilita' gia' usata per .navlinks/.checkgrid altrove. */
+.calNav{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:14px 0}
+.calNav .b{min-height:44px}
+.calNavLabel{font-family:'Roboto Mono',monospace;font-size:11.5px;color:var(--grigio2);text-align:center}
+.calGridWrap{overflow-x:auto;margin:14px 0}
+.calGrid{display:grid;grid-template-columns:60px repeat(7,minmax(64px,1fr));gap:1px;
+  background:var(--bordo);border:1px solid var(--bordo);min-width:560px}
+.calGridHeadCell{background:var(--nero2);padding:8px 4px;text-align:center;
+  font-family:'Roboto Mono',monospace;font-size:10px;letter-spacing:.08em;color:var(--grigio2)}
+.calGridHeadCell b{display:block;color:var(--bianco);font-size:15px;font-family:'Saira Condensed',sans-serif;font-weight:700}
+.calGridOra{background:var(--nero2);color:var(--grigio2);font-family:'Roboto Mono',monospace;
+  font-size:10px;padding:6px 6px;display:flex;align-items:center;justify-content:flex-end}
+.calCell{background:var(--nero);border:0;color:var(--bianco);min-height:34px;cursor:pointer;
+  font-family:'Roboto Mono',monospace;font-size:10px;padding:2px;text-align:center}
+.calCell small{display:block;opacity:.7;font-size:8.5px}
+.calCell[data-stato="libero"]:hover{background:var(--nero3)}
+.calCell[data-stato="selezionato"]{background:var(--bluSoft);color:var(--blu2);font-weight:700}
+.calCell[data-stato="occupato"]{background:var(--nero2);color:var(--grigio2);cursor:not-allowed}
+.calCell[data-stato="non-disponibile"]{background:var(--nero2);color:var(--grigio2);opacity:.32;cursor:not-allowed}
+.calCell[data-stato="passato"]{background:var(--nero2);color:var(--grigio2);opacity:.22;cursor:not-allowed}
+.calAgenda{display:none}
+.calAgendaRow{width:100%;min-height:44px;display:flex;justify-content:space-between;align-items:center;
+  gap:10px;padding:10px 14px;border:1px solid var(--bordo);background:var(--nero2);color:var(--bianco);
+  margin-bottom:6px;font-family:'Roboto Mono',monospace;font-size:12.5px;text-align:left;cursor:pointer}
+.calAgendaRow[data-stato="selezionato"]{border-color:var(--blu2);background:var(--bluSoft);color:var(--blu2)}
+.calAgendaRow[data-stato="occupato"],.calAgendaRow[data-stato="non-disponibile"],
+.calAgendaRow[data-stato="passato"]{opacity:.5;cursor:not-allowed}
+@media(max-width:640px){
+  .calGridWrap{display:none}
+  .calAgenda{display:block}
+}
 .azsess{font-family:'Roboto Mono',monospace;font-size:11.5px;letter-spacing:.04em;
   border:1px solid var(--bordo);background:var(--nero);padding:6px 12px;cursor:pointer;border-radius:2px}
 .azsess.sposta{color:var(--blu2)}
@@ -884,6 +959,58 @@ function oreAllaSessione(p) {
   const q = quandoSessione(p);
   if (!q) return Infinity;
   return (q.getTime() - Date.now()) / 3600000;
+}
+
+/* ---- calendario di allocazione: helper puri, riusabili sia dalla vista
+   griglia (desktop) sia dalla vista agenda (mobile) ---- */
+
+// "2026-09-05" a partire da un oggetto Date, sempre in locale (mai UTC: a
+// mezzanotte UTC potrebbe gia' essere il giorno dopo/prima in Europa)
+function dataIso(d) {
+  const y = d.getFullYear(), m = String(d.getMonth() + 1).padStart(2, "0"), g = String(d.getDate()).padStart(2, "0");
+  return `${y}-${m}-${g}`;
+}
+
+// lunedi' della settimana che contiene "d" — base per la vista a griglia
+function lunediDellaSettimana(d) {
+  const copia = new Date(d);
+  const scarto = (copia.getDay() + 6) % 7; // getDay(): 0=domenica..6=sabato -> vogliamo 0=lunedi'
+  copia.setDate(copia.getDate() - scarto);
+  copia.setHours(0, 0, 0, 0);
+  return copia;
+}
+
+// "d" spostato di n giorni (n negativo = indietro) — passo unico sia per la
+// navigazione a settimana (±7) sia a giorno singolo (±1)
+function addGiorni(d, n) {
+  const copia = new Date(d);
+  copia.setDate(copia.getDate() + n);
+  return copia;
+}
+
+// e' nel passato? confronta lo slot pieno (giorno + ora), non solo il giorno
+function slotPassato(giornoJs, ora) {
+  const inizio = new Date(giornoJs);
+  inizio.setHours(ora, 0, 0, 0);
+  return inizio.getTime() <= Date.now();
+}
+
+// occupato da una prenotazione gia' allocata con questo coach? le sessioni
+// svolte/cancellate/in contestazione non bloccano lo slot: quell'ora e' di
+// nuovo (o non e' mai stata) impegnata
+function slotOccupato(prenotazioni, coachId, giornoIso, oraLabel) {
+  return prenotazioni.some((p) =>
+    p.coachId === coachId && p.stato === "allocata" &&
+    (p.orario === `${giornoIso} · ${oraLabel}` || (p.data === giornoIso && p.orario === oraLabel)));
+}
+
+// annotazione "ora locale del coach" solo se il suo fuso e' diverso da
+// quello mostrato al pilota — differenza di sole ore intere (vedi FUSI_OFFSET)
+function oraLocaleCoach(ora, fusoCoach, fusoPilota) {
+  if (fusoCoach === fusoPilota) return null;
+  const diff = (FUSI_OFFSET[fusoCoach] ?? 0) - (FUSI_OFFSET[fusoPilota] ?? 0);
+  const oraCoach = ((ora + diff) % 24 + 24) % 24;
+  return `${String(oraCoach).padStart(2, "0")}:00`;
 }
 
 function statoForbice(coachIr, allievoIr) {
@@ -1445,9 +1572,7 @@ function Cerca({ apri, mia, miaIr, iracingCollegato, setIracingCollegato }) {
   );
 }
 
-function Scheda({ c, mia, miaIr, iracingCollegato, walletOre, onPrenota, apriAcquistoOre, chiudi, vaiPercorso, vediCoach, apriChat, nonLettiDi }) {
-  const [slot, setSlot] = useState(null);
-  const [fatto, setFatto] = useState(false);
+function Scheda({ c, mia, miaIr, iracingCollegato, walletOre, apriAcquistoOre, apriCalendario, chiudi, vaiPercorso, vediCoach, apriChat, nonLettiDi }) {
   const [apri, setApri] = useState(false);
   const f = iracingCollegato ? c.fasce[mia] : undefined;
   const allievoIr = iRAllievo(miaIr, mia);
@@ -1456,35 +1581,6 @@ function Scheda({ c, mia, miaIr, iracingCollegato, walletOre, onPrenota, apriAcq
   const alternative = COACHES.filter((x) => x.id !== c.id &&
     x.cat.some((k) => c.cat.includes(k)) &&
     calcolaStato(x, allievoIr, mia) === "consigliato").slice(0, 3);
-
-  if (fatto)
-    return (
-      <div className="w">
-        <button className="indietro" onClick={chiudi}>← Torna ai coach</button>
-        <div className="ok">
-          <h2 style={{ fontSize: 24, color: "var(--blu2)" }}>Sessione prenotata</h2>
-          <p style={{ marginTop: 10, fontSize: 14.5, lineHeight: 1.6 }}>
-            {c.nome} · {slot}. {DURATA_SESSIONE_ORE} ora del tuo portafoglio è stata allocata: la
-            trovi anche in "Il mio percorso".
-          </p>
-        </div>
-        <div className="stit"><span>Punto zero fissato</span></div>
-        <div className="blocco">
-          <div className="riga"><span>iRating alla prenotazione</span><b className="mn">1.842</b></div>
-          <div className="riga"><span>Gare negli ultimi 30 giorni</span><b className="mn">14</b></div>
-          <div className="riga"><span>Primo controllo</span><b className="mn">fra 30 giorni</b></div>
-          <p className="nota">
-            Da qui in poi la tua curva viene confrontata con i 30 giorni precedenti. Servono almeno
-            otto gare perché il dato sia valido.
-          </p>
-        </div>
-        <div style={{ margin: "20px 0 40px" }}>
-          <button className="b b-blu b-lg" style={{ width: "100%" }} onClick={vaiPercorso}>
-            Vai al tuo percorso
-          </button>
-        </div>
-      </div>
-    );
 
   return (
     <div className="w">
@@ -1643,31 +1739,260 @@ function Scheda({ c, mia, miaIr, iracingCollegato, walletOre, onPrenota, apriAcq
         </div>
       </div>
 
-      <div className="stit"><span>Prenota · 60 minuti</span></div>
-      <div className="slotgrid">
-        {c.slots.map((s) => (
-          <button key={s} className="slotchip" data-on={slot === s ? "1" : "0"} onClick={() => setSlot(s)}>{s}</button>
-        ))}
-      </div>
+      <div className="stit"><span>Alloca ore</span></div>
       <div className="blocco">
-        <div className="riga"><span>Ore che userai</span><b className="mn">{DURATA_SESSIONE_ORE} ora</b></div>
         <div className="riga">
           <span>Ore disponibili con {c.nome}</span>
-          <b className="mn" style={{ color: walletOre >= DURATA_SESSIONE_ORE ? "var(--blu2)" : "var(--distr2)" }}>
-            {walletOre}
-          </b>
+          <b className="mn" style={{ color: walletOre > 0 ? "var(--blu2)" : "var(--distr2)" }}>{walletOre}</b>
         </div>
-        {walletOre < DURATA_SESSIONE_ORE && (
+        {walletOre === 0 ? (
           <p className="nota">
             Non hai ore con {c.nome}: le ore comprate da un altro coach non si possono usare qui.
-            Compra un pacchetto qui sopra.
+            Compra un pacchetto qui sopra prima di allocare.
           </p>
+        ) : (
+          <p className="nota">Scegli uno o più slot da {DURATA_SESSIONE_ORE} ora sul calendario di {c.nome}.</p>
         )}
       </div>
       <div style={{ margin: "16px 0 40px" }}>
-        <button className="b b-blu b-lg" style={{ width: "100%" }} disabled={!slot || walletOre < DURATA_SESSIONE_ORE}
-                onClick={() => { if (onPrenota?.(c, slot)) setFatto(true); }}>
-          {!slot ? "Scegli uno slot" : walletOre < DURATA_SESSIONE_ORE ? "Ore insufficienti" : `Prenota ${slot}`}
+        <button className="b b-blu b-lg" style={{ width: "100%" }} disabled={walletOre === 0}
+                onClick={() => apriCalendario?.(c)}>
+          {walletOre === 0 ? "Nessuna ora da allocare" : "Apri il calendario"}
+        </button>
+      </div>
+    </div>
+  );
+}
+
+/* ---------------------------------- CALENDARIO DI ALLOCAZIONE ----------------------------------
+   Spende le ore già comprate CON QUESTO COACH allocandole su slot da 1 ora. Due viste sullo
+   stesso stato (dataRif + selezionati): griglia settimanale su schermo largo, agenda a giorno
+   singolo su mobile — cambia solo il CSS che mostra l'una o l'altra (@media(max-width:640px)),
+   cosi' non serve rilevare il viewport in JS e non c'e' rischio di mismatch fra le due viste.
+   La disponibilita' del coach passa TUTTA da fasciaDiOrario(): quando esistera' un calendario
+   coach vero, si sostituisce quella funzione e questo componente non cambia. */
+function CalendarioAllocazione({ coach: c, walletOre, prenotazioni, fusoPilota, onConferma, chiudi, vaiPercorso }) {
+  const [dataRif, setDataRif] = useState(() => new Date());
+  const [selezionati, setSelezionati] = useState(anyOf([])); // [{ giornoIso, ora }]
+  const [motivo, setMotivo] = useState(""); // spiegazione mostrata al tocco di uno slot non selezionabile
+  const [step, setStep] = useState("selezione"); // selezione | riepilogo | successo
+  const [prenotateOra, setPrenotateOra] = useState(anyOf([])); // congelate al momento della conferma, per lo step "successo"
+
+  const ORE = anyOf([]);
+  for (let o = ORA_CALENDARIO_INIZIO; o < ORA_CALENDARIO_FINE; o++) ORE.push(o);
+
+  // stato di un singolo slot — un solo punto di verita' per griglia e agenda,
+  // cosi' le due viste non possono disallinearsi fra loro
+  function statoSlot(giornoJs, ora) {
+    if (slotPassato(giornoJs, ora)) return "passato";
+    const fascia = fasciaDiOrario(giornoJs, ora);
+    if (!fascia || !c.fasceOrarie.includes(fascia)) return "non-disponibile";
+    if (slotOccupato(prenotazioni, c.id, dataIso(giornoJs), `${String(ora).padStart(2, "0")}:00`)) return "occupato";
+    if (selezionati.some((s) => s.giornoIso === dataIso(giornoJs) && s.ora === ora)) return "selezionato";
+    return "libero";
+  }
+
+  function motivoBlocco(stato, giornoJs) {
+    if (stato === "passato") return "Questo slot è nel passato.";
+    if (stato === "occupato") return "Slot già occupato da un'altra sessione con questo coach.";
+    if (stato === "non-disponibile")
+      return `${c.nome} non è disponibile in questa fascia: le sue fasce dichiarate sono ${c.fasceOrarie.join(", ")}.`;
+    return "";
+  }
+
+  function clickSlot(giornoJs, ora) {
+    const stato = statoSlot(giornoJs, ora);
+    const giornoIso = dataIso(giornoJs);
+    if (stato === "selezionato") {
+      setSelezionati((prev) => prev.filter((s) => !(s.giornoIso === giornoIso && s.ora === ora)));
+      setMotivo("");
+      return;
+    }
+    if (stato === "libero") {
+      // il tetto mensile (TETTO_ORE_MENSILI) e' gia' rispettato per costruzione: walletOre
+      // e' un pezzo delle ore disponibili totali, che accreditaOre non fa mai superare il
+      // tetto — quindi qui basta il vincolo vero e proprio, il saldo CON QUESTO coach
+      if (selezionati.length >= walletOre) {
+        setMotivo(
+          `Hai già selezionato ${selezionati.length} ${selezionati.length === 1 ? "ora" : "ore"}: ` +
+          `è il massimo disponibile con ${c.nome} (tetto di ${TETTO_ORE_MENSILI} ore/mese già rispettato ` +
+          `sul totale del tuo portafoglio). Togli uno slot, oppure ricarica per allocarne altri.`
+        );
+        return;
+      }
+      setSelezionati((prev) => [...prev, { giornoIso, ora }]);
+      setMotivo("");
+      return;
+    }
+    setMotivo(motivoBlocco(stato, giornoJs));
+  }
+
+  const confermaPrenotazione = () => {
+    const ok = onConferma?.(c, selezionati.map((s) => ({ ...s, oraLabel: `${String(s.ora).padStart(2, "0")}:00` })));
+    if (ok) {
+      setPrenotateOra(selezionati);
+      setSelezionati([]);
+      setStep("successo");
+    }
+  };
+
+  if (walletOre <= 0)
+    return (
+      <div className="w">
+        <button className="indietro" onClick={chiudi}>← Torna alla scheda</button>
+        <div className="stit" style={{ marginTop: 10 }}><span>Alloca ore con {c.nome}</span></div>
+        <div className="notaBox distr">
+          <p><b>Nessuna ora disponibile con {c.nome}.</b> Le ore comprate da un altro coach non si possono
+          usare qui: compra un pacchetto sulla sua scheda per poter allocare uno slot.</p>
+        </div>
+      </div>
+    );
+
+  if (step === "successo") {
+    const oreTot = prenotateOra.length;
+    return (
+      <div className="w">
+        <div className="ok">
+          <div className="stit" style={{ marginTop: 0, borderBottom: 0, padding: 0 }}><span>Prenotazione confermata</span></div>
+          <p style={{ marginTop: 10 }}>
+            {oreTot} {oreTot === 1 ? "slot allocato" : "slot allocati"} con {c.nome}. Le sessioni sono ora in
+            "Prossime sessioni di coaching" e nel calendario unico. Il saldo con {c.nome} è sceso di {oreTot}
+            {oreTot === 1 ? " ora" : " ore"}.
+          </p>
+          <ul className="regole" style={{ marginTop: 14 }}>
+            {prenotateOra.map((s, i) => (
+              <li key={i}>{s.giornoIso} · {String(s.ora).padStart(2, "0")}:00</li>
+            ))}
+          </ul>
+          <p className="nota">
+            Fino a {FINESTRA_CANCELLAZIONE_ORE}h prima puoi ancora cancellare senza perdere l'ora: sotto quella
+            soglia resta scalata anche se non ti presenti tu.
+          </p>
+          <div style={{ display: "flex", gap: 10, marginTop: 18, flexWrap: "wrap" }}>
+            {walletOre - oreTot > 0 && (
+              <button className="b b-ghost" onClick={() => setStep("selezione")}>Alloca altre ore</button>
+            )}
+            <button className="b b-blu" onClick={vaiPercorso}>Vai al tuo percorso</button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (step === "riepilogo") {
+    const saldoResiduo = walletOre - selezionati.length;
+    // ordine cronologico: confronto sulla data ISO e poi sull'ora come numero
+    // (non come stringa concatenata, altrimenti "12" ordinerebbe prima di "9")
+    const ordinati = [...selezionati].sort((a, b) =>
+      a.giornoIso !== b.giornoIso ? (a.giornoIso > b.giornoIso ? 1 : -1) : a.ora - b.ora);
+    return (
+      <div className="w">
+        <button className="indietro" onClick={() => setStep("selezione")}>← Torna al calendario</button>
+        <div className="stit" style={{ marginTop: 10 }}><span>Riepilogo allocazione</span></div>
+        <div className="blocco">
+          {ordinati.map((s, i) => (
+            <div className="riga" key={i}>
+              <span>{s.giornoIso} · {String(s.ora).padStart(2, "0")}:00 con {c.nome}</span>
+              <b className="mn">{DURATA_SESSIONE_ORE} ora</b>
+            </div>
+          ))}
+          <div className="riga"><span>Ore totali</span><b className="mn">{selezionati.length}</b></div>
+          <div className="riga">
+            <span>Saldo con {c.nome} dopo la conferma</span>
+            <b className="mn" style={{ color: "var(--blu2)" }}>{saldoResiduo}</b>
+          </div>
+        </div>
+        <div style={{ margin: "16px 0 40px", display: "flex", gap: 10, flexWrap: "wrap" }}>
+          <button className="b b-blu b-lg" style={{ flex: 1, minWidth: 200 }} onClick={confermaPrenotazione}>
+            Conferma prenotazione
+          </button>
+          <button className="b b-ghost" onClick={() => setStep("selezione")}>Modifica selezione</button>
+        </div>
+      </div>
+    );
+  }
+
+  // ---- step "selezione": griglia (desktop) + agenda (mobile), stesso stato ----
+  const lunedi = lunediDellaSettimana(dataRif);
+  const giorniSettimana = GIORNI_SETTIMANA.map((_, i) => addGiorni(lunedi, i));
+  const fusoDiverso = c.fuso && c.fuso !== fusoPilota;
+
+  return (
+    <div className="w">
+      <button className="indietro" onClick={chiudi}>← Torna alla scheda</button>
+      <div className="stit" style={{ marginTop: 10 }}><span>Alloca ore con {c.nome}</span></div>
+
+      <div className="blocco">
+        <div className="riga">
+          <span>Ore da allocare</span>
+          <b className="mn" style={{ color: "var(--blu2)" }}>{selezionati.length} / {walletOre}</b>
+        </div>
+        <p className="nota" style={{ marginTop: 8 }}>
+          Orari in ora locale del pilota ({fusoPilota}).
+          {fusoDiverso && ` ${c.nome} è su un fuso diverso (${c.fuso}): l'orario del coach è indicato tra parentesi su ogni slot libero.`}
+        </p>
+        {motivo && <p className="nota" style={{ color: "var(--distr2)" }}>{motivo}</p>}
+      </div>
+
+      {/* griglia — schermo largo, righe = ore, colonne = giorni */}
+      <div className="calGridWrap">
+        <div className="calNav">
+          <button className="b b-ghost" onClick={() => setDataRif((d) => addGiorni(d, -7))} aria-label="Settimana precedente">‹ Settimana</button>
+          <span className="calNavLabel">{dataIso(giorniSettimana[0])} – {dataIso(giorniSettimana[6])}</span>
+          <button className="b b-ghost" onClick={() => setDataRif((d) => addGiorni(d, 7))} aria-label="Settimana successiva">Settimana ›</button>
+        </div>
+        <div className="calGrid">
+          <div className="calGridHeadCell" />
+          {giorniSettimana.map((g, i) => (
+            <div className="calGridHeadCell" key={i}>
+              {GIORNI_SETTIMANA[i]}<b>{g.getDate()}</b>
+            </div>
+          ))}
+          {ORE.map((ora) => (
+            <React.Fragment key={ora}>
+              <div className="calGridOra">{String(ora).padStart(2, "0")}:00</div>
+              {giorniSettimana.map((g, i) => {
+                const stato = statoSlot(g, ora);
+                const oraCoach = fusoDiverso ? oraLocaleCoach(ora, c.fuso, fusoPilota) : null;
+                return (
+                  <button key={i} className="calCell" data-stato={stato}
+                          title={stato === "libero" || stato === "selezionato" ? undefined : motivoBlocco(stato, g)}
+                          onClick={() => clickSlot(g, ora)}>
+                    {stato === "selezionato" ? "✓" : ""}
+                    {(stato === "libero" || stato === "selezionato") && oraCoach && <small> ({oraCoach})</small>}
+                  </button>
+                );
+              })}
+            </React.Fragment>
+          ))}
+        </div>
+      </div>
+
+      {/* agenda — mobile, un giorno alla volta, righe a piena larghezza */}
+      <div className="calAgenda">
+        <div className="calNav">
+          <button className="b b-ghost" onClick={() => setDataRif((d) => addGiorni(d, -1))} aria-label="Giorno precedente">‹</button>
+          <span className="calNavLabel">{GIORNI_SETTIMANA[(dataRif.getDay() + 6) % 7]} {dataIso(dataRif)}</span>
+          <button className="b b-ghost" onClick={() => setDataRif((d) => addGiorni(d, 1))} aria-label="Giorno successivo">›</button>
+        </div>
+        {ORE.map((ora) => {
+          const stato = statoSlot(dataRif, ora);
+          const oraCoach = fusoDiverso ? oraLocaleCoach(ora, c.fuso, fusoPilota) : null;
+          return (
+            <button key={ora} className="calAgendaRow" data-stato={stato} onClick={() => clickSlot(dataRif, ora)}>
+              <span>{String(ora).padStart(2, "0")}:00{(stato === "libero" || stato === "selezionato") && oraCoach ? ` (coach ${oraCoach})` : ""}</span>
+              <span className="ccsm">
+                {stato === "selezionato" ? "✓ selezionato" : stato === "libero" ? "libero" : motivoBlocco(stato, dataRif)}
+              </span>
+            </button>
+          );
+        })}
+      </div>
+
+      <div style={{ margin: "16px 0 40px" }}>
+        <button className="b b-blu b-lg" style={{ width: "100%" }} disabled={selezionati.length === 0}
+                onClick={() => setStep("riepilogo")}>
+          {selezionati.length === 0 ? "Scegli almeno uno slot" : `Vai al riepilogo · ${selezionati.length} ${selezionati.length === 1 ? "ora" : "ore"}`}
         </button>
       </div>
     </div>
@@ -2301,7 +2626,7 @@ function Percorso({
   vaiScheda, apriChat, nonLettiDi, note, setNote, iracingCollegato, setIracingCollegato, simulaMessaggioCoach,
   walletPerCoach, oreDisponibiliTotali, oreAllocateDi, prenotazioni, sessioniTotali,
   spostaSessione, cancellaSessione, sospendiTuttoConCoach, segnalaNoShow, risolviContestazione, onTerminaSessione,
-  apriAcquistoOre,
+  apriAcquistoOre, apriCalendario,
 }) {
   const [gareIds, setGareIds] = useState(PERCORSO.garePianificateIds);
   const [pickerAperto, setPickerAperto] = useState(false);
@@ -2544,10 +2869,16 @@ function Percorso({
                 {w.disponibili === 0 && (
                   <p className="nota">Nessuna ora disponibile con {c.nome}: ricarica per prenotare la prossima sessione.</p>
                 )}
-                <button className="b b-ghost" style={{ marginTop: 16 }}
-                        onClick={() => setRicaricaApertaPer((v) => (v === c.id ? 0 : c.id))}>
-                  {ricaricaApertaPer === c.id ? "Chiudi" : "Ricarica ore"}
-                </button>
+                <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginTop: 16 }}>
+                  <button className="b b-ghost"
+                          onClick={() => setRicaricaApertaPer((v) => (v === c.id ? 0 : c.id))}>
+                    {ricaricaApertaPer === c.id ? "Chiudi" : "Ricarica ore"}
+                  </button>
+                  <button className="b b-blu" disabled={w.disponibili === 0}
+                          onClick={() => apriCalendario?.(c)}>
+                    Alloca ore
+                  </button>
+                </div>
                 {ricaricaApertaPer === c.id && (
                   <div className="offerteGrid">
                     {c.offerte.map((o, i) => (
@@ -3086,6 +3417,7 @@ export default function App() {
     PERCORSO.prenotazioni.map((p) => ({ ...p, ore: DURATA_SESSIONE_ORE, stato: "allocata" })));
   const [sessioniTotali, setSessioniTotali] = useState(PERCORSO.sessioniTotali);
   const [acquisto, setAcquisto] = useState(null); // { coach, offerta } quando l'acquisto e' in corso
+  const [calendarioCoach, setCalendarioCoach] = useState(null); // coach il cui calendario di allocazione e' aperto, o null
 
   const walletDi = (coachId) => walletPerCoach[coachId] || { disponibili: 0, acquistateTotali: 0 };
   const oreDisponibiliTotali = Object.values(walletPerCoach).reduce((s, w) => s + anyOf(w).disponibili, 0);
@@ -3094,6 +3426,8 @@ export default function App() {
 
   const apriAcquistoOre = (coach, offerta) => setAcquisto(anyOf({ coach, offerta }));
   const chiudiAcquistoOre = () => setAcquisto(null);
+  const apriCalendarioAllocazione = (coach) => setCalendarioCoach(anyOf(coach));
+  const chiudiCalendarioAllocazione = () => setCalendarioCoach(null);
 
   const rimborsaCoach = (coachId, ore) =>
     setWalletPerCoach((prev) => {
@@ -3117,19 +3451,25 @@ export default function App() {
     });
   };
 
-  // allocare = prenotare: scala subito dal portafoglio di quel coach. false
-  // se non ci sono abbastanza ore CON QUEL COACH, cosi' Scheda sa di non
-  // mostrare la conferma
-  const prenotaSessione = (coach, slot) => {
-    if (walletDi(coach.id).disponibili < DURATA_SESSIONE_ORE) return false;
+  // allocare N slot dal calendario in un colpo solo: scala subito dal
+  // portafoglio DI QUEL COACH. false se il saldo con quel coach non basta
+  // per tutti gli slot scelti (il tetto mensile e' gia' rispettato per
+  // costruzione: walletOre non puo' mai superarlo, vedi accreditaOre) —
+  // cosi' CalendarioAllocazione sa di non mostrare lo step "successo"
+  const allocaSlot = (coach, slots) => {
+    if (slots.length === 0) return false;
+    if (walletDi(coach.id).disponibili < slots.length) return false;
     setWalletPerCoach((prev) => ({
       ...prev,
-      [coach.id]: { ...prev[coach.id], disponibili: prev[coach.id].disponibili - DURATA_SESSIONE_ORE },
+      [coach.id]: { ...prev[coach.id], disponibili: prev[coach.id].disponibili - slots.length },
     }));
-    setPrenotazioni((prev) => [...prev, {
-      id: `p-${Date.now()}`, data: new Date().toISOString().slice(0, 10),
-      coachId: coach.id, orario: slot, ore: DURATA_SESSIONE_ORE, stato: "allocata",
-    }]);
+    setPrenotazioni((prev) => [
+      ...prev,
+      ...slots.map((s, i) => ({
+        id: `p-${Date.now()}-${i}`, data: s.giornoIso,
+        coachId: coach.id, orario: s.oraLabel, ore: DURATA_SESSIONE_ORE, stato: "allocata",
+      })),
+    ]);
     return true;
   };
 
@@ -3308,15 +3648,23 @@ export default function App() {
                          onSuccesso={(ore, prezzo) => accreditaOre(anyOf(acquisto).coach.id, ore, prezzo)}
                          onChiudi={chiudiAcquistoOre} />
           )}
-          {ruolo === "pilota" && !chatCoachId && !acquisto && tab === "cerca" && (coach
+          {ruolo === "pilota" && !chatCoachId && !acquisto && calendarioCoach && (
+            <CalendarioAllocazione coach={calendarioCoach}
+                       walletOre={walletDi(anyOf(calendarioCoach).id).disponibili}
+                       prenotazioni={prenotazioni} fusoPilota={FUSO_PILOTA_DEFAULT}
+                       onConferma={allocaSlot} chiudi={chiudiCalendarioAllocazione}
+                       vaiPercorso={() => { chiudiCalendarioAllocazione(); setCoach(null); setTab("percorso"); }} />
+          )}
+          {ruolo === "pilota" && !chatCoachId && !acquisto && !calendarioCoach && tab === "cerca" && (coach
             ? <Scheda c={coach} mia={mia} miaIr={miaIr} iracingCollegato={iracingCollegato}
                        walletOre={walletDi(anyOf(coach).id).disponibili}
-                       onPrenota={prenotaSessione} apriAcquistoOre={apriAcquistoOre} chiudi={() => setCoach(null)}
+                       apriAcquistoOre={apriAcquistoOre} apriCalendario={apriCalendarioAllocazione}
+                       chiudi={() => setCoach(null)}
                        vaiPercorso={() => { setCoach(null); setTab("percorso"); }} vediCoach={setCoach}
                        apriChat={apriChat} nonLettiDi={nonLettiPer} />
             : <Cerca apri={setCoach} mia={mia} miaIr={miaIr}
                       iracingCollegato={iracingCollegato} setIracingCollegato={setIracingCollegato} />)}
-          {ruolo === "pilota" && !chatCoachId && !acquisto && tab === "percorso" && (
+          {ruolo === "pilota" && !chatCoachId && !acquisto && !calendarioCoach && tab === "percorso" && (
             <Percorso vaiScheda={(co) => { setCoach(co); setTab("cerca"); }}
                       apriChat={apriChat} nonLettiDi={nonLettiPer} note={note} setNote={setNote}
                       iracingCollegato={iracingCollegato} setIracingCollegato={setIracingCollegato}
@@ -3327,9 +3675,9 @@ export default function App() {
                       spostaSessione={spostaSessione} cancellaSessione={cancellaSessione}
                       sospendiTuttoConCoach={sospendiTuttoConCoach} segnalaNoShow={segnalaNoShow}
                       risolviContestazione={risolviContestazione} onTerminaSessione={onTerminaSessione}
-                      apriAcquistoOre={apriAcquistoOre} />
+                      apriAcquistoOre={apriAcquistoOre} apriCalendario={apriCalendarioAllocazione} />
           )}
-          {ruolo === "pilota" && !chatCoachId && !acquisto && tab === "scheda" && (
+          {ruolo === "pilota" && !chatCoachId && !acquisto && !calendarioCoach && tab === "scheda" && (
             <SchedaPilota vaiPercorso={() => setTab("percorso")}
                           iracingCollegato={iracingCollegato} setIracingCollegato={setIracingCollegato} />
           )}
