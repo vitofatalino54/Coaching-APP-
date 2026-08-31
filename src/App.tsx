@@ -1652,13 +1652,16 @@ function Scheda({ c, mia, miaIr, iracingCollegato, walletOre, onPrenota, apriAcq
       <div className="blocco">
         <div className="riga"><span>Ore che userai</span><b className="mn">{DURATA_SESSIONE_ORE} ora</b></div>
         <div className="riga">
-          <span>Ore disponibili nel tuo portafoglio</span>
+          <span>Ore disponibili con {c.nome}</span>
           <b className="mn" style={{ color: walletOre >= DURATA_SESSIONE_ORE ? "var(--blu2)" : "var(--distr2)" }}>
             {walletOre}
           </b>
         </div>
         {walletOre < DURATA_SESSIONE_ORE && (
-          <p className="nota">Non hai abbastanza ore per prenotare: compra un pacchetto qui sopra.</p>
+          <p className="nota">
+            Non hai ore con {c.nome}: le ore comprate da un altro coach non si possono usare qui.
+            Compra un pacchetto qui sopra.
+          </p>
         )}
       </div>
       <div style={{ margin: "16px 0 40px" }}>
@@ -1675,13 +1678,16 @@ function Scheda({ c, mia, miaIr, iracingCollegato, walletOre, onPrenota, apriAcq
    Pagamento simulato in un unico step separato dalla prenotazione: si comprano le
    ore qui, poi si allocano a parte sul calendario. Nessun dato di carta reale,
    nessun backend — ma stati ed esito sono quelli veri, pronti per Stripe dopo. */
-function AcquistoOre({ coach, offerta, walletOre, onSuccesso, onChiudi }) {
+function AcquistoOre({ coach, offerta, walletCoach, oreDisponibiliTotali, onSuccesso, onChiudi }) {
   const [step, setStep] = useState("riepilogo"); // riepilogo | pagamento | successo
   const [esitoUltimo, setEsitoUltimo] = useState(""); // "" | "errore" | "annullato"
 
   const commissione = (offerta.prezzo * COMMISSIONE_CORDA_PCT).toFixed(2);
-  const oreDopoAcquisto = walletOre + offerta.ore;
-  const superaTetto = oreDopoAcquisto > TETTO_ORE_MENSILI;
+  // il tetto è per persona, sommato su tutti i coach — non sul singolo
+  // portafoglio — quindi si verifica sul totale, anche se l'accredito finisce
+  // solo nel portafoglio di questo coach
+  const totaleDopoAcquisto = oreDisponibiliTotali + offerta.ore;
+  const superaTetto = totaleDopoAcquisto > TETTO_ORE_MENSILI;
 
   const paga = () => { setStep("successo"); onSuccesso(offerta.ore, offerta.prezzo); };
   const simulaErrore = () => { setEsitoUltimo("errore"); setStep("riepilogo"); };
@@ -1701,10 +1707,10 @@ function AcquistoOre({ coach, offerta, walletOre, onSuccesso, onChiudi }) {
         <div className="blocco" style={{ marginBottom: 40 }}>
           <div className="riga"><span>Pacchetto</span><b className="mn">{offerta.ore} ore</b></div>
           <div className="riga"><span>Pagato</span><b className="mn" style={{ color: "var(--blu2)" }}>{offerta.prezzo.toFixed(2)} €</b></div>
-          {/* walletOre qui è già il saldo aggiornato: onSuccesso ha scalato lo
+          {/* walletCoach qui è già il saldo aggiornato: onSuccesso ha scalato lo
               stato in App nello stesso giro di re-render che porta a "successo",
               quindi non va sommato di nuovo a offerta.ore (altrimenti si conta due volte) */}
-          <div className="riga"><b>Ore nel portafoglio ora</b><b className="mn" style={{ color: "var(--verde)" }}>{walletOre}</b></div>
+          <div className="riga"><b>Ore con {coach.nome} ora</b><b className="mn" style={{ color: "var(--verde)" }}>{walletCoach}</b></div>
         </div>
         <div style={{ margin: "0 0 40px" }}>
           <button className="b b-blu b-lg" style={{ width: "100%" }} onClick={onChiudi}>
@@ -1755,6 +1761,9 @@ function AcquistoOre({ coach, offerta, walletOre, onSuccesso, onChiudi }) {
       )}
 
       <div className="blocco">
+        <div className="riga" style={{ color: "var(--grigio2)" }}>
+          <span>Ore che hai già con {coach.nome}</span><span className="mn">{walletCoach}</span>
+        </div>
         <div className="riga"><span>Pacchetto</span><b className="mn">{offerta.ore} ore</b></div>
         <div className="riga"><span>Prezzo totale</span><b className="mn">{offerta.prezzo.toFixed(2)} €</b></div>
         <div className="riga" style={{ color: "var(--grigio2)" }}>
@@ -1767,9 +1776,10 @@ function AcquistoOre({ coach, offerta, walletOre, onSuccesso, onChiudi }) {
       {superaTetto ? (
         <div className="notaBox distr">
           <p>
-            <b>Supereresti il tetto di {TETTO_ORE_MENSILI} ore mensili.</b> Hai già {walletOre} ore
-            disponibili: con questo pacchetto arriveresti a {oreDopoAcquisto}. Scegli un pacchetto
-            più piccolo o usa prima le ore che hai.
+            <b>Supereresti il tetto di {TETTO_ORE_MENSILI} ore mensili.</b> Il tetto conta le ore
+            disponibili su tutti i coach insieme, non solo con {coach.nome}: ne hai già{" "}
+            {oreDisponibiliTotali} in totale, con questo pacchetto arriveresti a {totaleDopoAcquisto}.
+            Scegli un pacchetto più piccolo o usa prima le ore che hai.
           </p>
         </div>
       ) : (
@@ -2289,13 +2299,13 @@ function SchedaPilota({ vaiPercorso, iracingCollegato, setIracingCollegato }) {
 
 function Percorso({
   vaiScheda, apriChat, nonLettiDi, note, setNote, iracingCollegato, setIracingCollegato, simulaMessaggioCoach,
-  walletOre, oreAllocate, oreAcquistateTotali, prenotazioni, sessioniTotali,
+  walletPerCoach, oreDisponibiliTotali, oreAllocateDi, prenotazioni, sessioniTotali,
   spostaSessione, cancellaSessione, sospendiTuttoConCoach, segnalaNoShow, risolviContestazione, onTerminaSessione,
   apriAcquistoOre,
 }) {
   const [gareIds, setGareIds] = useState(PERCORSO.garePianificateIds);
   const [pickerAperto, setPickerAperto] = useState(false);
-  const [ricaricaAperta, setRicaricaAperta] = useState(false);
+  const [ricaricaApertaPer, setRicaricaApertaPer] = useState(0); // coachId con il pannello offerte aperto, 0 = nessuno (gli id coach partono da 1)
   const [spostaAperto, setSpostaAperto] = useState(""); // id della prenotazione in modifica, "" = nessuna
   const [spostaScelto, setSpostaScelto] = useState(""); // slot scelto, in attesa di conferma
   const [cancellaConferma, setCancellaConferma] = useState(""); // id della prenotazione da confermare
@@ -2339,6 +2349,13 @@ function Percorso({
   const garePianificate = CALENDARIO_STAGIONE
     .filter((g) => gareIds.includes(g.id))
     .sort((a, b) => a.data.localeCompare(b.data));
+  // ogni coach con cui il pilota ha mai avuto ore (disponibili o comprate):
+  // un'ora vale solo con il coach da cui è stata comprata, quindi la barra
+  // "ore a disposizione" è per coach, non un saldo unico
+  const walletDi = (coachId) => walletPerCoach[coachId] || { disponibili: 0, acquistateTotali: 0 };
+  const coachConWallet = anyOf(Object.keys(walletPerCoach)
+    .map((id) => COACHES.find((c) => c.id === Number(id)))
+    .filter(Boolean));
   // ogni sessione svolta vale DURATA_SESSIONE_ORE: piu' diretto e sempre
   // coerente che sottrarre disponibili+allocate dal totale storico (che
   // dovrebbe tornare uguale, ma dipende da cancellazioni/contestazioni
@@ -2396,6 +2413,13 @@ function Percorso({
                 </div>
               </div>
             </div>
+            <p className="nota">
+              <b className="mn" style={{ color: walletDi(coachAttuale.id).disponibili > 0 ? "var(--blu2)" : "var(--distr2)" }}>
+                {walletDi(coachAttuale.id).disponibili} ore disponibili
+              </b>{" "}
+              con {coachAttuale.nome}
+              {oreAllocateDi(coachAttuale.id) > 0 && ` · ${oreAllocateDi(coachAttuale.id)} allocate su sessioni prenotate`}
+            </p>
             <div style={{ marginTop: 16, display: "flex", gap: 10, flexWrap: "wrap" }}>
               <button className="b b-blu" onClick={() => vaiScheda?.(coachAttuale)}>Vai al suo profilo</button>
               <button className="b b-ghost" onClick={() => apriChat?.(coachAttuale.id)}>
@@ -2480,48 +2504,69 @@ function Percorso({
         </div>
       )}
 
-      {/* 4. ore acquistate */}
-      <div className="stit"><span>Ore di coaching</span></div>
-      <div className="blocco">
-        <div style={{ display: "flex", gap: 32, flexWrap: "wrap", alignItems: "baseline" }}>
-          <div>
-            <div className="ccbig">{walletOre} ore disponibili</div>
-            <div className="ccsm">su {oreAcquistateTotali} acquistate finora</div>
-          </div>
-          {oreAllocate > 0 && (
-            <div>
-              <div className="kval" style={{ fontSize: 22 }}>{oreAllocate}</div>
-              <div className="ccsm">allocate su sessioni prenotate</div>
-            </div>
-          )}
+      {/* 4. ore acquistate — un portafoglio per coach, un'ora vale solo con
+         chi l'ha venduta. Il totale qui sotto è solo un riepilogo a colpo
+         d'occhio: quello che si spende resta sempre il saldo di un coach */}
+      <div className="stit"><span>Le tue ore per coach</span></div>
+      {coachConWallet.length === 0 ? (
+        <div className="blocco">
+          <p className="nota" style={{ marginTop: 0 }}>
+            Non hai ancora comprato ore da nessun coach. Vai sul profilo di un coach e scegli un
+            pacchetto per iniziare.
+          </p>
         </div>
-        <div className="orebar"><div className="orebarfill" style={{ width: `${Math.min(100, (walletOre / TETTO_ORE_MENSILI) * 100)}%` }} /></div>
-        <p className="nn" style={{ marginTop: 6 }}>Tetto: {TETTO_ORE_MENSILI} ore al mese</p>
-        {walletOre === 0 && (
-          <p className="nota">Portafoglio vuoto: compra un pacchetto per prenotare una sessione.</p>
-        )}
-        <button className="b b-ghost" style={{ marginTop: 16 }} onClick={() => setRicaricaAperta((v) => !v)}>
-          {ricaricaAperta ? "Chiudi" : "Ricarica ore"}
-        </button>
-        {ricaricaAperta && (
-          coachAttuale ? (
-            <div className="offerteGrid">
-              {coachAttuale.offerte.map((o, i) => (
-                <div className="offertaCard" key={i}>
-                  <div className="kval" style={{ fontSize: 22 }}>{o.ore} ore</div>
-                  <div className="ccsm">{o.prezzo.toFixed(2)} € totali</div>
-                  <button className="b b-blu" style={{ marginTop: 10, width: "100%" }}
-                          onClick={() => apriAcquistoOre(coachAttuale, o)}>
-                    Compra
-                  </button>
+      ) : (
+        <>
+          <p className="nota" style={{ marginTop: 0 }}>
+            <b className="mn">{oreDisponibiliTotali}</b> ore disponibili in totale su {coachConWallet.length}
+            {coachConWallet.length === 1 ? " coach" : " coach diversi"} · riepilogo, non un saldo unico:
+            ogni ora vale solo con il coach da cui è stata comprata. Tetto: {TETTO_ORE_MENSILI} ore al
+            mese in tutto.
+          </p>
+          {coachConWallet.map((c) => {
+            const w = walletDi(c.id);
+            const allocate = oreAllocateDi(c.id);
+            return (
+              <div className="blocco" key={c.id} style={{ marginBottom: 14 }}>
+                <div style={{ display: "flex", gap: 32, flexWrap: "wrap", alignItems: "baseline" }}>
+                  <div>
+                    <div className="ccbig">{w.disponibili} ore disponibili</div>
+                    <div className="ccsm">con {c.nome} · su {w.acquistateTotali} acquistate finora</div>
+                  </div>
+                  {allocate > 0 && (
+                    <div>
+                      <div className="kval" style={{ fontSize: 22 }}>{allocate}</div>
+                      <div className="ccsm">allocate su sessioni prenotate</div>
+                    </div>
+                  )}
                 </div>
-              ))}
-            </div>
-          ) : (
-            <p className="nota">Vai sul profilo di un coach per comprare un pacchetto di ore.</p>
-          )
-        )}
-      </div>
+                <div className="orebar"><div className="orebarfill" style={{ width: `${Math.min(100, (w.disponibili / TETTO_ORE_MENSILI) * 100)}%` }} /></div>
+                {w.disponibili === 0 && (
+                  <p className="nota">Nessuna ora disponibile con {c.nome}: ricarica per prenotare la prossima sessione.</p>
+                )}
+                <button className="b b-ghost" style={{ marginTop: 16 }}
+                        onClick={() => setRicaricaApertaPer((v) => (v === c.id ? 0 : c.id))}>
+                  {ricaricaApertaPer === c.id ? "Chiudi" : "Ricarica ore"}
+                </button>
+                {ricaricaApertaPer === c.id && (
+                  <div className="offerteGrid">
+                    {c.offerte.map((o, i) => (
+                      <div className="offertaCard" key={i}>
+                        <div className="kval" style={{ fontSize: 22 }}>{o.ore} ore</div>
+                        <div className="ccsm">{o.prezzo.toFixed(2)} € totali</div>
+                        <button className="b b-blu" style={{ marginTop: 10, width: "100%" }}
+                                onClick={() => apriAcquistoOre(c, o)}>
+                          Compra
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </>
+      )}
 
       {/* 5. calendario — sessioni di coaching e gare pianificate, due liste separate */}
       <div className="stit"><span>Prossime sessioni di coaching</span></div>
@@ -3024,39 +3069,63 @@ export default function App() {
   const mia = iracingCollegato ? fasciaDaIr(PILOTA_DEMO.ir) : "b2";
   const miaIr = iracingCollegato ? String(PILOTA_DEMO.ir) : "";
 
-  /* ---------------- portafoglio ore: stato condiviso ----------------
-     Lifted qui perché Scheda (alloca prenotando), Percorso (mostra/gestisce)
-     e AcquistoOre (accredita) sono fratelli, non genitore-figlio: nessuno di
-     loro da solo può tenere questo stato. walletOre sono le ore libere,
-     spendibili subito — le ore "allocate" su una prenotazione sono già state
-     scalate da qui, e si vedono contandole nelle prenotazioni con
-     stato "allocata" (vedi oreAllocate più sotto). */
-  const [walletOre, setWalletOre] = useState(PERCORSO.oreResidue);
-  const [oreAcquistateTotali, setOreAcquistateTotali] = useState(PERCORSO.oreAcquistate);
+  /* ---------------- portafoglio ore: stato condiviso, per coach ----------------
+     Un'ora vale solo con il coach da cui è stata comprata: niente saldo unico,
+     niente travaso tra coach. La mappa è coachId -> { disponibili,
+     acquistateTotali }; ogni operazione riceve un coachId e tocca solo quella
+     voce. Lifted qui (non su Percorso) perché Scheda (alloca prenotando),
+     Percorso (mostra/gestisce) e AcquistoOre (accredita) sono fratelli:
+     nessuno dei tre da solo può tenere questo stato.
+     Il tetto di TETTO_ORE_MENSILI resta per persona, sommato su tutti i
+     coach — non per singolo coach — quindi si controlla sul totale
+     (oreDisponibiliTotali), non sulla singola voce della mappa. */
+  const [walletPerCoach, setWalletPerCoach] = useState(() => ({
+    [PERCORSO.coachAttualeId]: { disponibili: PERCORSO.oreResidue, acquistateTotali: PERCORSO.oreAcquistate },
+  }));
   const [prenotazioni, setPrenotazioni] = useState(() =>
     PERCORSO.prenotazioni.map((p) => ({ ...p, ore: DURATA_SESSIONE_ORE, stato: "allocata" })));
   const [sessioniTotali, setSessioniTotali] = useState(PERCORSO.sessioniTotali);
   const [acquisto, setAcquisto] = useState(null); // { coach, offerta } quando l'acquisto e' in corso
 
-  const oreAllocate = prenotazioni.filter((p) => p.stato === "allocata").reduce((s, p) => s + p.ore, 0);
+  const walletDi = (coachId) => walletPerCoach[coachId] || { disponibili: 0, acquistateTotali: 0 };
+  const oreDisponibiliTotali = Object.values(walletPerCoach).reduce((s, w) => s + anyOf(w).disponibili, 0);
+  const oreAllocateDi = (coachId) =>
+    prenotazioni.filter((p) => p.coachId === coachId && p.stato === "allocata").reduce((s, p) => s + p.ore, 0);
 
   const apriAcquistoOre = (coach, offerta) => setAcquisto(anyOf({ coach, offerta }));
   const chiudiAcquistoOre = () => setAcquisto(null);
 
-  // successo pagamento (simulato): accredita e rispetta comunque il tetto,
-  // anche se il riepilogo lo blocca già prima di arrivare qui. prezzo non
-  // serve al saldo ma resta nella firma: e' quello che un vero Stripe
-  // manderebbe insieme alla conferma
-  const accreditaOre = (ore, prezzo) => {
-    setWalletOre((prev) => Math.min(TETTO_ORE_MENSILI, prev + ore));
-    setOreAcquistateTotali((prev) => prev + ore);
+  const rimborsaCoach = (coachId, ore) =>
+    setWalletPerCoach((prev) => {
+      const attuale = prev[coachId] || { disponibili: 0, acquistateTotali: 0 };
+      return { ...prev, [coachId]: { ...attuale, disponibili: attuale.disponibili + ore } };
+    });
+
+  // successo pagamento (simulato): accredita SOLO il coach dell'offerta
+  // comprata, rispettando comunque il tetto totale (anche se il riepilogo lo
+  // blocca già prima di arrivare qui). prezzo non serve al saldo ma resta
+  // nella firma: e' quello che un vero Stripe manderebbe insieme alla conferma
+  const accreditaOre = (coachId, ore, prezzo) => {
+    setWalletPerCoach((prev) => {
+      const totaleAttuale = Object.values(prev).reduce((s, w) => s + anyOf(w).disponibili, 0);
+      const oreEffettive = Math.max(0, Math.min(ore, TETTO_ORE_MENSILI - totaleAttuale));
+      const attuale = prev[coachId] || { disponibili: 0, acquistateTotali: 0 };
+      return {
+        ...prev,
+        [coachId]: { disponibili: attuale.disponibili + oreEffettive, acquistateTotali: attuale.acquistateTotali + oreEffettive },
+      };
+    });
   };
 
-  // allocare = prenotare: scala subito dal portafoglio. false se non ci sono
-  // abbastanza ore, cosi' Scheda sa di non mostrare la conferma
+  // allocare = prenotare: scala subito dal portafoglio di quel coach. false
+  // se non ci sono abbastanza ore CON QUEL COACH, cosi' Scheda sa di non
+  // mostrare la conferma
   const prenotaSessione = (coach, slot) => {
-    if (walletOre < DURATA_SESSIONE_ORE) return false;
-    setWalletOre((prev) => prev - DURATA_SESSIONE_ORE);
+    if (walletDi(coach.id).disponibili < DURATA_SESSIONE_ORE) return false;
+    setWalletPerCoach((prev) => ({
+      ...prev,
+      [coach.id]: { ...prev[coach.id], disponibili: prev[coach.id].disponibili - DURATA_SESSIONE_ORE },
+    }));
     setPrenotazioni((prev) => [...prev, {
       id: `p-${Date.now()}`, data: new Date().toISOString().slice(0, 10),
       coachId: coach.id, orario: slot, ore: DURATA_SESSIONE_ORE, stato: "allocata",
@@ -3068,14 +3137,15 @@ export default function App() {
   const spostaSessione = (id, nuovoSlot) =>
     setPrenotazioni((prev) => prev.map((p) => (p.id === id ? { ...p, orario: nuovoSlot } : p)));
 
-  // cancellare: rimborso pieno solo con piu' di FINESTRA_CANCELLAZIONE_ORE di
-  // preavviso (e il coach non viene pagato); sotto quella soglia l'ora resta
-  // scalata e il coach viene comunque pagato per lo slot bloccato
+  // cancellare: rimborso pieno al portafoglio DI QUEL COACH solo con piu' di
+  // FINESTRA_CANCELLAZIONE_ORE di preavviso (e il coach non viene pagato);
+  // sotto quella soglia l'ora resta scalata e il coach viene comunque pagato
+  // per lo slot bloccato
   const cancellaSessione = (id) => {
     const p = prenotazioni.find((x) => x.id === id);
     if (!p) return;
     if (oreAllaSessione(p) >= FINESTRA_CANCELLAZIONE_ORE) {
-      setWalletOre((prev) => prev + p.ore);
+      rimborsaCoach(p.coachId, p.ore);
       setPrenotazioni((prev) => prev.filter((x) => x.id !== id));
     } else {
       setPrenotazioni((prev) => prev.map((x) => (x.id === id ? { ...x, stato: "cancellata-addebitata" } : x)));
@@ -3102,7 +3172,7 @@ export default function App() {
   const risolviContestazione = (id, esito) => {
     const p = prenotazioni.find((x) => x.id === id);
     if (!p) return;
-    if (esito === "no-show") setWalletOre((prev) => prev + p.ore); // restituzione piena, il coach non viene pagato
+    if (esito === "no-show") rimborsaCoach(p.coachId, p.ore); // restituzione piena, il coach non viene pagato
     setPrenotazioni((prev) => prev.filter((x) => x.id !== id));
   };
 
@@ -3232,11 +3302,15 @@ export default function App() {
                   notificheEmail={notificheEmail} setNotificheEmail={setNotificheEmail} />
           )}
           {ruolo === "pilota" && !chatCoachId && acquisto && (
-            <AcquistoOre coach={anyOf(acquisto).coach} offerta={anyOf(acquisto).offerta} walletOre={walletOre}
-                         onSuccesso={accreditaOre} onChiudi={chiudiAcquistoOre} />
+            <AcquistoOre coach={anyOf(acquisto).coach} offerta={anyOf(acquisto).offerta}
+                         walletCoach={walletDi(anyOf(acquisto).coach.id).disponibili}
+                         oreDisponibiliTotali={oreDisponibiliTotali}
+                         onSuccesso={(ore, prezzo) => accreditaOre(anyOf(acquisto).coach.id, ore, prezzo)}
+                         onChiudi={chiudiAcquistoOre} />
           )}
           {ruolo === "pilota" && !chatCoachId && !acquisto && tab === "cerca" && (coach
-            ? <Scheda c={coach} mia={mia} miaIr={miaIr} iracingCollegato={iracingCollegato} walletOre={walletOre}
+            ? <Scheda c={coach} mia={mia} miaIr={miaIr} iracingCollegato={iracingCollegato}
+                       walletOre={walletDi(anyOf(coach).id).disponibili}
                        onPrenota={prenotaSessione} apriAcquistoOre={apriAcquistoOre} chiudi={() => setCoach(null)}
                        vaiPercorso={() => { setCoach(null); setTab("percorso"); }} vediCoach={setCoach}
                        apriChat={apriChat} nonLettiDi={nonLettiPer} />
@@ -3247,7 +3321,8 @@ export default function App() {
                       apriChat={apriChat} nonLettiDi={nonLettiPer} note={note} setNote={setNote}
                       iracingCollegato={iracingCollegato} setIracingCollegato={setIracingCollegato}
                       simulaMessaggioCoach={simulaMessaggioCoach}
-                      walletOre={walletOre} oreAllocate={oreAllocate} oreAcquistateTotali={oreAcquistateTotali}
+                      walletPerCoach={walletPerCoach} oreDisponibiliTotali={oreDisponibiliTotali}
+                      oreAllocateDi={oreAllocateDi}
                       prenotazioni={prenotazioni} sessioniTotali={sessioniTotali}
                       spostaSessione={spostaSessione} cancellaSessione={cancellaSessione}
                       sospendiTuttoConCoach={sospendiTuttoConCoach} segnalaNoShow={segnalaNoShow}
