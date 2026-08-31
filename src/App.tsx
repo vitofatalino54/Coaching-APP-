@@ -54,6 +54,7 @@ const COACHES = [
     bio: "Ex pilota kart, dieci anni su iRacing. Lavoro quasi solo sul punto di staccata: nella maggior parte dei casi il tempo che manca è lì, non nel setup.",
     metodo: ["Sessione 0: giro tuo, senza correzioni.", "Confronto telemetria curva per curva.",
       "Due curve alla volta, mai di più.", "Compito scritto tra una lezione e l'altra."],
+    offerte: [{ ore: 4, prezzo: 170 }, { ore: 8, prezzo: 320 }, { ore: 12, prezzo: 450 }],
     slots: ["Gio 28 · 20:30", "Ven 29 · 21:00", "Sab 30 · 18:00", "Dom 31 · 20:00"],
     rec: [{ chi: "L. Moretti", auto: "Huracán GT3 · Monza", ir: 564, gg: 22,
       txt: "Mi ha smontato la staccata della prima variante e ricostruita in due sessioni." }],
@@ -68,6 +69,7 @@ const COACHES = [
     bio: "Il giro secco lo trovi da sola con la telemetria. Quello che non trovi da sola è cosa fare quando hai tre macchine attorno al giro 12.",
     metodo: ["Analisi delle tue ultime cinque gare.", "Doppiaggi e difesa pulita.",
       "In gara insieme, io in macchina con te.", "Debrief a caldo dopo la bandiera."],
+    offerte: [{ ore: 4, prezzo: 225 }, { ore: 8, prezzo: 420 }, { ore: 12, prezzo: 600 }],
     slots: ["Gio 28 · 16:00", "Sab 30 · 15:30", "Dom 31 · 17:00"],
     rec: [{ chi: "A. Rinaldi", auto: "M4 GT3 · Nürburgring", ir: 612, gg: 28,
       txt: "Ho smesso di buttare via gare al primo giro. Sembra poco, vale mezzo campionato." }],
@@ -82,6 +84,7 @@ const COACHES = [
     bio: "Faccio setup da otto anni. Non ti vendo il mio file: ti insegno a leggere le pressioni a caldo.",
     metodo: ["Partiamo dal tuo feedback, non dai numeri.", "Una modifica per volta, con run di controllo.",
       "Foglio di lavoro pista per pista.", "Alla fine il setup lo sai rifare senza di me."],
+    offerte: [{ ore: 4, prezzo: 130 }, { ore: 8, prezzo: 250 }, { ore: 12, prezzo: 360 }],
     slots: ["Ven 29 · 21:30", "Sab 30 · 22:00", "Lun 1 · 21:00"],
     rec: [{ chi: "F. Curci", auto: "Huracán GT3 · Monza", ir: 284, gg: 31,
       txt: "Due sessioni e ho capito che il problema era il differenziale, non il posteriore." }],
@@ -96,6 +99,7 @@ const COACHES = [
     bio: "Lavoro con chi ha appena comprato la GT3 e non capisce perché va fuori a ogni curva.",
     metodo: ["Prima le basi: sguardo, riferimenti, rilascio del freno.", "Niente dati finché il giro non è pulito.",
       "Obiettivo: chiudere gare intere senza incidenti.", "Poi, e solo poi, cerchiamo il tempo."],
+    offerte: [{ ore: 4, prezzo: 95 }, { ore: 8, prezzo: 180 }, { ore: 12, prezzo: 264 }],
     slots: ["Sab 30 · 10:30", "Sab 30 · 12:00", "Dom 31 · 11:00"],
     rec: [{ chi: "M. Loprete", auto: "296 GT3 · Watkins Glen", ir: 806, gg: 24,
       txt: "Ero fermo in D da sei mesi. In cinque settimane sono passato in C." }],
@@ -110,6 +114,7 @@ const COACHES = [
     bio: "Nelle endurance non vince chi è più veloce, vince chi consegna trenta giri uguali.",
     metodo: ["Simulazione di stint completo.", "Deviazione tra i giri, non il giro migliore.",
       "Procedure pit e cambi guida.", "Piano gara scritto per il tuo evento."],
+    offerte: [{ ore: 4, prezzo: 265 }, { ore: 8, prezzo: 500 }, { ore: 12, prezzo: 720 }],
     slots: ["Sab 30 · 20:00", "Dom 31 · 19:00"],
     rec: [{ chi: "Team Aversa", auto: "AMG GT3 · Sebring 12h", ir: 226, gg: 44,
       txt: "Ci ha riscritto le procedure di pit. Finita la 12h senza un danno." }],
@@ -124,6 +129,7 @@ const COACHES = [
     bio: "Prendo solo piloti già sotto il secondo dal riferimento. Se sei più lontano, ti faccio perdere tempo e soldi.",
     metodo: ["Solo giro secco.", "Confronto sui canali freno e sterzo.",
       "Tre curve chiave per pista.", "Sessione singola, torni quando serve."],
+    offerte: [{ ore: 4, prezzo: 320 }, { ore: 8, prezzo: 600 }, { ore: 12, prezzo: 860 }],
     slots: ["Ven 29 · 19:00", "Dom 31 · 18:30"],
     rec: [{ chi: "R. Halme", auto: "911 GT3 R · Road Atlanta", ir: 188, gg: 30,
       txt: "Tre curve, una sessione, quattro decimi. Caro, ma sa dove guardare." }],
@@ -138,6 +144,7 @@ const COACHES = [
     bio: "In monoposto non puoi nasconderti dietro il setup. O gestisci il rilascio del freno o giri lento, punto.",
     metodo: ["Partiamo dalla Ray, sempre, anche se corri in F3.", "Un solo canale alla volta: prima il freno.",
       "Niente aero finché il piede non è pulito.", "Test settimanale sulla stessa pista, per misurare."],
+    offerte: [{ ore: 4, prezzo: 150 }, { ore: 8, prezzo: 290 }, { ore: 12, prezzo: 420 }],
     slots: ["Ven 29 · 19:30", "Sab 30 · 17:00", "Dom 31 · 21:30"],
     rec: [{ chi: "G. Petrosino", auto: "Dallara F3 · Silverstone", ir: 402, gg: 29,
       txt: "Venivo dalle GT e frenavo come un camion. Mi ha rifatto il piede da zero." }],
@@ -331,6 +338,15 @@ const MAX_OBIETTIVI = 4;
 // estremi dello slider del prezzo orario
 const PREZZO_MIN = 9.99;
 const PREZZO_MAX = 99;
+
+/* ------------------ portafoglio ore: configurazione ------------------
+   Numeri veri, non sparsi nel codice: il pilota non paga a sessione, ricarica
+   un portafoglio di ore che poi alloca prenotando. Pagamento e integrazione
+   Stripe restano simulati in questo giro, ma stati e saldo sono reali. */
+const COMMISSIONE_CORDA_PCT = 0.18; // placeholder, sostituira' la commissione reale
+const TETTO_ORE_MENSILI = 100; // saldo massimo consentito nel portafoglio
+const DURATA_SESSIONE_ORE = 1; // ogni sessione prenotata vale 1 ora dal portafoglio
+const FINESTRA_CANCELLAZIONE_ORE = 24; // sotto questa soglia, cancellare non rimborsa
 
 // logistica della Scheda Pilota: lingua e fuso, stessa idea di FASCE_ORARIE
 const LINGUE = [
@@ -726,6 +742,11 @@ html,body{margin:0;padding:0;-webkit-text-size-adjust:100%;text-size-adjust:100%
 .dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:8px;vertical-align:middle}
 .orebar{height:8px;background:var(--bordo);border-radius:4px;overflow:hidden;margin-top:14px}
 .orebarfill{height:100%;background:var(--blu2)}
+
+/* ---- pacchetti ore: auto-fit si impila da solo sotto un certo spazio,
+   niente media query dedicata da mantenere in giro ---- */
+.offerteGrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-top:14px}
+.offertaCard{border:1px solid var(--bordo);background:var(--nero);padding:14px;text-align:center}
 .lockbox{border:1px dashed var(--bordo);background:var(--nero2);padding:22px}
 .azsess{font-family:'Roboto Mono',monospace;font-size:11.5px;letter-spacing:.04em;
   border:1px solid var(--bordo);background:var(--nero);padding:6px 12px;cursor:pointer;border-radius:2px}
@@ -830,6 +851,39 @@ function fasciaDaIr(ir) {
   if (ir < 2500) return "b2";
   if (ir < 4000) return "b3";
   return "b4";
+}
+
+/* ---- portafoglio ore: da uno slot a una data vera --------------------
+   Gli slot dei coach sono etichette tipo "Sab 30 · 10:30": solo giorno del
+   mese e ora, senza mese/anno. Per calcolare la finestra di cancellazione
+   (24 ore) serve una data reale, quindi si risale al mese corrente e, se
+   quel giorno è già passato, al mese successivo — cosi' lo slot è sempre
+   nel futuro, qualunque sia la data reale in cui gira la demo. Le
+   prenotazioni del seed hanno invece data ISO + orario separati: si combinano
+   direttamente, senza bisogno di indovinare nulla. */
+function dataDaSlot(slot) {
+  const m = slot.match(/(\d{1,2})\s*·\s*(\d{1,2}):(\d{2})/);
+  if (!m) return null;
+  const giorno = Number(m[1]), ore = Number(m[2]), minuti = Number(m[3]);
+  const ora = new Date();
+  let d = new Date(ora.getFullYear(), ora.getMonth(), giorno, ore, minuti, 0, 0);
+  if (d.getTime() <= ora.getTime()) d = new Date(ora.getFullYear(), ora.getMonth() + 1, giorno, ore, minuti, 0, 0);
+  return d;
+}
+
+function quandoSessione(p) {
+  if (p.orario.includes("·")) return dataDaSlot(p.orario);
+  const d = new Date(`${p.data}T${p.orario}:00`);
+  return isNaN(d.getTime()) ? null : d;
+}
+
+// ore di preavviso rispetto all'inizio della sessione: se non si riesce a
+// calcolarla, meglio essere generosi (rimborso) che penalizzare per un dato
+// mancante che non è colpa del pilota
+function oreAllaSessione(p) {
+  const q = quandoSessione(p);
+  if (!q) return Infinity;
+  return (q.getTime() - Date.now()) / 3600000;
 }
 
 function statoForbice(coachIr, allievoIr) {
@@ -1391,12 +1445,11 @@ function Cerca({ apri, mia, miaIr, iracingCollegato, setIracingCollegato }) {
   );
 }
 
-function Scheda({ c, mia, miaIr, iracingCollegato, chiudi, vaiPercorso, vediCoach, apriChat, nonLettiDi }) {
+function Scheda({ c, mia, miaIr, iracingCollegato, walletOre, onPrenota, apriAcquistoOre, chiudi, vaiPercorso, vediCoach, apriChat, nonLettiDi }) {
   const [slot, setSlot] = useState(null);
   const [fatto, setFatto] = useState(false);
   const [apri, setApri] = useState(false);
   const f = iracingCollegato ? c.fasce[mia] : undefined;
-  const fee = (c.prezzo * 0.15).toFixed(2);
   const allievoIr = iRAllievo(miaIr, mia);
   const stato = iracingCollegato ? calcolaStato(c, allievoIr, mia) : "neutro";
   const nonLetti = nonLettiDi?.(c.id) || 0;
@@ -1411,7 +1464,8 @@ function Scheda({ c, mia, miaIr, iracingCollegato, chiudi, vaiPercorso, vediCoac
         <div className="ok">
           <h2 style={{ fontSize: 24, color: "var(--blu2)" }}>Sessione prenotata</h2>
           <p style={{ marginTop: 10, fontSize: 14.5, lineHeight: 1.6 }}>
-            {c.nome} · {slot}. L'importo resta in deposito fino a 24 ore dopo la sessione.
+            {c.nome} · {slot}. {DURATA_SESSIONE_ORE} ora del tuo portafoglio è stata allocata: la
+            trovi anche in "Il mio percorso".
           </p>
         </div>
         <div className="stit"><span>Punto zero fissato</span></div>
@@ -1569,6 +1623,26 @@ function Scheda({ c, mia, miaIr, iracingCollegato, chiudi, vaiPercorso, vediCoac
         </div>
       ))}
 
+      <div className="stit"><span>Pacchetti ore</span></div>
+      <div className="blocco">
+        <p className="nota" style={{ marginTop: 0 }}>
+          Con {c.nome} non paghi a sessione: compri un pacchetto di ore e le usi quando prenoti. Le
+          ore restano tue finché non le allochi su uno slot.
+        </p>
+        <div className="offerteGrid">
+          {c.offerte.map((o, i) => (
+            <div className="offertaCard" key={i}>
+              <div className="kval" style={{ fontSize: 26 }}>{o.ore} ore</div>
+              <div className="ccsm">{o.prezzo.toFixed(2)} € totali</div>
+              <button className="b b-blu" style={{ marginTop: 10, width: "100%" }}
+                      onClick={() => apriAcquistoOre?.(c, o)}>
+                Compra
+              </button>
+            </div>
+          ))}
+        </div>
+      </div>
+
       <div className="stit"><span>Prenota · 60 minuti</span></div>
       <div className="slotgrid">
         {c.slots.map((s) => (
@@ -1576,17 +1650,135 @@ function Scheda({ c, mia, miaIr, iracingCollegato, chiudi, vaiPercorso, vediCoac
         ))}
       </div>
       <div className="blocco">
-        <div className="riga"><span>Sessione 60 min</span><span className="mn">{c.prezzo.toFixed(2)} €</span></div>
-        <div className="riga" style={{ color: "var(--grigio2)" }}>
-          <span>di cui commissione CORDA (15%)</span><span className="mn">{fee} €</span>
+        <div className="riga"><span>Ore che userai</span><b className="mn">{DURATA_SESSIONE_ORE} ora</b></div>
+        <div className="riga">
+          <span>Ore disponibili nel tuo portafoglio</span>
+          <b className="mn" style={{ color: walletOre >= DURATA_SESSIONE_ORE ? "var(--blu2)" : "var(--distr2)" }}>
+            {walletOre}
+          </b>
         </div>
-        <div className="riga"><b>Paghi ora</b><b className="mn" style={{ color: "var(--blu2)" }}>{c.prezzo.toFixed(2)} €</b></div>
+        {walletOre < DURATA_SESSIONE_ORE && (
+          <p className="nota">Non hai abbastanza ore per prenotare: compra un pacchetto qui sopra.</p>
+        )}
       </div>
       <div style={{ margin: "16px 0 40px" }}>
-        <button className="b b-blu b-lg" style={{ width: "100%" }} disabled={!slot} onClick={() => setFatto(true)}>
-          {slot ? `Prenota ${slot}` : "Scegli uno slot"}
+        <button className="b b-blu b-lg" style={{ width: "100%" }} disabled={!slot || walletOre < DURATA_SESSIONE_ORE}
+                onClick={() => { if (onPrenota?.(c, slot)) setFatto(true); }}>
+          {!slot ? "Scegli uno slot" : walletOre < DURATA_SESSIONE_ORE ? "Ore insufficienti" : `Prenota ${slot}`}
         </button>
       </div>
+    </div>
+  );
+}
+
+/* ---------------------------------- ACQUISTO ORE ----------------------------------
+   Pagamento simulato in un unico step separato dalla prenotazione: si comprano le
+   ore qui, poi si allocano a parte sul calendario. Nessun dato di carta reale,
+   nessun backend — ma stati ed esito sono quelli veri, pronti per Stripe dopo. */
+function AcquistoOre({ coach, offerta, walletOre, onSuccesso, onChiudi }) {
+  const [step, setStep] = useState("riepilogo"); // riepilogo | pagamento | successo
+  const [esitoUltimo, setEsitoUltimo] = useState(""); // "" | "errore" | "annullato"
+
+  const commissione = (offerta.prezzo * COMMISSIONE_CORDA_PCT).toFixed(2);
+  const oreDopoAcquisto = walletOre + offerta.ore;
+  const superaTetto = oreDopoAcquisto > TETTO_ORE_MENSILI;
+
+  const paga = () => { setStep("successo"); onSuccesso(offerta.ore, offerta.prezzo); };
+  const simulaErrore = () => { setEsitoUltimo("errore"); setStep("riepilogo"); };
+  const annulla = () => { setEsitoUltimo("annullato"); setStep("riepilogo"); };
+
+  if (step === "successo")
+    return (
+      <div className="w">
+        <div className="ok">
+          <h2 style={{ fontSize: 24, color: "var(--blu2)" }}>Pagamento riuscito</h2>
+          <p style={{ marginTop: 10, fontSize: 14.5, lineHeight: 1.6 }}>
+            {offerta.ore} ore aggiunte al tuo portafoglio con {coach.nome}. Sono già disponibili per
+            prenotare una sessione.
+          </p>
+        </div>
+        <div className="stit"><span>Riepilogo acquisto</span></div>
+        <div className="blocco" style={{ marginBottom: 40 }}>
+          <div className="riga"><span>Pacchetto</span><b className="mn">{offerta.ore} ore</b></div>
+          <div className="riga"><span>Pagato</span><b className="mn" style={{ color: "var(--blu2)" }}>{offerta.prezzo.toFixed(2)} €</b></div>
+          {/* walletOre qui è già il saldo aggiornato: onSuccesso ha scalato lo
+              stato in App nello stesso giro di re-render che porta a "successo",
+              quindi non va sommato di nuovo a offerta.ore (altrimenti si conta due volte) */}
+          <div className="riga"><b>Ore nel portafoglio ora</b><b className="mn" style={{ color: "var(--verde)" }}>{walletOre}</b></div>
+        </div>
+        <div style={{ margin: "0 0 40px" }}>
+          <button className="b b-blu b-lg" style={{ width: "100%" }} onClick={onChiudi}>
+            Torna al profilo di {coach.nome}
+          </button>
+        </div>
+      </div>
+    );
+
+  if (step === "pagamento")
+    return (
+      <div className="w">
+        <button className="indietro" onClick={() => setStep("riepilogo")}>← Torna al riepilogo</button>
+        <div className="stit" style={{ marginTop: 8 }}><span>Pagamento</span></div>
+        <div className="blocco">
+          <p className="nota" style={{ marginTop: 0 }}>
+            Pagamento simulato: in questo prototipo non viene richiesto né salvato nessun dato di
+            carta reale. Il bottone "Paga" è pronto per essere collegato a Stripe.
+          </p>
+          <div className="riga"><b>Totale da pagare</b><b className="mn" style={{ color: "var(--blu2)" }}>{offerta.prezzo.toFixed(2)} €</b></div>
+        </div>
+        <div style={{ margin: "16px 0 10px" }}>
+          <button className="b b-blu b-lg" style={{ width: "100%" }} onClick={paga}>
+            Paga {offerta.prezzo.toFixed(2)} €
+          </button>
+        </div>
+        <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginBottom: 40 }}>
+          <button className="b b-ghost" onClick={simulaErrore}>(demo) Simula un pagamento non riuscito</button>
+          <button className="b b-ghost" onClick={annulla}>Annulla</button>
+        </div>
+      </div>
+    );
+
+  return (
+    <div className="w">
+      <button className="indietro" onClick={onChiudi}>← Torna al profilo di {coach.nome}</button>
+      <div className="stit" style={{ marginTop: 8 }}><span>Compra ore</span><span>{coach.nome}</span></div>
+
+      {esitoUltimo === "errore" && (
+        <div className="notaBox ambra">
+          <p><b>Il pagamento precedente non è andato a buon fine.</b> Nessuna ora è stata addebitata: puoi riprovare quando vuoi.</p>
+        </div>
+      )}
+      {esitoUltimo === "annullato" && (
+        <div className="notaBox">
+          <p>Hai annullato il pagamento. Nessuna ora è stata addebitata.</p>
+        </div>
+      )}
+
+      <div className="blocco">
+        <div className="riga"><span>Pacchetto</span><b className="mn">{offerta.ore} ore</b></div>
+        <div className="riga"><span>Prezzo totale</span><b className="mn">{offerta.prezzo.toFixed(2)} €</b></div>
+        <div className="riga" style={{ color: "var(--grigio2)" }}>
+          <span>di cui commissione CORDA ({(COMMISSIONE_CORDA_PCT * 100).toFixed(0)}%)</span>
+          <span className="mn">{commissione} €</span>
+        </div>
+        <div className="riga"><b>Paghi ora</b><b className="mn" style={{ color: "var(--blu2)" }}>{offerta.prezzo.toFixed(2)} €</b></div>
+      </div>
+
+      {superaTetto ? (
+        <div className="notaBox distr">
+          <p>
+            <b>Supereresti il tetto di {TETTO_ORE_MENSILI} ore mensili.</b> Hai già {walletOre} ore
+            disponibili: con questo pacchetto arriveresti a {oreDopoAcquisto}. Scegli un pacchetto
+            più piccolo o usa prima le ore che hai.
+          </p>
+        </div>
+      ) : (
+        <div style={{ margin: "16px 0 40px" }}>
+          <button className="b b-blu b-lg" style={{ width: "100%" }} onClick={() => setStep("pagamento")}>
+            Vai al pagamento
+          </button>
+        </div>
+      )}
     </div>
   );
 }
@@ -2095,20 +2287,24 @@ function SchedaPilota({ vaiPercorso, iracingCollegato, setIracingCollegato }) {
   );
 }
 
-function Percorso({ vaiScheda, apriChat, nonLettiDi, note, setNote, iracingCollegato, setIracingCollegato, simulaMessaggioCoach }) {
+function Percorso({
+  vaiScheda, apriChat, nonLettiDi, note, setNote, iracingCollegato, setIracingCollegato, simulaMessaggioCoach,
+  walletOre, oreAllocate, oreAcquistateTotali, prenotazioni, sessioniTotali,
+  spostaSessione, cancellaSessione, sospendiTuttoConCoach, segnalaNoShow, risolviContestazione, onTerminaSessione,
+  apriAcquistoOre,
+}) {
   const [gareIds, setGareIds] = useState(PERCORSO.garePianificateIds);
   const [pickerAperto, setPickerAperto] = useState(false);
   const [ricaricaAperta, setRicaricaAperta] = useState(false);
-  const [prenotazioni, setPrenotazioni] = useState(PERCORSO.prenotazioni);
   const [spostaAperto, setSpostaAperto] = useState(""); // id della prenotazione in modifica, "" = nessuna
   const [spostaScelto, setSpostaScelto] = useState(""); // slot scelto, in attesa di conferma
   const [cancellaConferma, setCancellaConferma] = useState(""); // id della prenotazione da confermare
+  const [segnalaAperto, setSegnalaAperto] = useState(""); // id della prenotazione da segnalare come no-show
   const [sospendiAperto, setSospendiAperto] = useState(false);
   const [sospesoMsg, setSospesoMsg] = useState(false);
   // la prenotazione della stanza aperta, o null se nessuna — il cast JSDoc dà a
   // TS la forma vera dell'oggetto invece di bloccarlo su "null"
   const [sessioneAttiva, setSessioneAttiva] = useState(null);
-  const [sessioniTotali, setSessioniTotali] = useState(PERCORSO.sessioniTotali);
 
   const toggleGara = (id) =>
     setGareIds((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
@@ -2116,34 +2312,41 @@ function Percorso({ vaiScheda, apriChat, nonLettiDi, note, setNote, iracingColle
   const chiediCancella = (id) => setCancellaConferma(id);
   const annullaCancella = () => setCancellaConferma("");
   const confermaCancella = (id) => {
-    setPrenotazioni((prev) => prev.filter((p) => p.id !== id));
+    cancellaSessione(id);
     setCancellaConferma("");
   };
 
   const chiudiSposta = () => { setSpostaAperto(""); setSpostaScelto(""); };
 
   // lo slot scelto ("Gio 28 · 20:30") sostituisce interamente l'orario: la data
-  // originale della prenotazione resta solo per l'ordinamento della lista
+  // originale della prenotazione resta solo per l'ordinamento della lista.
+  // Spostare non tocca il portafoglio: muove solo lo slot.
   const confermaSposta = (id, slot) => {
-    setPrenotazioni((prev) => prev.map((p) => (p.id === id ? { ...p, orario: slot } : p)));
+    spostaSessione(id, slot);
     chiudiSposta();
   };
 
   const sospendiTutto = () => {
-    setPrenotazioni((prev) => prev.filter((p) => p.coachId !== coachAttuale?.id));
+    sospendiTuttoConCoach(coachAttuale?.id);
     setSospendiAperto(false);
     setSospesoMsg(true);
   };
 
   const coachAttuale = COACHES.find((c) => c.id === PERCORSO.coachAttualeId);
-  const prossimeSessioni = [...prenotazioni].sort((a, b) => a.data.localeCompare(b.data));
+  const sessioniAllocate = prenotazioni.filter((p) => p.stato === "allocata");
+  const sessioniInSospeso = prenotazioni.filter((p) => p.stato === "contestazione" || p.stato === "cancellata-addebitata");
+  const prossimeSessioni = [...sessioniAllocate].sort((a, b) => a.data.localeCompare(b.data));
   const garePianificate = CALENDARIO_STAGIONE
     .filter((g) => gareIds.includes(g.id))
     .sort((a, b) => a.data.localeCompare(b.data));
-  const oreUsate = PERCORSO.oreAcquistate - PERCORSO.oreResidue;
+  // ogni sessione svolta vale DURATA_SESSIONE_ORE: piu' diretto e sempre
+  // coerente che sottrarre disponibili+allocate dal totale storico (che
+  // dovrebbe tornare uguale, ma dipende da cancellazioni/contestazioni
+  // passate di cui qui non teniamo un registro separato)
+  const oreUsate = sessioniTotali * DURATA_SESSIONE_ORE;
 
   // prenotazione "congelata" al click su Avvia sessione: resta stabile anche se
-  // onTermina la toglie nel frattempo da prenotazioni, cosi' la schermata di
+  // onTerminaSessione la segna nel frattempo come svolta, cosi' la schermata di
   // conferma non sparisce sotto i piedi dell'utente
   if (sessioneAttiva) {
     const s = anyOf(sessioneAttiva);
@@ -2152,10 +2355,7 @@ function Percorso({ vaiScheda, apriChat, nonLettiDi, note, setNote, iracingColle
         prenotazione={s}
         coach={COACHES.find((c) => c.id === s.coachId)}
         chiudi={() => setSessioneAttiva(null)}
-        onTermina={() => {
-          setSessioniTotali((n) => n + 1);
-          setPrenotazioni((prev) => prev.filter((p) => p.id !== s.id));
-        }}
+        onTermina={() => onTerminaSessione(s.id)}
         vaiScheda={vaiScheda}
       />
     );
@@ -2283,17 +2483,43 @@ function Percorso({ vaiScheda, apriChat, nonLettiDi, note, setNote, iracingColle
       {/* 4. ore acquistate */}
       <div className="stit"><span>Ore di coaching</span></div>
       <div className="blocco">
-        <div className="ccbig">{PERCORSO.oreResidue} ore residue</div>
-        <div className="ccsm">su {PERCORSO.oreAcquistate} acquistate finora</div>
-        <div className="orebar"><div className="orebarfill" style={{ width: `${(PERCORSO.oreResidue / PERCORSO.oreAcquistate) * 100}%` }} /></div>
-        <button className="b b-ghost" style={{ marginTop: 16 }} onClick={() => setRicaricaAperta(true)}>
-          Ricarica ore
+        <div style={{ display: "flex", gap: 32, flexWrap: "wrap", alignItems: "baseline" }}>
+          <div>
+            <div className="ccbig">{walletOre} ore disponibili</div>
+            <div className="ccsm">su {oreAcquistateTotali} acquistate finora</div>
+          </div>
+          {oreAllocate > 0 && (
+            <div>
+              <div className="kval" style={{ fontSize: 22 }}>{oreAllocate}</div>
+              <div className="ccsm">allocate su sessioni prenotate</div>
+            </div>
+          )}
+        </div>
+        <div className="orebar"><div className="orebarfill" style={{ width: `${Math.min(100, (walletOre / TETTO_ORE_MENSILI) * 100)}%` }} /></div>
+        <p className="nn" style={{ marginTop: 6 }}>Tetto: {TETTO_ORE_MENSILI} ore al mese</p>
+        {walletOre === 0 && (
+          <p className="nota">Portafoglio vuoto: compra un pacchetto per prenotare una sessione.</p>
+        )}
+        <button className="b b-ghost" style={{ marginTop: 16 }} onClick={() => setRicaricaAperta((v) => !v)}>
+          {ricaricaAperta ? "Chiudi" : "Ricarica ore"}
         </button>
         {ricaricaAperta && (
-          <p className="nota">
-            Il pagamento online arriva in una prossima versione: per ora contatta il tuo coach o
-            l'assistenza per aggiungere ore.
-          </p>
+          coachAttuale ? (
+            <div className="offerteGrid">
+              {coachAttuale.offerte.map((o, i) => (
+                <div className="offertaCard" key={i}>
+                  <div className="kval" style={{ fontSize: 22 }}>{o.ore} ore</div>
+                  <div className="ccsm">{o.prezzo.toFixed(2)} € totali</div>
+                  <button className="b b-blu" style={{ marginTop: 10, width: "100%" }}
+                          onClick={() => apriAcquistoOre(coachAttuale, o)}>
+                    Compra
+                  </button>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="nota">Vai sul profilo di un coach per comprare un pacchetto di ore.</p>
+          )
         )}
       </div>
 
@@ -2304,6 +2530,8 @@ function Percorso({ vaiScheda, apriChat, nonLettiDi, note, setNote, iracingColle
         {prossimeSessioni.map((p) => {
           const co = COACHES.find((c) => c.id === p.coachId);
           const dataOrario = p.orario.includes("·") ? p.orario : `${fmtData(p.data)} · ${p.orario}`;
+          const oreMancanti = oreAllaSessione(p);
+          const rimborsabile = oreMancanti >= FINESTRA_CANCELLAZIONE_ORE;
           return (
             <div key={p.id}>
               <div className="riga" style={{ flexDirection: "column", alignItems: "stretch", gap: 8 }}>
@@ -2323,14 +2551,39 @@ function Percorso({ vaiScheda, apriChat, nonLettiDi, note, setNote, iracingColle
                     Cancella
                   </button>
                 </div>
+                <button className="apri" style={{ alignSelf: "flex-start", minHeight: 44, display: "flex", alignItems: "center" }}
+                        onClick={() => setSegnalaAperto(segnalaAperto === p.id ? "" : p.id)}>
+                  Il coach non si è presentato?
+                </button>
               </div>
 
               {cancellaConferma === p.id && (
                 <div className="notaBox distr" style={{ marginTop: 0, marginBottom: 14 }}>
-                  <p><b>Cancellare la sessione di {dataOrario}?</b> Non potrai annullarlo da qui.</p>
+                  <p><b>Cancellare la sessione di {dataOrario}?</b></p>
+                  <p>
+                    {rimborsabile
+                      ? `Mancano più di ${FINESTRA_CANCELLAZIONE_ORE} ore: l'ora torna nel tuo portafoglio e il coach non viene pagato per questo slot.`
+                      : `Mancano meno di ${FINESTRA_CANCELLAZIONE_ORE} ore: l'ora resta scalata e il coach viene comunque pagato per lo slot bloccato.`}
+                  </p>
                   <div style={{ display: "flex", gap: 10, marginTop: 10 }}>
                     <button className="b b-distr" onClick={() => confermaCancella(p.id)}>Conferma cancellazione</button>
                     <button className="b b-ghost" onClick={annullaCancella}>Annulla</button>
+                  </div>
+                </div>
+              )}
+
+              {segnalaAperto === p.id && (
+                <div className="notaBox ambra" style={{ marginTop: 0, marginBottom: 14 }}>
+                  <p>
+                    <b>Segnalare che {co?.nome} non si è presentato?</b> L'ora resta congelata — né
+                    persa né restituita — finché non verifichiamo cosa è successo. Quando la stanza
+                    sessione traccerà le presenze in automatico, questo passaggio sparirà.
+                  </p>
+                  <div style={{ display: "flex", gap: 10, marginTop: 10 }}>
+                    <button className="b b-blu" onClick={() => { segnalaNoShow(p.id); setSegnalaAperto(""); }}>
+                      Conferma segnalazione
+                    </button>
+                    <button className="b b-ghost" onClick={() => setSegnalaAperto("")}>Annulla</button>
                   </div>
                 </div>
               )}
@@ -2345,7 +2598,7 @@ function Percorso({ vaiScheda, apriChat, nonLettiDi, note, setNote, iracingColle
 
               {spostaAperto === p.id && spostaScelto && (
                 <div className="notaBox ambra" style={{ marginTop: 0, marginBottom: 14 }}>
-                  <p><b>Spostare la sessione a {spostaScelto}?</b> Era fissata per {dataOrario}.</p>
+                  <p><b>Spostare la sessione a {spostaScelto}?</b> Era fissata per {dataOrario}. Lo spostamento non tocca il tuo portafoglio.</p>
                   <div style={{ display: "flex", gap: 10, marginTop: 10 }}>
                     <button className="b b-blu" onClick={() => confermaSposta(p.id, spostaScelto)}>Conferma spostamento</button>
                     <button className="b b-ghost" onClick={chiudiSposta}>Annulla</button>
@@ -2356,6 +2609,45 @@ function Percorso({ vaiScheda, apriChat, nonLettiDi, note, setNote, iracingColle
           );
         })}
       </div>
+
+      {sessioniInSospeso.length > 0 && (
+        <>
+          <div className="stit"><span>Sessioni in sospeso</span></div>
+          <div className="blocco">
+            <p className="nota" style={{ marginTop: 0 }}>
+              Ore congelate o addebitate che restano visibili finché non sono chiuse — nulla qui si
+              perde in silenzio.
+            </p>
+            {sessioniInSospeso.map((p) => {
+              const co = COACHES.find((c) => c.id === p.coachId);
+              const dataOrario = p.orario.includes("·") ? p.orario : `${fmtData(p.data)} · ${p.orario}`;
+              const inContestazione = p.stato === "contestazione";
+              return (
+                <div className="riga" key={p.id} style={{ flexDirection: "column", alignItems: "stretch", gap: 8 }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", gap: 10, flexWrap: "wrap" }}>
+                    <span>{dataOrario} · {co?.nome}</span>
+                    <span className={`stato stato-${inContestazione ? "avviso" : "neutro"}`}>
+                      {inContestazione ? "In contestazione" : "Cancellata · ora addebitata"}
+                    </span>
+                  </div>
+                  {inContestazione && (
+                    <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                      <button className="b b-ghost" style={{ fontSize: 12.5 }}
+                              onClick={() => risolviContestazione(p.id, "no-show")}>
+                        (demo) Risolvi: no-show confermato → ora restituita
+                      </button>
+                      <button className="b b-ghost" style={{ fontSize: 12.5 }}
+                              onClick={() => risolviContestazione(p.id, "regolare")}>
+                        (demo) Risolvi: sessione regolare
+                      </button>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </>
+      )}
 
       <div className="stit"><span>Gare che hai in programma</span></div>
       <div className="blocco">
@@ -2732,6 +3024,93 @@ export default function App() {
   const mia = iracingCollegato ? fasciaDaIr(PILOTA_DEMO.ir) : "b2";
   const miaIr = iracingCollegato ? String(PILOTA_DEMO.ir) : "";
 
+  /* ---------------- portafoglio ore: stato condiviso ----------------
+     Lifted qui perché Scheda (alloca prenotando), Percorso (mostra/gestisce)
+     e AcquistoOre (accredita) sono fratelli, non genitore-figlio: nessuno di
+     loro da solo può tenere questo stato. walletOre sono le ore libere,
+     spendibili subito — le ore "allocate" su una prenotazione sono già state
+     scalate da qui, e si vedono contandole nelle prenotazioni con
+     stato "allocata" (vedi oreAllocate più sotto). */
+  const [walletOre, setWalletOre] = useState(PERCORSO.oreResidue);
+  const [oreAcquistateTotali, setOreAcquistateTotali] = useState(PERCORSO.oreAcquistate);
+  const [prenotazioni, setPrenotazioni] = useState(() =>
+    PERCORSO.prenotazioni.map((p) => ({ ...p, ore: DURATA_SESSIONE_ORE, stato: "allocata" })));
+  const [sessioniTotali, setSessioniTotali] = useState(PERCORSO.sessioniTotali);
+  const [acquisto, setAcquisto] = useState(null); // { coach, offerta } quando l'acquisto e' in corso
+
+  const oreAllocate = prenotazioni.filter((p) => p.stato === "allocata").reduce((s, p) => s + p.ore, 0);
+
+  const apriAcquistoOre = (coach, offerta) => setAcquisto(anyOf({ coach, offerta }));
+  const chiudiAcquistoOre = () => setAcquisto(null);
+
+  // successo pagamento (simulato): accredita e rispetta comunque il tetto,
+  // anche se il riepilogo lo blocca già prima di arrivare qui. prezzo non
+  // serve al saldo ma resta nella firma: e' quello che un vero Stripe
+  // manderebbe insieme alla conferma
+  const accreditaOre = (ore, prezzo) => {
+    setWalletOre((prev) => Math.min(TETTO_ORE_MENSILI, prev + ore));
+    setOreAcquistateTotali((prev) => prev + ore);
+  };
+
+  // allocare = prenotare: scala subito dal portafoglio. false se non ci sono
+  // abbastanza ore, cosi' Scheda sa di non mostrare la conferma
+  const prenotaSessione = (coach, slot) => {
+    if (walletOre < DURATA_SESSIONE_ORE) return false;
+    setWalletOre((prev) => prev - DURATA_SESSIONE_ORE);
+    setPrenotazioni((prev) => [...prev, {
+      id: `p-${Date.now()}`, data: new Date().toISOString().slice(0, 10),
+      coachId: coach.id, orario: slot, ore: DURATA_SESSIONE_ORE, stato: "allocata",
+    }]);
+    return true;
+  };
+
+  // spostare non tocca il saldo: muove solo lo slot
+  const spostaSessione = (id, nuovoSlot) =>
+    setPrenotazioni((prev) => prev.map((p) => (p.id === id ? { ...p, orario: nuovoSlot } : p)));
+
+  // cancellare: rimborso pieno solo con piu' di FINESTRA_CANCELLAZIONE_ORE di
+  // preavviso (e il coach non viene pagato); sotto quella soglia l'ora resta
+  // scalata e il coach viene comunque pagato per lo slot bloccato
+  const cancellaSessione = (id) => {
+    const p = prenotazioni.find((x) => x.id === id);
+    if (!p) return;
+    if (oreAllaSessione(p) >= FINESTRA_CANCELLAZIONE_ORE) {
+      setWalletOre((prev) => prev + p.ore);
+      setPrenotazioni((prev) => prev.filter((x) => x.id !== id));
+    } else {
+      setPrenotazioni((prev) => prev.map((x) => (x.id === id ? { ...x, stato: "cancellata-addebitata" } : x)));
+    }
+  };
+
+  // sospendere un coach = cancellare tutte le sue sessioni allocate, con la
+  // stessa regola di rimborso della cancellazione singola
+  const sospendiTuttoConCoach = (coachId) => {
+    prenotazioni
+      .filter((p) => p.coachId === coachId && p.stato === "allocata")
+      .forEach((p) => cancellaSessione(p.id));
+  };
+
+  // no-show del coach: verifica manuale in questo giro (la stanza sessione
+  // non traccia ancora le presenze). L'ora resta congelata, ne' persa ne'
+  // restituita, finche' non si risolve la contestazione
+  const segnalaNoShow = (id) =>
+    setPrenotazioni((prev) => prev.map((p) => (p.id === id ? { ...p, stato: "contestazione" } : p)));
+
+  // risolve una contestazione aperta — oggi cliccato a mano dal pilota per la
+  // demo, ma è la stessa funzione che va richiamata in automatico appena la
+  // stanza sessione saprà dire "pilota presente, coach assente" da sola
+  const risolviContestazione = (id, esito) => {
+    const p = prenotazioni.find((x) => x.id === id);
+    if (!p) return;
+    if (esito === "no-show") setWalletOre((prev) => prev + p.ore); // restituzione piena, il coach non viene pagato
+    setPrenotazioni((prev) => prev.filter((x) => x.id !== id));
+  };
+
+  const onTerminaSessione = (id) => {
+    setSessioniTotali((n) => n + 1);
+    setPrenotazioni((prev) => prev.map((p) => (p.id === id ? { ...p, stato: "svolta" } : p)));
+  };
+
   useEffect(() => { window.scrollTo(0, 0); }, [pagina, tab, coach, chatCoachId]);
 
   const vaiLogin = (r) => { setRuolo(r); setPagina("login"); };
@@ -2852,19 +3231,30 @@ export default function App() {
                   messaggi={chatMessaggi} setMessaggi={aggiornaMessaggi}
                   notificheEmail={notificheEmail} setNotificheEmail={setNotificheEmail} />
           )}
-          {ruolo === "pilota" && !chatCoachId && tab === "cerca" && (coach
-            ? <Scheda c={coach} mia={mia} miaIr={miaIr} iracingCollegato={iracingCollegato} chiudi={() => setCoach(null)}
+          {ruolo === "pilota" && !chatCoachId && acquisto && (
+            <AcquistoOre coach={anyOf(acquisto).coach} offerta={anyOf(acquisto).offerta} walletOre={walletOre}
+                         onSuccesso={accreditaOre} onChiudi={chiudiAcquistoOre} />
+          )}
+          {ruolo === "pilota" && !chatCoachId && !acquisto && tab === "cerca" && (coach
+            ? <Scheda c={coach} mia={mia} miaIr={miaIr} iracingCollegato={iracingCollegato} walletOre={walletOre}
+                       onPrenota={prenotaSessione} apriAcquistoOre={apriAcquistoOre} chiudi={() => setCoach(null)}
                        vaiPercorso={() => { setCoach(null); setTab("percorso"); }} vediCoach={setCoach}
                        apriChat={apriChat} nonLettiDi={nonLettiPer} />
             : <Cerca apri={setCoach} mia={mia} miaIr={miaIr}
                       iracingCollegato={iracingCollegato} setIracingCollegato={setIracingCollegato} />)}
-          {ruolo === "pilota" && !chatCoachId && tab === "percorso" && (
+          {ruolo === "pilota" && !chatCoachId && !acquisto && tab === "percorso" && (
             <Percorso vaiScheda={(co) => { setCoach(co); setTab("cerca"); }}
                       apriChat={apriChat} nonLettiDi={nonLettiPer} note={note} setNote={setNote}
                       iracingCollegato={iracingCollegato} setIracingCollegato={setIracingCollegato}
-                      simulaMessaggioCoach={simulaMessaggioCoach} />
+                      simulaMessaggioCoach={simulaMessaggioCoach}
+                      walletOre={walletOre} oreAllocate={oreAllocate} oreAcquistateTotali={oreAcquistateTotali}
+                      prenotazioni={prenotazioni} sessioniTotali={sessioniTotali}
+                      spostaSessione={spostaSessione} cancellaSessione={cancellaSessione}
+                      sospendiTuttoConCoach={sospendiTuttoConCoach} segnalaNoShow={segnalaNoShow}
+                      risolviContestazione={risolviContestazione} onTerminaSessione={onTerminaSessione}
+                      apriAcquistoOre={apriAcquistoOre} />
           )}
-          {ruolo === "pilota" && !chatCoachId && tab === "scheda" && (
+          {ruolo === "pilota" && !chatCoachId && !acquisto && tab === "scheda" && (
             <SchedaPilota vaiPercorso={() => setTab("percorso")}
                           iracingCollegato={iracingCollegato} setIracingCollegato={setIracingCollegato} />
           )}
