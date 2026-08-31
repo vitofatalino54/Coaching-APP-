@@ -346,8 +346,12 @@ const CSS = `
 
 /* azzera il margine di default del browser su body: senza, i 20px di
    padding laterale di .w si sommavano a un margine invisibile, riducendo
-   lo spazio reale disponibile proprio dove serve di piu' (mobile stretto) */
-html,body{margin:0;padding:0}
+   lo spazio reale disponibile proprio dove serve di piu' (mobile stretto).
+   text-size-adjust:100% disattiva il boost automatico del testo che alcuni
+   browser/webview mobile applicano su pagine strette: senza, il testo puo'
+   rendere piu' largo del previsto proprio sui telefoni reali, anche se in
+   un test headless (dove il boost non scatta mai) sembra tutto a posto. */
+html,body{margin:0;padding:0;-webkit-text-size-adjust:100%;text-size-adjust:100%}
 
 .crd{
   --nero:#0A0B0D; --nero2:#121418; --nero3:#1A1D23; --bordo:#282C34;
@@ -623,7 +627,12 @@ html,body{margin:0;padding:0}
   .frow{flex-direction:column;align-items:stretch;gap:6px}
   .frow > label{width:auto}
   .frow select,.frow input,.temaSelect{min-height:44px}
-  .checkgrid label{min-height:44px;padding:10px 14px}
+  /* una casella per riga, a piena larghezza: niente colonne affiancate che
+     possano stringersi fino a sovrapporsi. white-space torna a "normal"
+     cosi' un'etichetta lunga va a capo dentro la sua riga invece di
+     spingere il bordo della casella fuori dal viewport */
+  .checkgrid{flex-direction:column}
+  .checkgrid label{min-height:44px;padding:10px 14px;width:100%;white-space:normal;flex-shrink:1}
   .b{min-height:44px;display:inline-flex;align-items:center;justify-content:center}
   .emailBanner{position:static;top:auto}
 }
