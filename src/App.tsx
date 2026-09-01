@@ -604,10 +604,12 @@ html,body{margin:0;padding:0;-webkit-text-size-adjust:100%;text-size-adjust:100%
 /* solo altezza, mai altezza+larghezza insieme: la larghezza segue da sola
    per rispettare le proporzioni del file (640x490), qualunque esse siano —
    vale anche se un giorno LOGO_IRACING_DATAURI punta a un SVG con un
-   rapporto diverso. L'altezza è ancorata alla riga di testo accanto (stessa
-   scala di .plat, non un valore a caso), ben sotto la dimensione naturale
-   del file quindi non lo ingrandisce mai */
-.platLogo{height:14px;width:auto;display:block}
+   rapporto diverso. 32px e' una dimensione da logo autonomo (non piu'
+   accostato a una riga di testo come nella versione con riquadro), ben
+   sotto la dimensione naturale del file quindi non lo ingrandisce mai.
+   margin-bottom riprende quella che aveva .plat, per non cambiare lo
+   spazio verso il titolo sotto */
+.platLogoStandalone{height:32px;width:auto;display:block;margin-bottom:24px}
 
 .band{border-bottom:1px solid var(--bordo);background:var(--nero2)}
 .bandin{display:grid;grid-template-columns:repeat(2,1fr);gap:1px;background:var(--bordo)}
@@ -1004,16 +1006,11 @@ const MODALITA_BADGE = anyOf("logo"); // 'logo' | 'testo'
 function BadgeIRacing() {
   if (MODALITA_BADGE === "testo")
     return <div className="plat"><i />FUNZIONA SU iRACING</div>;
-  return (
-    <div className="plat">
-      {/* il logo è bianco su trasparente: .plat ha sempre uno sfondo scuro
-         (--nero2) in tutti i temi, quindi resta leggibile ovunque — se un
-         giorno .plat finisse su un fondo chiaro, qui andrebbe deciso se
-         forzare un contenitore scuro o ripiegare su MODALITA_BADGE="testo" */}
-      <span>Funziona su</span>
-      <img src={LOGO_IRACING_DATAURI} alt="Funziona su iRacing" className="platLogo" />
-    </div>
-  );
+  // solo il logo, senza riquadro/testo intorno — richiesto esplicitamente:
+  // non è più dentro .plat (niente bordo, sfondo o padding), resta solo lo
+  // spazio sotto per non far toccare il logo al titolo. Il logo è bianco:
+  // lo sfondo qui è sempre scuro (vedi .crd), quindi resta leggibile.
+  return <img src={LOGO_IRACING_DATAURI} alt="Funziona su iRacing" className="platLogoStandalone" />;
 }
 
 const fmtData = (iso) => {
