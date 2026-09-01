@@ -21,6 +21,18 @@ const MEDIA = {
   V05: null, // chiusura — montaggio gare, loop lungo
 };
 
+// badge "Funziona su iRacing": MODALITA_BADGE vive più sotto, subito sopra
+// BadgeIRacing (deve venire dopo anyOf — vedi il commento lì). Qui resta
+// solo l'asset che quella variabile sceglie se mostrare o no.
+// PNG/WEBP fornito: silhouette bianca su trasparente, 640×490, senza
+// wordmark. Incorporato come data URI — stesso file sorgente, un solo
+// costante da sostituire, funziona identico nell'app Vite e nell'artifact
+// HTML statico (nessun asset esterno da servire in nessuno dei due). Se in
+// futuro arriva una versione SVG basta cambiare questo valore (anche con
+// un "data:image/svg+xml,..."): BadgeIRacing non va toccato, il tag <img>
+// e il suo CSS restano gli stessi per qualunque formato raster o vettoriale.
+const LOGO_IRACING_DATAURI = "data:image/webp;base64,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";
+
 /* ------------------------------- dati demo ------------------------------- */
 
 const FASCE = [
@@ -586,8 +598,16 @@ html,body{margin:0;padding:0;-webkit-text-size-adjust:100%;text-size-adjust:100%
 .ctas{display:flex;flex-direction:column;gap:10px}
 @media(min-width:640px){.ctas{flex-direction:row}}
 .plat{display:inline-flex;align-items:center;gap:9px;border:1px solid var(--bordo);background:var(--nero2);
-  padding:7px 12px;font-family:'Roboto Mono',monospace;font-size:11.5px;letter-spacing:.12em;color:var(--grigio);margin-bottom:24px}
+  padding:7px 12px;font-family:'Roboto Mono',monospace;font-size:11.5px;letter-spacing:.12em;color:var(--grigio);margin-bottom:24px;
+  max-width:100%;flex-wrap:wrap}
 .plat i{width:7px;height:7px;border-radius:50%;background:var(--blu2);display:inline-block}
+/* solo altezza, mai altezza+larghezza insieme: la larghezza segue da sola
+   per rispettare le proporzioni del file (640x490), qualunque esse siano —
+   vale anche se un giorno LOGO_IRACING_DATAURI punta a un SVG con un
+   rapporto diverso. L'altezza è ancorata alla riga di testo accanto (stessa
+   scala di .plat, non un valore a caso), ben sotto la dimensione naturale
+   del file quindi non lo ingrandisce mai */
+.platLogo{height:14px;width:auto;display:block}
 
 .band{border-bottom:1px solid var(--bordo);background:var(--nero2)}
 .bandin{display:grid;grid-template-columns:repeat(2,1fr);gap:1px;background:var(--bordo)}
@@ -965,6 +985,37 @@ function OpzioneCheck({ checked, disabled = false, onChange, children }) {
   );
 }
 
+/* ---- badge "Funziona su iRacing": logo vs testo, reversibile in un colpo ----
+   L'uso del logo iRacing dipende da una verifica sui termini del marchio
+   ancora in corso: finché non è chiusa, deve restare un interruttore, non
+   una scelta cablata nel markup. Cambiando SOLO questa variabile si torna
+   al badge testuale ovunque compare, senza toccare BadgeIRacing né i punti
+   che lo usano — ed è per questo che il badge è un componente unico invece
+   di essere ripetuto nei vari punti dove compare. anyOf() qui (come per lo
+   useState(null) altrove) serve solo a evitare che TS blocchi il confronto
+   qui sotto perché "logo" da solo verrebbe letto come tipo letterale. */
+const MODALITA_BADGE = anyOf("logo"); // 'logo' | 'testo'
+
+// badge "Funziona su iRacing" — UNICO componente per ogni punto in cui il
+// badge compare: cambiare MODALITA_BADGE qui sopra basta a tornare al
+// testo ovunque, senza toccare i chiamanti. Il contenitore (.plat) e il
+// suo ingombro restano identici nelle due modalità: cambia solo cosa c'è
+// dentro. Non è un link: badge informativo, nessun onClick verso iRacing.
+function BadgeIRacing() {
+  if (MODALITA_BADGE === "testo")
+    return <div className="plat"><i />FUNZIONA SU iRACING</div>;
+  return (
+    <div className="plat">
+      {/* il logo è bianco su trasparente: .plat ha sempre uno sfondo scuro
+         (--nero2) in tutti i temi, quindi resta leggibile ovunque — se un
+         giorno .plat finisse su un fondo chiaro, qui andrebbe deciso se
+         forzare un contenitore scuro o ripiegare su MODALITA_BADGE="testo" */}
+      <span>Funziona su</span>
+      <img src={LOGO_IRACING_DATAURI} alt="Funziona su iRacing" className="platLogo" />
+    </div>
+  );
+}
+
 const fmtData = (iso) => {
   const s = new Date(iso + "T00:00:00").toLocaleDateString("it-IT", { weekday: "short", day: "numeric", month: "short" });
   return s.charAt(0).toUpperCase() + s.slice(1);
@@ -1165,7 +1216,7 @@ function Home({ vaiLogin, vaiCandidatura }) {
       <section className="hero">
         <div className="w herogrid">
           <div>
-            <div className="plat"><i />FUNZIONA SU iRACING</div>
+            <BadgeIRacing />
             <h1 className="h1">
               Trova il coach che ti fa <em>salire davvero</em>.
             </h1>
