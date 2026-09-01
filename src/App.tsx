@@ -406,8 +406,15 @@ const CSS = `
    text-size-adjust:100% disattiva il boost automatico del testo che alcuni
    browser/webview mobile applicano su pagine strette: senza, il testo puo'
    rendere piu' largo del previsto proprio sui telefoni reali, anche se in
-   un test headless (dove il boost non scatta mai) sembra tutto a posto. */
-html,body{margin:0;padding:0;-webkit-text-size-adjust:100%;text-size-adjust:100%}
+   un test headless (dove il boost non scatta mai) sembra tutto a posto.
+   overflow-x:hidden + max-width:100% e' la GUARDIA GLOBALE finale: qualunque
+   elemento interno sfori comunque (un bug futuro, un contenuto non previsto)
+   non apre piu' uno scroll orizzontale ne' un salto del layout — il sintomo
+   che ha reso il bug visibile finora (logo tagliato a sinistra: il browser
+   scorre la pagina per seguire il controllo che sfora) semplicemente non
+   puo' piu' verificarsi qui, indipendentemente da dove nasce lo sforamento. */
+html,body{margin:0;padding:0;-webkit-text-size-adjust:100%;text-size-adjust:100%;
+  max-width:100%;overflow-x:hidden}
 
 .crd{
   --nero:#0A0B0D; --nero2:#121418; --nero3:#1A1D23; --bordo:#282C34;
@@ -507,6 +514,18 @@ html,body{margin:0;padding:0;-webkit-text-size-adjust:100%;text-size-adjust:100%
 .crd[data-theme="menta-navy"] .b-rosso{color:var(--nero)}
 
 .crd *{box-sizing:border-box}
+/* regola globale anti-overflow (fix layout mobile, giro definitivo): il
+   default CSS di un figlio flex/grid e' min-width:auto, cioe' "non
+   restringerti sotto la larghezza del tuo contenuto" — e' la causa n.1 di
+   etichette tagliate/righe che sforano, perche' un testo lungo in una
+   riga stretta preferisce sforare piuttosto che andare a capo. Azzerarlo
+   qui, una volta per tutta l'app, vuol dire che ogni testo dentro un
+   flex/grid puo' SEMPRE restringersi e andare a capo prima di sforare —
+   vale per i componenti di oggi e per quelli scritti domani, non serve
+   ricordarsene schermata per schermata. Un elemento con una larghezza
+   esplicita (es. .avat{width:44px}) non ne risente: min-width:0 conta solo
+   quando qualcosa lo starebbe comunque comprimendo sotto il suo contenuto. */
+.crd *{min-width:0}
 .crd h1,.crd h2,.crd h3{font-family:'Saira Condensed',system-ui,sans-serif;font-weight:700;line-height:1.08;margin:0;letter-spacing:-.02em}
 .mn{font-family:'Roboto Mono',ui-monospace,monospace;font-variant-numeric:tabular-nums}
 .w{max-width:1080px;margin:0 auto;padding:0 20px}
@@ -635,18 +654,38 @@ html,body{margin:0;padding:0;-webkit-text-size-adjust:100%;text-size-adjust:100%
    stato abbastanza lungo da sforare il contenitore) */
 .campo > label{display:block;font-family:'Roboto Mono',monospace;font-size:10.5px;letter-spacing:.16em;
   text-transform:uppercase;color:var(--grigio2);margin-bottom:6px}
-.campo input{width:100%;background:var(--nero);border:1px solid var(--bordo);color:var(--bianco);
+/* :not(checkbox/radio) — stessa famiglia di bug della regola sopra, mai
+   corretta insieme ad essa: senza l'esclusione, questa regola raggiungeva
+   anche i checkbox di un .checkgrid annidato in un .campo (Scheda Pilota,
+   Candidatura) e li stirava a width:100% del proprio contenitore — una
+   casella diventa una barra larga quanto la riga, con l'etichetta spinta
+   di lato: esattamente il bug "casella a un estremo, etichetta all'altro,
+   vuoto in mezzo" segnalato. Qui si corregge alla radice, non sulle singole
+   schermate dove si è visto: vale per ogni .campo, presente e futuro. */
+.campo input:not([type="checkbox"]):not([type="radio"]){width:100%;background:var(--nero);border:1px solid var(--bordo);color:var(--bianco);
   padding:11px 12px;font-family:'Titillium Web',sans-serif;font-size:14px;border-radius:2px}
 .campo input:focus{outline:none;border-color:var(--grigio)}
 .campo select,.campo textarea{width:100%;background:var(--nero);border:1px solid var(--bordo);color:var(--bianco);
   padding:11px 12px;font-family:'Titillium Web',sans-serif;font-size:14px;border-radius:2px}
 .campo textarea{resize:vertical;min-height:88px;line-height:1.5}
 .campo select:focus,.campo textarea:focus{outline:none;border-color:var(--grigio)}
+/* riga opzione con checkbox (componente OpzioneCheck, riusato ovunque serva
+   una lista di caselle): sempre una singola riga flex, casella a sinistra
+   a dimensione fissa (flex:0 0 auto, non si stira mai), etichetta in uno
+   <span> a destra che invece puo' SEMPRE restringersi e andare a capo
+   (flex:1 1 auto + min-width:0) invece di tagliarsi o spingere la casella
+   fuori dal contenitore — questa e' la regola, non una correzione per
+   schermata: cambia qui e vale per fasce orarie, obiettivi e ogni lista
+   analoga scritta in futuro. */
 .checkgrid{display:flex;flex-wrap:wrap;gap:8px;margin-top:4px}
-.checkgrid label{display:flex;align-items:center;gap:7px;flex-shrink:0;white-space:nowrap;
+.checkgrid label{display:flex;align-items:center;gap:10px;flex-shrink:0;white-space:nowrap;
   border:1px solid var(--bordo);padding:8px 12px;font-size:13px;cursor:pointer;border-radius:2px;color:var(--grigio)}
 .checkgrid label:has(input:checked){border-color:var(--blu2);color:var(--blu2);background:var(--bluSoft)}
-.checkgrid input{accent-color:var(--blu2)}
+.checkgrid input{accent-color:var(--blu2);flex:0 0 auto}
+/* white-space non va ripetuto qui: e' una proprieta' ereditata, segue
+   sempre quella della <label> (nowrap sui chip da desktop, normal sotto
+   i 640px) — basta cambiarla in un solo punto, vedi media query sotto */
+.checkgrid label>span{flex:1 1 auto;min-width:0}
 .hintbox{border-left:2px solid var(--bordo);padding-left:12px;margin-top:18px;color:var(--grigio2);font-size:12.5px;line-height:1.6}
 
 /* ---- app ---- */
@@ -670,7 +709,12 @@ html,body{margin:0;padding:0;-webkit-text-size-adjust:100%;text-size-adjust:100%
 .frow > label{font-family:'Roboto Mono',monospace;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;
   color:var(--grigio2);width:104px;flex:none}
 .frow.hi > label{color:var(--blu2)}
-.frow select,.frow input{flex:1;min-width:0;background:var(--nero);color:var(--bianco);border:1px solid var(--bordo);
+/* stessa esclusione di .campo input, stessa ragione: il filtro "Obiettivo"
+   nella Cerca annida un .checkgrid dentro un .frow, e senza :not(...) questa
+   regola dava flex:1 anche ai suoi checkbox, stirandoli a riempire l'intera
+   riga (il caso piu' vistoso del bug: la casella diventava un rettangolo
+   largo quanto tutta la riga, il testo spinto ai margini). */
+.frow select,.frow input:not([type="checkbox"]):not([type="radio"]){flex:1;min-width:0;background:var(--nero);color:var(--bianco);border:1px solid var(--bordo);
   padding:8px 10px;font-family:'Roboto Mono',monospace;font-size:13px;border-radius:2px}
 .frow input::placeholder{color:var(--grigio2)}
 
@@ -904,6 +948,22 @@ const perSett = (ir, gg) => Math.round((ir / gg) * 7);
 // useState(null), senza `as`/generici — sintassi che romperebbe il parsing di
 // Babel quando questo file gira nell'artifact (solo preset "react", niente TS)
 const anyOf = (x) => x;
+
+// riga opzione con checkbox — UNICO componente riusato per fasce orarie,
+// obiettivi e ogni altra lista dentro un .checkgrid (Cerca, Scheda Pilota,
+// Candidatura coach). Il testo e' avvolto in uno <span> apposta: e' quello
+// a cui la CSS da' flex:1 1 auto + min-width:0, cosi' e' SEMPRE il testo a
+// restringersi/andare a capo, mai la casella a stirarsi per riempire lo
+// spazio — la stessa regola CSS `.checkgrid input,.checkgrid label>span`
+// vale per ogni chiamante, presente o futuro, senza doverla ripetere.
+function OpzioneCheck({ checked, disabled = false, onChange, children }) {
+  return (
+    <label>
+      <input type="checkbox" checked={checked} disabled={disabled} onChange={onChange} />
+      <span>{children}</span>
+    </label>
+  );
+}
 
 const fmtData = (iso) => {
   const s = new Date(iso + "T00:00:00").toLocaleDateString("it-IT", { weekday: "short", day: "numeric", month: "short" });
@@ -1460,11 +1520,10 @@ function Cerca({ apri, mia, miaIr, iracingCollegato, setIracingCollegato }) {
               {OBIETTIVI.map((o) => {
                 const on = obi.includes(o.k);
                 return (
-                  <label key={o.k}>
-                    <input type="checkbox" checked={on} disabled={!on && obi.length >= MAX_OBIETTIVI}
-                           onChange={() => toggleObi(o.k)} />
+                  <OpzioneCheck key={o.k} checked={on} disabled={!on && obi.length >= MAX_OBIETTIVI}
+                                onChange={() => toggleObi(o.k)}>
                     {o.l}
-                  </label>
+                  </OpzioneCheck>
                 );
               })}
             </div>
@@ -2512,11 +2571,10 @@ function SchedaPilota({ vaiPercorso, iracingCollegato, setIracingCollegato }) {
           {OBIETTIVI.map((o) => {
             const on = obiettivi.includes(o.k);
             return (
-              <label key={o.k}>
-                <input type="checkbox" checked={on} disabled={!on && obiettivi.length >= MAX_OBIETTIVI}
-                       onChange={() => toggleObiettivo(o.k)} />
+              <OpzioneCheck key={o.k} checked={on} disabled={!on && obiettivi.length >= MAX_OBIETTIVI}
+                            onChange={() => toggleObiettivo(o.k)}>
                 {o.l}
-              </label>
+              </OpzioneCheck>
             );
           })}
         </div>
@@ -2536,10 +2594,9 @@ function SchedaPilota({ vaiPercorso, iracingCollegato, setIracingCollegato }) {
         <label>Fasce orarie disponibili</label>
         <div className="checkgrid">
           {FASCE_ORARIE.map((v) => (
-            <label key={v}>
-              <input type="checkbox" checked={fasceOrarie.includes(v)} onChange={() => toggleFasciaOraria(v)} />
+            <OpzioneCheck key={v} checked={fasceOrarie.includes(v)} onChange={() => toggleFasciaOraria(v)}>
               {v}
-            </label>
+            </OpzioneCheck>
           ))}
         </div>
       </div>
@@ -3246,10 +3303,9 @@ function Candidatura({ chiudi, vaiLoginCoach }) {
           <label>4 · Fasce orarie in cui sei disponibile</label>
           <div className="checkgrid">
             {FASCE_ORARIE.map((v) => (
-              <label key={v}>
-                <input type="checkbox" checked={r.fasceOrarie.includes(v)} onChange={() => toggleOraria(v)} />
+              <OpzioneCheck key={v} checked={r.fasceOrarie.includes(v)} onChange={() => toggleOraria(v)}>
                 {v}
-              </label>
+              </OpzioneCheck>
             ))}
           </div>
         </div>
