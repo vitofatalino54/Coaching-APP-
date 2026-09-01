@@ -410,7 +410,12 @@ function fasciaDiOrario(dataJs, ora) {
 /* ---------------------------------- stile ---------------------------------- */
 
 const CSS = `
-@import url('https://fonts.googleapis.com/css2?family=Saira+Condensed:wght@500;600;700;800;900&family=Titillium+Web:wght@400;600;700&family=Roboto+Mono:wght@400;500&display=swap');
+/* Due famiglie, non tre: Saira Condensed per titoli e numeri-eroe (verticale,
+   da cruscotto), Titillium Web per tutto il resto — corpo, etichette, dati
+   inclusi. Roboto Mono è stato tolto: i dati si distinguono per allineamento
+   tabulare (font-variant-numeric, vedi .mn), non per un terzo alfabeto — è
+   la differenza fra "sembra tecnico" e "è misurato in colonna". */
+@import url('https://fonts.googleapis.com/css2?family=Saira+Condensed:wght@500;600;700;800;900&family=Titillium+Web:wght@400;600;700&display=swap');
 
 /* azzera il margine di default del browser su body: senza, i 20px di
    padding laterale di .w si sommavano a un margine invisibile, riducendo
@@ -539,9 +544,15 @@ html,body{margin:0;padding:0;-webkit-text-size-adjust:100%;text-size-adjust:100%
    quando qualcosa lo starebbe comunque comprimendo sotto il suo contenuto. */
 .crd *{min-width:0}
 .crd h1,.crd h2,.crd h3{font-family:'Saira Condensed',system-ui,sans-serif;font-weight:700;line-height:1.08;margin:0;letter-spacing:-.02em}
-.mn{font-family:'Roboto Mono',ui-monospace,monospace;font-variant-numeric:tabular-nums}
+/* niente font monospace: il "misurato" è l'allineamento tabulare (due cifre
+   si confrontano in colonna, prima/dopo una sessione o un'allocazione), non
+   un alfabeto da terminale — il font resta quello del corpo del testo */
+.mn{font-variant-numeric:tabular-nums;font-feature-settings:"tnum" 1;font-weight:600}
 .w{max-width:1080px;margin:0 auto;padding:0 20px}
-.eyebrow{font-family:'Roboto Mono',monospace;font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--grigio2)}
+/* didascalia, non eyebrow urlata: maiuscolo/tracking largo restano ai
+   badge di stato veri (.stato, .irTag) — qui è solo un titoletto in
+   maiuscolo naturale, un po' più marcato del testo attorno */
+.eyebrow{font-size:13px;font-weight:600;color:var(--grigio2);margin-bottom:6px}
 
 /* ---- barra ---- */
 .nav{position:sticky;top:0;z-index:40;background:rgba(10,11,13,.94);backdrop-filter:blur(10px);border-bottom:1px solid var(--bordo)}
@@ -558,7 +569,7 @@ html,body{margin:0;padding:0;-webkit-text-size-adjust:100%;text-size-adjust:100%
 .navlinks button:hover{color:var(--bianco)}
 .navcta{margin-left:auto;display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:flex-end}
 .temaSelect{background:var(--nero2);border:1px solid var(--bordo);color:var(--grigio);max-width:100%;
-  font-family:'Roboto Mono',monospace;font-size:11px;padding:6px 8px;border-radius:2px;cursor:pointer}
+  font-family:'Titillium Web',sans-serif;font-size:11px;padding:6px 8px;border-radius:2px;cursor:pointer}
 
 /* ---- bottoni ---- */
 .b{font-family:'Saira Condensed',sans-serif;font-weight:600;font-size:14px;letter-spacing:.01em;
@@ -579,10 +590,10 @@ html,body{margin:0;padding:0;-webkit-text-size-adjust:100%;text-size-adjust:100%
 .slot{position:relative;width:100%;border:1px dashed var(--bordo);background:
   repeating-linear-gradient(135deg,transparent,transparent 9px,rgba(255,255,255,.022) 9px,rgba(255,255,255,.022) 18px),var(--nero2);
   display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:18px;text-align:center}
-.slot code{font-family:'Roboto Mono',monospace;font-size:12px;letter-spacing:.16em;color:var(--rosso2);
-  border:1px solid var(--rosso2);padding:3px 9px}
+.slot code{font-size:12px;letter-spacing:.1em;color:var(--grigio);
+  border:1px solid var(--bordo);padding:3px 9px}
 .slot p{margin:0;font-size:12.5px;color:var(--grigio2);max-width:34ch;line-height:1.45}
-.slot span{font-family:'Roboto Mono',monospace;font-size:10.5px;color:var(--bordo);letter-spacing:.1em}
+.slot span{font-family:'Titillium Web',sans-serif;font-size:10.5px;color:var(--bordo);letter-spacing:.1em}
 .slot video,.slot img{width:100%;height:100%;object-fit:cover;display:block}
 .media{overflow:hidden;background:var(--nero2);border:1px solid var(--bordo)}
 .media video,.media img{width:100%;height:100%;object-fit:cover;display:block}
@@ -593,12 +604,11 @@ html,body{margin:0;padding:0;-webkit-text-size-adjust:100%;text-size-adjust:100%
 .herogrid{display:grid;gap:38px;grid-template-columns:1fr;align-items:center}
 @media(min-width:900px){.herogrid{grid-template-columns:1.05fr .95fr;gap:52px}}
 .h1{font-size:clamp(38px,6.4vw,60px)}
-.h1 em{font-style:normal;color:var(--rosso2)}
 .lead{color:var(--grigio);font-size:17px;line-height:1.6;margin:20px 0 28px;max-width:46ch}
 .ctas{display:flex;flex-direction:column;gap:10px}
 @media(min-width:640px){.ctas{flex-direction:row}}
 .plat{display:inline-flex;align-items:center;gap:9px;border:1px solid var(--bordo);background:var(--nero2);
-  padding:7px 12px;font-family:'Roboto Mono',monospace;font-size:11.5px;letter-spacing:.12em;color:var(--grigio);margin-bottom:24px;
+  padding:7px 12px;font-family:'Titillium Web',sans-serif;font-size:11.5px;letter-spacing:.12em;color:var(--grigio);margin-bottom:24px;
   max-width:100%;flex-wrap:wrap}
 .plat i{width:7px;height:7px;border-radius:50%;background:var(--blu2);display:inline-block}
 /* solo altezza, mai altezza+larghezza insieme: la larghezza segue da sola
@@ -616,7 +626,7 @@ html,body{margin:0;padding:0;-webkit-text-size-adjust:100%;text-size-adjust:100%
 @media(min-width:760px){.bandin{grid-template-columns:repeat(4,1fr)}}
 .bcell{background:var(--nero2);padding:22px 18px}
 .bcell b{display:block;font-family:'Saira Condensed',sans-serif;font-size:29px;font-weight:700;letter-spacing:-.02em}
-.bcell span{font-family:'Roboto Mono',monospace;font-size:10.5px;letter-spacing:.16em;color:var(--grigio2);text-transform:uppercase}
+.bcell span{font-size:12.5px;color:var(--grigio2);margin-top:4px;display:block}
 
 .sez{padding:70px 0;border-bottom:1px solid var(--bordo)}
 .sezhead{max-width:56ch;margin-bottom:38px}
@@ -625,7 +635,11 @@ html,body{margin:0;padding:0;-webkit-text-size-adjust:100%;text-size-adjust:100%
 
 .passi{display:grid;gap:20px;grid-template-columns:1fr}
 @media(min-width:820px){.passi{grid-template-columns:repeat(3,1fr);gap:24px}}
-.passo .num{font-family:'Roboto Mono',monospace;font-size:11px;letter-spacing:.2em;color:var(--rosso2);margin-bottom:12px}
+/* numero nudo, non "PASSO 01": la sequenza è già leggibile dalla posizione
+   nella riga di tre — il numero da solo basta, senza la parola davanti a
+   urlare "questa è una sequenza". Grigio, non rosso: non serve il colore
+   di marca per giustificare un contatore */
+.passo .num{font-family:'Saira Condensed',sans-serif;font-size:28px;font-weight:800;color:var(--grigio2);margin-bottom:10px}
 .passo h3{font-size:21px;margin-bottom:8px}
 .passo p{color:var(--grigio);font-size:14.5px;line-height:1.6;margin:0 0 16px}
 
@@ -637,10 +651,14 @@ html,body{margin:0;padding:0;-webkit-text-size-adjust:100%;text-size-adjust:100%
    verificato in Attuale/Teal/Menta&Navy, prende un tono dedicato e dosato
    in Papaya e Oro&Bordeaux (vedi definizioni di --eroe nei blocchi tema) */
 .numero-eroe{color:var(--eroe)}
-.metric .sm{font-family:'Roboto Mono',monospace;font-size:12px;color:var(--grigio2);margin-top:8px;letter-spacing:.06em}
+/* solo transform/opacity, come da regola: qui è l'opacità a segnalare "sto
+   misurando" mentre il valore si assesta (vedi NumeroMisurato) */
+.numeroMisurato{display:inline-block;transition:opacity .2s ease}
+@media(prefers-reduced-motion:reduce){.numeroMisurato{transition:none}}
+.metric .sm{font-family:'Titillium Web',sans-serif;font-size:12px;color:var(--grigio2);margin-top:8px;letter-spacing:.06em}
 .check{list-style:none;padding:0;margin:20px 0 0}
 .check li{position:relative;padding-left:24px;margin-bottom:12px;color:var(--grigio);font-size:15px;line-height:1.55}
-.check li::before{content:"";position:absolute;left:0;top:8px;width:9px;height:9px;background:var(--rosso2)}
+.check li::before{content:"";position:absolute;left:0;top:8px;width:9px;height:9px;background:var(--grigio2)}
 
 .due{display:grid;gap:16px;grid-template-columns:1fr}
 @media(min-width:760px){.due{grid-template-columns:1fr 1fr}}
@@ -654,7 +672,7 @@ html,body{margin:0;padding:0;-webkit-text-size-adjust:100%;text-size-adjust:100%
 .faq details{border-bottom:1px solid var(--bordo);padding:18px 0}
 .faq summary{cursor:pointer;font-family:'Saira Condensed',sans-serif;font-weight:600;font-size:16.5px;list-style:none}
 .faq summary::-webkit-details-marker{display:none}
-.faq summary::before{content:"+ ";color:var(--rosso2)}
+.faq summary::before{content:"+ ";color:var(--grigio)}
 .faq details[open] summary::before{content:"− "}
 .faq p{color:var(--grigio);font-size:14.5px;line-height:1.65;margin:12px 0 0;max-width:64ch}
 
@@ -674,8 +692,7 @@ html,body{margin:0;padding:0;-webkit-text-size-adjust:100%;text-size-adjust:100%
    dei checkbox dentro un .checkgrid annidato in un .campo (font monospace
    piu' largo del previsto, mai emerso finche' il testo dei checkbox non e'
    stato abbastanza lungo da sforare il contenitore) */
-.campo > label{display:block;font-family:'Roboto Mono',monospace;font-size:10.5px;letter-spacing:.16em;
-  text-transform:uppercase;color:var(--grigio2);margin-bottom:6px}
+.campo > label{display:block;font-size:13px;font-weight:600;color:var(--grigio2);margin-bottom:6px}
 /* :not(checkbox/radio) — stessa famiglia di bug della regola sopra, mai
    corretta insieme ad essa: senza l'esclusione, questa regola raggiungeva
    anche i checkbox di un .checkgrid annidato in un .campo (Scheda Pilota,
@@ -701,8 +718,10 @@ html,body{margin:0;padding:0;-webkit-text-size-adjust:100%;text-size-adjust:100%
    analoga scritta in futuro. */
 .checkgrid{display:flex;flex-wrap:wrap;gap:8px;margin-top:4px}
 .checkgrid label{display:flex;align-items:center;gap:10px;flex-shrink:0;white-space:nowrap;
-  border:1px solid var(--bordo);padding:8px 12px;font-size:13px;cursor:pointer;border-radius:2px;color:var(--grigio)}
-.checkgrid label:has(input:checked){border-color:var(--blu2);color:var(--blu2);background:var(--bluSoft)}
+  border:1px solid var(--bordo);padding:8px 12px;font-size:13px;cursor:pointer;border-radius:2px;color:var(--grigio);
+  transition:transform .12s ease}
+.checkgrid label:has(input:checked){border-color:var(--blu2);color:var(--blu2);background:var(--bluSoft);transform:scale(1.02)}
+@media(prefers-reduced-motion:reduce){.checkgrid label{transition:none}}
 .checkgrid input{accent-color:var(--blu2);flex:0 0 auto}
 /* white-space non va ripetuto qui: e' una proprieta' ereditata, segue
    sempre quella della <label> (nowrap sui chip da desktop, normal sotto
@@ -715,7 +734,11 @@ html,body{margin:0;padding:0;-webkit-text-size-adjust:100%;text-size-adjust:100%
 .appbarin{display:flex;align-items:center;gap:4px;height:50px;overflow-x:auto}
 .appbarin button{background:none;border:0;border-bottom:2px solid transparent;color:var(--grigio);
   padding:14px 12px;cursor:pointer;font-family:'Saira Condensed',sans-serif;font-weight:600;font-size:14px;white-space:nowrap}
-.appbarin button[data-on="1"]{color:var(--bianco);border-bottom-color:var(--rosso2)}
+/* la scheda attiva si segnala col bianco pieno, non col rosso di marca:
+   "dove sono" è uno stato dell'interfaccia, non un momento di marchio —
+   tenerli separati evita che il rosso perda significato a forza di
+   comparire ovunque */
+.appbarin button[data-on="1"]{color:var(--bianco);border-bottom-color:var(--bianco)}
 .appbarin .esci{margin-left:auto;color:var(--grigio2);font-size:13px;font-weight:500;
   white-space:nowrap;flex:none}
 /* "Scheda Pilota" prende lo spazio a destra lasciato libero dall'identita',
@@ -723,13 +746,12 @@ html,body{margin:0;padding:0;-webkit-text-size-adjust:100%;text-size-adjust:100%
 .appbarin .schedaTab{margin-left:auto}
 
 .filtri{border:1px solid var(--bordo);background:var(--nero2);margin:22px 0}
-.fhead{padding:10px 14px;border-bottom:1px solid var(--bordo);font-family:'Roboto Mono',monospace;
-  font-size:10.5px;letter-spacing:.18em;color:var(--grigio2);display:flex;justify-content:space-between}
+.fhead{padding:10px 14px;border-bottom:1px solid var(--bordo);
+  font-size:13px;font-weight:600;color:var(--grigio2);display:flex;justify-content:space-between}
 .frow{display:flex;align-items:center;gap:12px;padding:11px 14px;border-bottom:1px solid var(--bordo)}
 .frow:last-child{border-bottom:0}
 .frow.hi{background:var(--bluSoft)}
-.frow > label{font-family:'Roboto Mono',monospace;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;
-  color:var(--grigio2);width:104px;flex:none}
+.frow > label{font-size:13px;font-weight:600;color:var(--grigio2);width:132px;flex:none}
 .frow.hi > label{color:var(--blu2)}
 /* stessa esclusione di .campo input, stessa ragione: il filtro "Obiettivo"
    nella Cerca annida un .checkgrid dentro un .frow, e senza :not(...) questa
@@ -737,7 +759,7 @@ html,body{margin:0;padding:0;-webkit-text-size-adjust:100%;text-size-adjust:100%
    riga (il caso piu' vistoso del bug: la casella diventava un rettangolo
    largo quanto tutta la riga, il testo spinto ai margini). */
 .frow select,.frow input:not([type="checkbox"]):not([type="radio"]){flex:1;min-width:0;background:var(--nero);color:var(--bianco);border:1px solid var(--bordo);
-  padding:8px 10px;font-family:'Roboto Mono',monospace;font-size:13px;border-radius:2px}
+  padding:8px 10px;font-family:'Titillium Web',sans-serif;font-size:13px;border-radius:2px}
 .frow input::placeholder{color:var(--grigio2)}
 
 /* ---- fix layout mobile: niente contenitori piu' larghi del viewport ----
@@ -761,22 +783,27 @@ html,body{margin:0;padding:0;-webkit-text-size-adjust:100%;text-size-adjust:100%
 
 .lista{display:grid;gap:14px;grid-template-columns:1fr;margin:20px 0 40px}
 @media(min-width:780px){.lista{grid-template-columns:1fr 1fr}}
-.cc{border:1px solid var(--bordo);background:var(--nero2);padding:18px;text-align:left;cursor:pointer;
+/* la card-coach è una decisione da prendere, non una riga informativa: un
+   bordo un filo più presente di .blocco (usato per riepiloghi, non per
+   scegliere) basta a farla pesare di più, senza ricorrere a ombre o raggi
+   diversi — la stessa griglia piatta, solo un contorno più netto dove
+   davvero si clicca per decidere */
+.cc{border:1px solid var(--grigio2);background:var(--nero2);padding:18px;text-align:left;cursor:pointer;
   color:inherit;font:inherit;width:100%;transition:border-color .16s,transform .16s}
-.cc:hover{border-color:var(--rosso2);transform:translateY(-2px)}
+.cc:hover{border-color:var(--grigio);transform:translateY(-2px)}
 .cc:focus-visible{outline:2px solid var(--blu2);outline-offset:2px}
 .cctop{display:flex;gap:12px;align-items:center}
 .avat{width:44px;height:44px;flex:none;background:var(--nero3);border:1px solid var(--bordo);
   display:flex;align-items:center;justify-content:center;font-family:'Saira Condensed',sans-serif;font-weight:700;color:var(--grigio)}
 .ccnome{font-family:'Saira Condensed',sans-serif;font-weight:700;font-size:18px}
-.ccsub{font-family:'Roboto Mono',monospace;font-size:11.5px;color:var(--grigio2)}
+.ccsub{font-family:'Titillium Web',sans-serif;font-size:11.5px;color:var(--grigio2)}
 .ccmetr{display:flex;align-items:flex-end;gap:14px;margin-top:16px}
 .ccbig{font-family:'Saira Condensed',sans-serif;font-weight:800;font-size:30px;color:var(--blu2);letter-spacing:-.02em;line-height:1}
-.ccsm{font-family:'Roboto Mono',monospace;font-size:11px;color:var(--grigio2);line-height:1.5}
+.ccsm{font-family:'Titillium Web',sans-serif;font-size:11px;color:var(--grigio2);line-height:1.5}
 .fit{margin-top:14px;border:1px solid var(--blu2);background:var(--bluSoft);padding:9px 11px;font-size:13px}
 .fit b{color:var(--blu2)}
 .fit.no{border-color:var(--bordo);background:var(--nero);color:var(--grigio2)}
-.stato{display:inline-flex;align-items:center;font-family:'Roboto Mono',monospace;font-size:10.5px;
+.stato{display:inline-flex;align-items:center;font-family:'Titillium Web',sans-serif;font-size:10.5px;
   letter-spacing:.1em;text-transform:uppercase;padding:4px 9px;border:1px solid transparent;border-radius:2px}
 .stato-consigliato{background:var(--verde);color:#fff}
 .stato-neutro{background:var(--oro);color:#241A05}
@@ -791,10 +818,10 @@ html,body{margin:0;padding:0;-webkit-text-size-adjust:100%;text-size-adjust:100%
 .notaBox.distr b{color:var(--distr2)}
 .altList{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
 .altList button{background:var(--nero);border:1px solid var(--bordo);color:var(--bianco);
-  font-family:'Roboto Mono',monospace;font-size:11.5px;padding:6px 10px;cursor:pointer;border-radius:2px}
+  font-family:'Titillium Web',sans-serif;font-size:11.5px;padding:6px 10px;cursor:pointer;border-radius:2px}
 .altList button:hover{border-color:var(--blu2);color:var(--blu2)}
 .chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:14px}
-.chip{font-family:'Roboto Mono',monospace;font-size:10.5px;letter-spacing:.06em;border:1px solid var(--bordo);
+.chip{font-family:'Titillium Web',sans-serif;font-size:10.5px;letter-spacing:.06em;border:1px solid var(--bordo);
   color:var(--grigio2);padding:4px 8px}
 .chip.p{border-color:var(--rosso2);color:var(--rosso2)}
 .specbox{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
@@ -822,14 +849,14 @@ html,body{margin:0;padding:0;-webkit-text-size-adjust:100%;text-size-adjust:100%
 .blocco{border:1px solid var(--bordo);background:var(--nero2);padding:18px}
 .riga{display:flex;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid var(--bordo);font-size:14px;align-items:baseline}
 .riga:last-child{border-bottom:0}
-.riga .nn{font-family:'Roboto Mono',monospace;font-size:11px;color:var(--grigio2)}
-.stit{font-family:'Roboto Mono',monospace;font-size:10.5px;letter-spacing:.18em;color:var(--grigio2);
-  text-transform:uppercase;border-bottom:1px solid var(--bordo);padding-bottom:8px;margin:32px 0 14px;
+.riga .nn{font-family:'Titillium Web',sans-serif;font-size:11px;color:var(--grigio2)}
+.stit{font-size:14px;font-weight:600;color:var(--grigio2);
+  border-bottom:1px solid var(--bordo);padding-bottom:8px;margin:32px 0 14px;
   display:flex;justify-content:space-between;gap:10px}
 .nota{font-size:12.5px;color:var(--grigio2);line-height:1.6;margin-top:12px}
 .indietro{background:none;border:0;color:var(--grigio2);cursor:pointer;font-size:13px;padding:18px 0 6px;font-family:inherit}
 .slotchip{border:1px solid var(--bordo);background:var(--nero);color:var(--bianco);padding:11px;
-  cursor:pointer;font-family:'Roboto Mono',monospace;font-size:13px;border-radius:2px}
+  cursor:pointer;font-family:'Titillium Web',sans-serif;font-size:13px;border-radius:2px}
 .slotchip[data-on="1"]{border-color:var(--blu2);background:var(--bluSoft);color:var(--blu2)}
 .slotgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px}
 .ok{border:1px solid var(--blu);background:var(--bluSoft);padding:20px;margin:22px 0}
@@ -837,14 +864,14 @@ html,body{margin:0;padding:0;-webkit-text-size-adjust:100%;text-size-adjust:100%
 .kpigrid{display:grid;gap:14px;grid-template-columns:1fr}
 @media(min-width:620px){.kpigrid{grid-template-columns:1fr 1fr}}
 .kbox{border:1px solid var(--bordo);background:var(--nero2);padding:18px}
-.klab{font-family:'Roboto Mono',monospace;font-size:10px;letter-spacing:.16em;color:var(--grigio2);text-transform:uppercase}
+.klab{font-size:12.5px;font-weight:600;color:var(--grigio2)}
 .kval{font-family:'Saira Condensed',sans-serif;font-weight:800;font-size:32px;margin-top:8px;letter-spacing:-.02em}
-.apri{background:none;border:0;color:var(--blu2);cursor:pointer;font-family:'Roboto Mono',monospace;font-size:12px;padding:10px 0;text-align:left}
+.apri{background:none;border:0;color:var(--blu2);cursor:pointer;font-family:'Titillium Web',sans-serif;font-size:12px;padding:10px 0;text-align:left}
 .regole{border-left:2px solid var(--bordo);padding-left:14px;margin:4px 0 0}
 .regole li{font-size:12.5px;color:var(--grigio2);line-height:1.55;margin-bottom:8px}
 .recens{border-left:2px solid var(--bordo);padding-left:14px;margin-bottom:16px}
 .recens p{font-size:14px;line-height:1.6;margin:7px 0}
-.recmeta{display:flex;gap:12px;flex-wrap:wrap;font-family:'Roboto Mono',monospace;font-size:11.5px;color:var(--grigio2)}
+.recmeta{display:flex;gap:12px;flex-wrap:wrap;font-family:'Titillium Web',sans-serif;font-size:11.5px;color:var(--grigio2)}
 .dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:8px;vertical-align:middle}
 .orebar{height:8px;background:var(--bordo);border-radius:4px;overflow:hidden;margin-top:14px}
 .orebarfill{height:100%;background:var(--blu2)}
@@ -861,35 +888,43 @@ html,body{margin:0;padding:0;-webkit-text-size-adjust:100%;text-size-adjust:100%
    stessa logica di visibilita' gia' usata per .navlinks/.checkgrid altrove. */
 .calNav{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:14px 0}
 .calNav .b{min-height:44px}
-.calNavLabel{font-family:'Roboto Mono',monospace;font-size:11.5px;color:var(--grigio2);text-align:center}
+.calNavLabel{font-family:'Titillium Web',sans-serif;font-size:11.5px;color:var(--grigio2);text-align:center}
 .calGridWrap{overflow-x:auto;margin:14px 0}
 .calGrid{display:grid;grid-template-columns:60px repeat(7,minmax(64px,1fr));gap:1px;
   background:var(--bordo);border:1px solid var(--bordo);min-width:560px}
 .calGridHeadCell{background:var(--nero2);padding:8px 4px;text-align:center;
-  font-family:'Roboto Mono',monospace;font-size:10px;letter-spacing:.08em;color:var(--grigio2)}
+  font-family:'Titillium Web',sans-serif;font-size:10px;letter-spacing:.08em;color:var(--grigio2)}
 .calGridHeadCell b{display:block;color:var(--bianco);font-size:15px;font-family:'Saira Condensed',sans-serif;font-weight:700}
-.calGridOra{background:var(--nero2);color:var(--grigio2);font-family:'Roboto Mono',monospace;
+.calGridOra{background:var(--nero2);color:var(--grigio2);font-family:'Titillium Web',sans-serif;
   font-size:10px;padding:6px 6px;display:flex;align-items:center;justify-content:flex-end}
 .calCell{background:var(--nero);border:0;color:var(--bianco);min-height:34px;cursor:pointer;
-  font-family:'Roboto Mono',monospace;font-size:10px;padding:2px;text-align:center}
+  font-family:'Titillium Web',sans-serif;font-size:10px;padding:2px;text-align:center}
 .calCell small{display:block;opacity:.7;font-size:8.5px}
 .calCell[data-stato="libero"]:hover{background:var(--nero3)}
-.calCell[data-stato="selezionato"]{background:var(--bluSoft);color:var(--blu2);font-weight:700}
+/* movimento che risponde a un'azione, non decorativo: selezionare uno slot
+   lo fa "scattare" leggermente — mostra che qualcosa È cambiato, non solo
+   che è cambiato un colore. Solo transform, e riparte ogni volta che lo
+   stato torna "selezionato" (anche per lo stesso slot, se lo riselezioni) */
+.calCell[data-stato="selezionato"]{background:var(--bluSoft);color:var(--blu2);font-weight:700;animation:scattaSelezione .16s ease-out}
 .calCell[data-stato="occupato"]{background:var(--nero2);color:var(--grigio2);cursor:not-allowed}
 .calCell[data-stato="non-disponibile"]{background:var(--nero2);color:var(--grigio2);opacity:.32;cursor:not-allowed}
 .calCell[data-stato="passato"]{background:var(--nero2);color:var(--grigio2);opacity:.22;cursor:not-allowed}
 .calAgenda{display:none}
 .calAgendaRow{width:100%;min-height:44px;display:flex;justify-content:space-between;align-items:center;
   gap:10px;padding:10px 14px;border:1px solid var(--bordo);background:var(--nero2);color:var(--bianco);
-  margin-bottom:6px;font-family:'Roboto Mono',monospace;font-size:12.5px;text-align:left;cursor:pointer}
-.calAgendaRow[data-stato="selezionato"]{border-color:var(--blu2);background:var(--bluSoft);color:var(--blu2)}
+  margin-bottom:6px;font-family:'Titillium Web',sans-serif;font-size:12.5px;text-align:left;cursor:pointer}
+.calAgendaRow[data-stato="selezionato"]{border-color:var(--blu2);background:var(--bluSoft);color:var(--blu2);animation:scattaSelezione .16s ease-out}
+@keyframes scattaSelezione{from{transform:scale(.94)}to{transform:scale(1)}}
+@media(prefers-reduced-motion:reduce){
+  .calCell[data-stato="selezionato"],.calAgendaRow[data-stato="selezionato"]{animation:none}
+}
 .calAgendaRow[data-stato="occupato"],.calAgendaRow[data-stato="non-disponibile"],
 .calAgendaRow[data-stato="passato"]{opacity:.5;cursor:not-allowed}
 @media(max-width:640px){
   .calGridWrap{display:none}
   .calAgenda{display:block}
 }
-.azsess{font-family:'Roboto Mono',monospace;font-size:11.5px;letter-spacing:.04em;
+.azsess{font-family:'Titillium Web',sans-serif;font-size:11.5px;letter-spacing:.04em;
   border:1px solid var(--bordo);background:var(--nero);padding:6px 12px;cursor:pointer;border-radius:2px}
 .azsess.sposta{color:var(--blu2)}
 .azsess.sposta:hover{border-color:var(--blu2)}
@@ -899,16 +934,16 @@ html,body{margin:0;padding:0;-webkit-text-size-adjust:100%;text-size-adjust:100%
 .azsess.avvia:hover{border-color:var(--verde)}
 .badge{display:inline-flex;align-items:center;justify-content:center;min-width:16px;height:16px;
   padding:0 4px;margin-left:7px;border-radius:8px;background:var(--ambra);color:#fff;
-  font-family:'Roboto Mono',monospace;font-size:10px;font-weight:600;vertical-align:middle}
+  font-family:'Titillium Web',sans-serif;font-size:10px;font-weight:600;vertical-align:middle}
 .chatBox{border:1px solid var(--bordo);background:var(--nero2);padding:16px;margin-top:20px;
   display:flex;flex-direction:column;gap:10px;max-height:60vh;overflow-y:auto}
 .msg{max-width:78%;padding:9px 12px;border-radius:3px;font-size:14px;line-height:1.5}
 .msg p{margin:0}
 .msg .msgOra{display:flex;align-items:center;gap:8px;margin-top:5px;
-  font-family:'Roboto Mono',monospace;font-size:10px;opacity:.75}
+  font-family:'Titillium Web',sans-serif;font-size:10px;opacity:.75}
 .msg.loro{align-self:flex-start;background:var(--nero3);color:var(--bianco);border:1px solid var(--bordo)}
 .msg.mio{align-self:flex-end;background:var(--blu);color:#fff}
-.msgAzione{background:none;border:0;padding:0;cursor:pointer;font-family:'Roboto Mono',monospace;
+.msgAzione{background:none;border:0;padding:0;cursor:pointer;font-family:'Titillium Web',sans-serif;
   font-size:10px;text-decoration:underline;color:inherit;opacity:.9}
 .msgAzione.fatta{text-decoration:none;cursor:default}
 .chatInput{display:flex;gap:10px;margin-top:14px}
@@ -935,18 +970,18 @@ html,body{margin:0;padding:0;-webkit-text-size-adjust:100%;text-size-adjust:100%
 .emailBanner .chiudiBanner:hover{opacity:1}
 
 /* ---- provenienza nota: dal coach o salvata dalla chat (punto 4) ---- */
-.origineTag{font-family:'Roboto Mono',monospace;font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;
+.origineTag{font-family:'Titillium Web',sans-serif;font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;
   border:1px solid var(--bordo);padding:2px 6px;border-radius:2px;color:var(--grigio2)}
 .origineTag.coach{border-color:var(--blu2);color:var(--blu2)}
 
 /* ---- iRating verificato/da verificare nell'identita' in header ---- */
-.irTag{font-family:'Roboto Mono',monospace;font-size:9.5px;letter-spacing:.06em;text-transform:uppercase;
+.irTag{font-family:'Titillium Web',sans-serif;font-size:9.5px;letter-spacing:.06em;text-transform:uppercase;
   color:var(--oro);border:1px solid var(--oro);padding:1px 6px;border-radius:2px;margin-left:7px}
 .irTag.ok{color:var(--verde);border-color:var(--verde)}
 
 /* ---- identita' pilota, spostata nell'header accanto al logo: e' anche la
    scorciatoia per la Scheda Pilota ---- */
-.identita{background:none;border:0;color:var(--grigio);cursor:pointer;font-family:'Roboto Mono',monospace;
+.identita{background:none;border:0;color:var(--grigio);cursor:pointer;font-family:'Titillium Web',sans-serif;
   font-size:12.5px;padding:4px 0;text-align:left;white-space:nowrap}
 .identita:hover{color:var(--bianco)}
 .identita b{color:var(--bianco);font-weight:500}
@@ -1181,7 +1216,7 @@ function Media({ id, ratio = "16 / 9", nota, tipo = "video" }) {
     <div className="slot" style={{ aspectRatio: ratio }}>
       <code>{id}</code>
       <p>{nota}</p>
-      <span>{tipo === "video" ? "VIDEO IN LOOP" : "IMMAGINE"} · {ratio.replace(" ", "")}</span>
+      <span>{tipo === "video" ? "Video in loop" : "Immagine"} · {ratio.replace(" ", "")}</span>
     </div>
   );
 }
@@ -1204,6 +1239,72 @@ function Spark({ curva, start, w = 110, h = 36 }) {
   );
 }
 
+/* ---- il momento orchestrato del restyling --------------------------------
+   L'UNICO punto della pagina dove qualcosa si muove senza che l'utente
+   abbia agito: il numero-eroe della sezione "Il numero che conta" (la tesi
+   esplicita del prodotto: dato verificato, non dichiarazione) non compare
+   già scritto, si ASSESTA — come una misura che si stabilizza, non un
+   contatore che sale a caso. Un solo innesco, mai ripetuto, e per una
+   ragione precisa: qui e non altrove, perché è qui che il prodotto
+   argomenta la propria tesi con un numero solo.
+   - Il valore vero è SEMPRE il contenuto iniziale (nessun opacity:0, nessun
+     "aspetta il JS per apparire"): senza JavaScript, o se IntersectionObserver
+     non esiste, o se l'osservatore non parte, il numero è già quello giusto.
+   - prefers-reduced-motion: reduce -> l'effetto non parte proprio, resta il
+     valore fermo fin dal primo render.
+   - Il "rumore" (le cifre casuali) è un cambio di contenuto testuale, non
+     un'animazione CSS: la regola "solo transform/opacity" governa la resa
+     visiva del gesto (l'opacità scende leggermente mentre misura, torna a 1
+     quando si assesta), non il testo che cambia sotto — non c'è modo di far
+     scorrere delle cifre casuali animando solo transform/opacity. */
+function NumeroMisurato({ prefisso = "", valore, suffisso = "" }) {
+  const [mostrato, setMostrato] = useState(valore);
+  const [misurando, setMisurando] = useState(false);
+  const rifEl = React.useRef(null);
+  const fattoGia = React.useRef(false);
+
+  useEffect(() => {
+    if (fattoGia.current) return;
+    if (typeof window === "undefined" || !("IntersectionObserver" in window)) return;
+    if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const el = rifEl.current;
+    if (!el) return;
+    const cifre = String(Math.abs(valore)).length;
+    const oss = new IntersectionObserver(
+      (entries) => {
+        if (!entries[0].isIntersecting || fattoGia.current) return;
+        fattoGia.current = true;
+        oss.disconnect();
+        const durata = 900;
+        const inizio = performance.now();
+        setMisurando(true);
+        const passo = (ora) => {
+          const t = Math.min(1, (ora - inizio) / durata);
+          const assestamento = 1 - Math.pow(1 - t, 3); // decelera: si assesta, non conta linearmente
+          if (t < 1) {
+            const casuale = Math.floor(Math.random() * Math.pow(10, cifre));
+            setMostrato(Math.random() < assestamento ? valore : casuale);
+            requestAnimationFrame(passo);
+          } else {
+            setMostrato(valore);
+            setMisurando(false);
+          }
+        };
+        requestAnimationFrame(passo);
+      },
+      { threshold: 0.4 }
+    );
+    oss.observe(el);
+    return () => oss.disconnect();
+  }, [valore]);
+
+  return (
+    <span ref={rifEl} className="numeroMisurato" style={{ opacity: misurando ? 0.8 : 1 }}>
+      {prefisso}{mostrato}{suffisso}
+    </span>
+  );
+}
+
 /* ---------------------------------- HOME ---------------------------------- */
 
 function Home({ vaiLogin, vaiCandidatura }) {
@@ -1214,9 +1315,7 @@ function Home({ vaiLogin, vaiCandidatura }) {
         <div className="w herogrid">
           <div>
             <BadgeIRacing />
-            <h1 className="h1">
-              Trova il coach che ti fa <em>salire davvero</em>.
-            </h1>
+            <h1 className="h1">Trova il coach che ti fa salire davvero.</h1>
             <p className="lead">
               Su CORDA ogni coach è valutato con un solo numero: l'iRating che i suoi allievi hanno
               guadagnato dopo la prima sessione. Il dato arriva dall'account iRacing dell'allievo,
@@ -1262,7 +1361,7 @@ function Home({ vaiLogin, vaiCandidatura }) {
 
           <div className="passi">
             <div className="passo">
-              <div className="num">PASSO 01</div>
+              <div className="num">01</div>
               <h3>Dici da dove parti</h3>
               <p>
                 Categoria, vettura, obiettivo e il tuo iRating attuale. Ti mostriamo solo i coach
@@ -1271,7 +1370,7 @@ function Home({ vaiLogin, vaiCandidatura }) {
               <Media id="V02" ratio="4 / 3" nota="Schermata di ricerca coach, con i filtri che si muovono." />
             </div>
             <div className="passo">
-              <div className="num">PASSO 02</div>
+              <div className="num">02</div>
               <h3>Guidi con il coach</h3>
               <p>
                 Sessione da un'ora in pista insieme. Il pagamento resta in deposito fino a 24 ore
@@ -1280,7 +1379,7 @@ function Home({ vaiLogin, vaiCandidatura }) {
               <Media id="V03" ratio="4 / 3" nota="Sessione live: schermo del coach con telemetria e onboard dell'allievo." />
             </div>
             <div className="passo">
-              <div className="num">PASSO 03</div>
+              <div className="num">03</div>
               <h3>Vedi se è servito</h3>
               <p>
                 Corri le tue gare normalmente. La piattaforma confronta la tua curva iRating con i
@@ -1312,8 +1411,10 @@ function Home({ vaiLogin, vaiCandidatura }) {
           </div>
           <div className="metric">
             <div className="eyebrow">Esempio reale di un allievo</div>
-            <div className="big numero-eroe" style={{ marginTop: 14 }}>+564 iR</div>
-            <div className="sm">IN 22 GIORNI · 179 iR A SETTIMANA · 19 GARE</div>
+            <div className="big numero-eroe" style={{ marginTop: 14 }}>
+              <NumeroMisurato prefisso="+" valore={564} suffisso=" iR" />
+            </div>
+            <div className="sm">in 22 giorni · 179 iR a settimana · 19 gare</div>
             <div style={{ marginTop: 20 }}>
               <Media id="I01" ratio="4 / 3" tipo="immagine"
                      nota="Postazione di un coach o schermata del profilo con la curva iRating." />
@@ -1543,7 +1644,7 @@ function Cerca({ apri, mia, miaIr, iracingCollegato, setIracingCollegato }) {
       )}
 
       <div className="filtri">
-        <div className="fhead"><span>FILTRI</span><span>iRACING</span></div>
+        <div className="fhead"><span>Filtri</span><span>Dati da iRacing</span></div>
         <div className="frow">
           <label htmlFor="f0">Categoria</label>
           <select id="f0" value={cat} onChange={(e) => cambiaCat(e.target.value)}>
@@ -2715,7 +2816,7 @@ function SchedaPilota({ vaiPercorso, iracingCollegato, setIracingCollegato }) {
           </div>
         </div>
         <button className="b b-ghost" style={{ marginTop: 16 }} onClick={vaiPercorso}>
-          Vai al tuo percorso completo →
+          Vai al tuo percorso completo
         </button>
       </div>
 
@@ -2847,8 +2948,8 @@ function Percorso({
               <b className="mn" style={{ color: walletDi(coachAttuale.id).disponibili > 0 ? "var(--blu2)" : "var(--distr2)" }}>
                 {walletDi(coachAttuale.id).disponibili} ore disponibili
               </b>{" "}
-              con {coachAttuale.nome}
-              {oreAllocateDi(coachAttuale.id) > 0 && ` · ${oreAllocateDi(coachAttuale.id)} allocate su sessioni prenotate`}
+              con {coachAttuale.nome}.
+              {oreAllocateDi(coachAttuale.id) > 0 && ` ${oreAllocateDi(coachAttuale.id)} già allocate su sessioni prenotate.`}
             </p>
             <div style={{ marginTop: 16, display: "flex", gap: 10, flexWrap: "wrap" }}>
               <button className="b b-blu" onClick={() => vaiScheda?.(coachAttuale)}>Vai al suo profilo</button>
@@ -2961,7 +3062,7 @@ function Percorso({
                 <div style={{ display: "flex", gap: 32, flexWrap: "wrap", alignItems: "baseline" }}>
                   <div>
                     <div className="ccbig">{w.disponibili} ore disponibili</div>
-                    <div className="ccsm">con {c.nome} · su {w.acquistateTotali} acquistate finora</div>
+                    <div className="ccsm">con {c.nome}, {w.acquistateTotali} acquistate in totale</div>
                   </div>
                   {allocate > 0 && (
                     <div>
@@ -3115,7 +3216,7 @@ function Percorso({
                     <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
                       <button className="b b-ghost" style={{ fontSize: 12.5 }}
                               onClick={() => risolviContestazione(p.id, "no-show")}>
-                        (demo) Risolvi: no-show confermato → ora restituita
+                        (demo) Conferma no-show: restituisce l'ora
                       </button>
                       <button className="b b-ghost" style={{ fontSize: 12.5 }}
                               onClick={() => risolviContestazione(p.id, "regolare")}>
@@ -3428,7 +3529,7 @@ function Candidatura({ chiudi, vaiLoginCoach }) {
       </p>
 
       <div className="filtri">
-        <div className="fhead"><span>REQUISITI</span><span>iRACING</span></div>
+        <div className="fhead"><span>Requisiti</span><span>Verificati su iRacing</span></div>
         <div className="frow">
           <label htmlFor="rl">Licenza</label>
           <select id="rl" value={licenza} onChange={(e) => setLicenza(e.target.value)}>
@@ -3721,7 +3822,7 @@ export default function App() {
               ) : (
                 <>
                   <button data-on="1">Area coach</button>
-                  <span className="esci mn">MARCO BERTOLINI</span>
+                  <span className="esci">Marco Bertolini</span>
                 </>
               )}
             </div>
