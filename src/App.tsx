@@ -410,12 +410,13 @@ function fasciaDiOrario(dataJs, ora) {
 /* ---------------------------------- stile ---------------------------------- */
 
 const CSS = `
-/* Due famiglie, non tre: Saira Condensed per titoli e numeri-eroe (verticale,
-   da cruscotto), Titillium Web per tutto il resto — corpo, etichette, dati
-   inclusi. Roboto Mono è stato tolto: i dati si distinguono per allineamento
-   tabulare (font-variant-numeric, vedi .mn), non per un terzo alfabeto — è
-   la differenza fra "sembra tecnico" e "è misurato in colonna". */
-@import url('https://fonts.googleapis.com/css2?family=Saira+Condensed:wght@500;600;700;800;900&family=Titillium+Web:wght@400;600;700&display=swap');
+/* Due famiglie, due voci — non due varianti della stessa: Fraunces è il
+   testo che RACCONTA (titoli, paragrafi, didascalie discorsive — il corpo
+   della pagina di base, vedi .crd), Saira Condensed è lo strumento che
+   COMANDA E MISURA (bottoni, nav, etichette di campo, dati). Nessuna terza
+   famiglia: i dati restano "misurati" per allineamento tabulare
+   (font-variant-numeric, vedi .mn), non per un alfabeto da terminale. */
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,400;0,500;0,600;1,500;1,600&family=Saira+Condensed:wght@500;600;700;800;900&display=swap');
 
 /* azzera il margine di default del browser su body: senza, i 20px di
    padding laterale di .w si sommavano a un margine invisibile, riducendo
@@ -433,7 +434,44 @@ const CSS = `
 html,body{margin:0;padding:0;-webkit-text-size-adjust:100%;text-size-adjust:100%;
   max-width:100%;overflow-x:hidden}
 
+/* ---- identità "La traiettoria": tarmac caldo, non un nero da webapp.
+   Un abitacolo è scuro, ma qui il fondo è asfalto — bruno-nero, non
+   blu-nero — e il testo è gesso, non bianco puro: nessuno dei due è
+   "neutro", sono entrambi presi dal tracciato. --linea è nuovo: il giallo
+   cordolo che disegna la traiettoria/apice (vedi il momento firma
+   nell'hero), riservato a QUELLO, mai al dato (--blu2) né al marchio
+   (--rosso2) — tre accenti, tre significati, mai lo stesso colore per due
+   cose diverse. */
 .crd{
+  --nero:#171512; --nero2:#221E19; --nero3:#2B251F; --bordo:#3A3229;
+  --bianco:#F2EDE3; --grigio:#B7AE9E; --grigio2:#867A66;
+  --rosso:#8A2E1F; --rosso2:#D4573E; --rossoSoft:rgba(212,87,62,.14);
+  --blu:#3E9E90; --blu2:#6FD1C4; --bluSoft:rgba(111,209,196,.14);
+  --ambra:#C97A3B; --ambraSoft:rgba(201,122,59,.14);
+  --verde:#7FA33C; --verdeSoft:rgba(127,163,60,.14);
+  --oro:#B08D57; --oroSoft:rgba(176,141,87,.14);
+  /* azione distruttiva: variabile a parte, cosi' non si confonde con il
+     marchio ne' con l'avviso — coincide col rosso di sempre, come da sempre */
+  --distr:#8A2E1F; --distr2:#D4573E; --distrSoft:rgba(212,87,62,.14);
+  /* hover dei bottoni primari, disaccoppiato da --blu2/--rosso2 */
+  --bluHover:#5BC2B3; --rossoHover:#E06A50;
+  /* colore del solo "numero-eroe" (es. il grande +iR in Home): segue
+     --blu2, come tutti i dati verificati */
+  --eroe:var(--blu2);
+  --linea:#E8B94C;
+  background:var(--nero); color:var(--bianco); min-height:100%;
+  font-family:'Fraunces',Georgia,serif; -webkit-font-smoothing:antialiased; line-height:1.5;
+}
+
+/* ============================ TEMI ALTERNATIVI (nascosti, solo sviluppo) ============================
+   Il selettore pubblico è sparito dall'header (il colore deve poter
+   portare significato con UNA sola palette, non funzionare con cinque):
+   questi blocchi restano nel codice, raggiungibili solo con ?tema=nome
+   nell'URL — non sono più un A/B in corso, sono uno strumento per
+   confrontare in futuro, se serve. "attuale" è l'esatta palette del giro
+   precedente, conservata qui invece che persa. Nessuna regola di
+   struttura tocca questi blocchi: solo variabili. */
+.crd[data-theme="attuale"]{
   --nero:#0A0B0D; --nero2:#121418; --nero3:#1A1D23; --bordo:#282C34;
   --bianco:#FFFFFF; --grigio:#9BA3AF; --grigio2:#6B727D;
   --rosso:#8E1A20; --rosso2:#B32229; --rossoSoft:rgba(179,34,41,.12);
@@ -441,24 +479,10 @@ html,body{margin:0;padding:0;-webkit-text-size-adjust:100%;text-size-adjust:100%
   --ambra:#E2472A; --ambraSoft:rgba(226,71,42,.14);
   --verde:#1FAA59; --verdeSoft:rgba(31,170,89,.14);
   --oro:#E3A63A; --oroSoft:rgba(227,166,58,.14);
-  /* azione distruttiva: variabile a parte, cosi' non si confonde con il
-     marchio ne' con l'avviso — nel tema Attuale coincide col rosso di sempre */
   --distr:#8E1A20; --distr2:#B32229; --distrSoft:rgba(179,34,41,.12);
-  /* hover dei bottoni primari, disaccoppiato da --blu2/--rosso2: in Papaya
-     --blu2 deve restare chiaro per i numeri, quindi l'hover non puo' leggerlo */
   --bluHover:#3C6DF0; --rossoHover:#B32229;
-  /* colore del solo "numero-eroe" (es. il grande +iR in Home): di norma segue
-     --blu2 come tutti i dati verificati; nei temi dove va dosato (Papaya,
-     Oro&Bordeaux) viene ridefinito qui sotto su un valore dedicato */
   --eroe:var(--blu2);
-  background:var(--nero); color:var(--bianco); min-height:100%;
-  font-family:'Titillium Web',system-ui,sans-serif; -webkit-font-smoothing:antialiased; line-height:1.5;
 }
-
-/* ============================ TEMI ALTERNATIVI (A/B) ============================
-   Solo variabili: nessuna regola di struttura tocca queste due liste. Il tema
-   "attuale" resta quello definito sopra in .crd{}, invariato — questi blocchi
-   si attivano solo con l'attributo data-theme sul contenitore .crd. */
 
 /* ---- TEMA A — "Teal" (ispirato Mercedes): un solo accento, dato+marchio+
    primario coincidono. Distruttivo resta un rosso a parte, per non confondersi. */
@@ -543,7 +567,11 @@ html,body{margin:0;padding:0;-webkit-text-size-adjust:100%;text-size-adjust:100%
    esplicita (es. .avat{width:44px}) non ne risente: min-width:0 conta solo
    quando qualcosa lo starebbe comunque comprimendo sotto il suo contenuto. */
 .crd *{min-width:0}
-.crd h1,.crd h2,.crd h3{font-family:'Saira Condensed',system-ui,sans-serif;font-weight:700;line-height:1.08;margin:0;letter-spacing:-.02em}
+/* i titoli sono editoriali (Fraunces, la stessa voce del corpo), non da
+   cruscotto: Saira Condensed resta ai comandi (bottoni, nav) e ai dati —
+   è la differenza fra "questa pagina racconta" e "questa pagina misura",
+   e questa direzione ha scelto di raccontare */
+.crd h1,.crd h2,.crd h3{font-family:'Fraunces',Georgia,serif;font-weight:600;line-height:1.05;margin:0;letter-spacing:-.01em}
 /* niente font monospace: il "misurato" è l'allineamento tabulare (due cifre
    si confrontano in colonna, prima/dopo una sessione o un'allocazione), non
    un alfabeto da terminale — il font resta quello del corpo del testo */
@@ -552,7 +580,7 @@ html,body{margin:0;padding:0;-webkit-text-size-adjust:100%;text-size-adjust:100%
 /* didascalia, non eyebrow urlata: maiuscolo/tracking largo restano ai
    badge di stato veri (.stato, .irTag) — qui è solo un titoletto in
    maiuscolo naturale, un po' più marcato del testo attorno */
-.eyebrow{font-size:13px;font-weight:600;color:var(--grigio2);margin-bottom:6px}
+.eyebrow{font-family:'Saira Condensed',sans-serif;font-size:14px;font-weight:600;color:var(--grigio2);margin-bottom:6px}
 
 /* ---- barra ---- */
 .nav{position:sticky;top:0;z-index:40;background:rgba(10,11,13,.94);backdrop-filter:blur(10px);border-bottom:1px solid var(--bordo)}
@@ -569,7 +597,7 @@ html,body{margin:0;padding:0;-webkit-text-size-adjust:100%;text-size-adjust:100%
 .navlinks button:hover{color:var(--bianco)}
 .navcta{margin-left:auto;display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:flex-end}
 .temaSelect{background:var(--nero2);border:1px solid var(--bordo);color:var(--grigio);max-width:100%;
-  font-family:'Titillium Web',sans-serif;font-size:11px;padding:6px 8px;border-radius:2px;cursor:pointer}
+  font-family:'Saira Condensed',sans-serif;font-size:11px;padding:6px 8px;border-radius:2px;cursor:pointer}
 
 /* ---- bottoni ---- */
 .b{font-family:'Saira Condensed',sans-serif;font-weight:600;font-size:14px;letter-spacing:.01em;
@@ -593,22 +621,39 @@ html,body{margin:0;padding:0;-webkit-text-size-adjust:100%;text-size-adjust:100%
 .slot code{font-size:12px;letter-spacing:.1em;color:var(--grigio);
   border:1px solid var(--bordo);padding:3px 9px}
 .slot p{margin:0;font-size:12.5px;color:var(--grigio2);max-width:34ch;line-height:1.45}
-.slot span{font-family:'Titillium Web',sans-serif;font-size:10.5px;color:var(--bordo);letter-spacing:.1em}
+.slot span{font-family:'Saira Condensed',sans-serif;font-size:10.5px;color:var(--bordo);letter-spacing:.1em}
 .slot video,.slot img{width:100%;height:100%;object-fit:cover;display:block}
 .media{overflow:hidden;background:var(--nero2);border:1px solid var(--bordo)}
 .media video,.media img{width:100%;height:100%;object-fit:cover;display:block}
 
 /* ---- home ---- */
-.hero{padding:64px 0 56px;border-bottom:1px solid var(--bordo)}
+/* overflow:hidden e' la rete di sicurezza della traiettoria: l'SVG e'
+   posizionato per attraversare il bordo dell'hero apposta (l'apice "esce"
+   visivamente dalla sezione), overflow:hidden lo ritaglia pulito senza
+   mai poter aprire uno scroll orizzontale, qualunque sia la larghezza */
+.hero{padding:64px 0 56px;border-bottom:1px solid var(--bordo);position:relative;overflow:hidden}
 @media(min-width:900px){.hero{padding:88px 0 76px}}
-.herogrid{display:grid;gap:38px;grid-template-columns:1fr;align-items:center}
-@media(min-width:900px){.herogrid{grid-template-columns:1.05fr .95fr;gap:52px}}
-.h1{font-size:clamp(38px,6.4vw,60px)}
+/* la traiettoria vive DIETRO al testo (z-index sotto), attraversa l'hero
+   da un bordo all'altro: preserveAspectRatio="none" la lascia deformarsi
+   con il contenitore invece di aggiungere barre vuote — e' una linea
+   d'atmosfera, non un disegno che deve restare in un rapporto fisso */
+.traiettoria{position:absolute;inset:0;width:100%;height:100%;z-index:0;opacity:.55}
+.herogrid{display:grid;gap:38px;grid-template-columns:1fr;align-items:start;position:relative;z-index:1}
+@media(min-width:900px){.herogrid{grid-template-columns:1.28fr .72fr;gap:44px}}
+.heroMedia{width:100%}
+@media(min-width:900px){.heroMedia{margin-top:64px}}
+.h1{font-size:clamp(34px,6.4vw,58px);font-style:normal}
+.h1riga{display:block}
+@media(min-width:640px){
+  .h1riga:nth-child(2){margin-left:5%}
+  .h1riga:nth-child(3){margin-left:11%}
+}
+.h1 em{font-style:italic}
 .lead{color:var(--grigio);font-size:17px;line-height:1.6;margin:20px 0 28px;max-width:46ch}
 .ctas{display:flex;flex-direction:column;gap:10px}
 @media(min-width:640px){.ctas{flex-direction:row}}
 .plat{display:inline-flex;align-items:center;gap:9px;border:1px solid var(--bordo);background:var(--nero2);
-  padding:7px 12px;font-family:'Titillium Web',sans-serif;font-size:11.5px;letter-spacing:.12em;color:var(--grigio);margin-bottom:24px;
+  padding:7px 12px;font-family:'Saira Condensed',sans-serif;font-size:11.5px;letter-spacing:.12em;color:var(--grigio);margin-bottom:24px;
   max-width:100%;flex-wrap:wrap}
 .plat i{width:7px;height:7px;border-radius:50%;background:var(--blu2);display:inline-block}
 /* solo altezza, mai altezza+larghezza insieme: la larghezza segue da sola
@@ -621,12 +666,18 @@ html,body{margin:0;padding:0;-webkit-text-size-adjust:100%;text-size-adjust:100%
    spazio verso il titolo sotto */
 .platLogoStandalone{height:32px;width:auto;display:block;margin-bottom:24px}
 
-.band{border-bottom:1px solid var(--bordo);background:var(--nero2)}
+/* l'autocritica del giro: una fascia di 4 numeri, presa cosi' com'era,
+   e' il pezzo di pagina piu' generico rimasto — andrebbe bene per
+   qualunque prodotto con delle statistiche. Un filo di --linea sopra
+   (secondo e ultimo uso della traiettoria in tutta la pagina, dopo
+   l'hero) basta a dirle "riga di settore letta a fine giro", non
+   "banner di metriche" */
+.band{border-top:2px solid var(--linea);border-bottom:1px solid var(--bordo);background:var(--nero2)}
 .bandin{display:grid;grid-template-columns:repeat(2,1fr);gap:1px;background:var(--bordo)}
 @media(min-width:760px){.bandin{grid-template-columns:repeat(4,1fr)}}
 .bcell{background:var(--nero2);padding:22px 18px}
 .bcell b{display:block;font-family:'Saira Condensed',sans-serif;font-size:29px;font-weight:700;letter-spacing:-.02em}
-.bcell span{font-size:12.5px;color:var(--grigio2);margin-top:4px;display:block}
+.bcell span{font-family:'Saira Condensed',sans-serif;font-size:13.5px;color:var(--grigio2);margin-top:4px;display:block}
 
 .sez{padding:70px 0;border-bottom:1px solid var(--bordo)}
 .sezhead{max-width:56ch;margin-bottom:38px}
@@ -651,11 +702,7 @@ html,body{margin:0;padding:0;-webkit-text-size-adjust:100%;text-size-adjust:100%
    verificato in Attuale/Teal/Menta&Navy, prende un tono dedicato e dosato
    in Papaya e Oro&Bordeaux (vedi definizioni di --eroe nei blocchi tema) */
 .numero-eroe{color:var(--eroe)}
-/* solo transform/opacity, come da regola: qui è l'opacità a segnalare "sto
-   misurando" mentre il valore si assesta (vedi NumeroMisurato) */
-.numeroMisurato{display:inline-block;transition:opacity .2s ease}
-@media(prefers-reduced-motion:reduce){.numeroMisurato{transition:none}}
-.metric .sm{font-family:'Titillium Web',sans-serif;font-size:12px;color:var(--grigio2);margin-top:8px;letter-spacing:.06em}
+.metric .sm{font-family:'Saira Condensed',sans-serif;font-size:12px;color:var(--grigio2);margin-top:8px;letter-spacing:.06em}
 .check{list-style:none;padding:0;margin:20px 0 0}
 .check li{position:relative;padding-left:24px;margin-bottom:12px;color:var(--grigio);font-size:15px;line-height:1.55}
 .check li::before{content:"";position:absolute;left:0;top:8px;width:9px;height:9px;background:var(--grigio2)}
@@ -692,7 +739,7 @@ html,body{margin:0;padding:0;-webkit-text-size-adjust:100%;text-size-adjust:100%
    dei checkbox dentro un .checkgrid annidato in un .campo (font monospace
    piu' largo del previsto, mai emerso finche' il testo dei checkbox non e'
    stato abbastanza lungo da sforare il contenitore) */
-.campo > label{display:block;font-size:13px;font-weight:600;color:var(--grigio2);margin-bottom:6px}
+.campo > label{display:block;font-family:'Saira Condensed',sans-serif;font-size:14px;font-weight:600;color:var(--grigio2);margin-bottom:6px}
 /* :not(checkbox/radio) — stessa famiglia di bug della regola sopra, mai
    corretta insieme ad essa: senza l'esclusione, questa regola raggiungeva
    anche i checkbox di un .checkgrid annidato in un .campo (Scheda Pilota,
@@ -702,10 +749,10 @@ html,body{margin:0;padding:0;-webkit-text-size-adjust:100%;text-size-adjust:100%
    vuoto in mezzo" segnalato. Qui si corregge alla radice, non sulle singole
    schermate dove si è visto: vale per ogni .campo, presente e futuro. */
 .campo input:not([type="checkbox"]):not([type="radio"]){width:100%;background:var(--nero);border:1px solid var(--bordo);color:var(--bianco);
-  padding:11px 12px;font-family:'Titillium Web',sans-serif;font-size:14px;border-radius:2px}
+  padding:11px 12px;font-family:'Saira Condensed',sans-serif;font-size:14px;border-radius:2px}
 .campo input:focus{outline:none;border-color:var(--grigio)}
 .campo select,.campo textarea{width:100%;background:var(--nero);border:1px solid var(--bordo);color:var(--bianco);
-  padding:11px 12px;font-family:'Titillium Web',sans-serif;font-size:14px;border-radius:2px}
+  padding:11px 12px;font-family:'Saira Condensed',sans-serif;font-size:14px;border-radius:2px}
 .campo textarea{resize:vertical;min-height:88px;line-height:1.5}
 .campo select:focus,.campo textarea:focus{outline:none;border-color:var(--grigio)}
 /* riga opzione con checkbox (componente OpzioneCheck, riusato ovunque serva
@@ -746,12 +793,12 @@ html,body{margin:0;padding:0;-webkit-text-size-adjust:100%;text-size-adjust:100%
 .appbarin .schedaTab{margin-left:auto}
 
 .filtri{border:1px solid var(--bordo);background:var(--nero2);margin:22px 0}
-.fhead{padding:10px 14px;border-bottom:1px solid var(--bordo);
-  font-size:13px;font-weight:600;color:var(--grigio2);display:flex;justify-content:space-between}
+.fhead{padding:10px 14px;border-bottom:1px solid var(--bordo);font-family:'Saira Condensed',sans-serif;
+  font-size:14px;font-weight:600;color:var(--grigio2);display:flex;justify-content:space-between}
 .frow{display:flex;align-items:center;gap:12px;padding:11px 14px;border-bottom:1px solid var(--bordo)}
 .frow:last-child{border-bottom:0}
 .frow.hi{background:var(--bluSoft)}
-.frow > label{font-size:13px;font-weight:600;color:var(--grigio2);width:132px;flex:none}
+.frow > label{font-family:'Saira Condensed',sans-serif;font-size:14px;font-weight:600;color:var(--grigio2);width:132px;flex:none}
 .frow.hi > label{color:var(--blu2)}
 /* stessa esclusione di .campo input, stessa ragione: il filtro "Obiettivo"
    nella Cerca annida un .checkgrid dentro un .frow, e senza :not(...) questa
@@ -759,7 +806,7 @@ html,body{margin:0;padding:0;-webkit-text-size-adjust:100%;text-size-adjust:100%
    riga (il caso piu' vistoso del bug: la casella diventava un rettangolo
    largo quanto tutta la riga, il testo spinto ai margini). */
 .frow select,.frow input:not([type="checkbox"]):not([type="radio"]){flex:1;min-width:0;background:var(--nero);color:var(--bianco);border:1px solid var(--bordo);
-  padding:8px 10px;font-family:'Titillium Web',sans-serif;font-size:13px;border-radius:2px}
+  padding:8px 10px;font-family:'Saira Condensed',sans-serif;font-size:13px;border-radius:2px}
 .frow input::placeholder{color:var(--grigio2)}
 
 /* ---- fix layout mobile: niente contenitori piu' larghi del viewport ----
@@ -796,14 +843,14 @@ html,body{margin:0;padding:0;-webkit-text-size-adjust:100%;text-size-adjust:100%
 .avat{width:44px;height:44px;flex:none;background:var(--nero3);border:1px solid var(--bordo);
   display:flex;align-items:center;justify-content:center;font-family:'Saira Condensed',sans-serif;font-weight:700;color:var(--grigio)}
 .ccnome{font-family:'Saira Condensed',sans-serif;font-weight:700;font-size:18px}
-.ccsub{font-family:'Titillium Web',sans-serif;font-size:11.5px;color:var(--grigio2)}
+.ccsub{font-family:'Saira Condensed',sans-serif;font-size:11.5px;color:var(--grigio2)}
 .ccmetr{display:flex;align-items:flex-end;gap:14px;margin-top:16px}
 .ccbig{font-family:'Saira Condensed',sans-serif;font-weight:800;font-size:30px;color:var(--blu2);letter-spacing:-.02em;line-height:1}
-.ccsm{font-family:'Titillium Web',sans-serif;font-size:11px;color:var(--grigio2);line-height:1.5}
+.ccsm{font-family:'Saira Condensed',sans-serif;font-size:11px;color:var(--grigio2);line-height:1.5}
 .fit{margin-top:14px;border:1px solid var(--blu2);background:var(--bluSoft);padding:9px 11px;font-size:13px}
 .fit b{color:var(--blu2)}
 .fit.no{border-color:var(--bordo);background:var(--nero);color:var(--grigio2)}
-.stato{display:inline-flex;align-items:center;font-family:'Titillium Web',sans-serif;font-size:10.5px;
+.stato{display:inline-flex;align-items:center;font-family:'Saira Condensed',sans-serif;font-size:10.5px;
   letter-spacing:.1em;text-transform:uppercase;padding:4px 9px;border:1px solid transparent;border-radius:2px}
 .stato-consigliato{background:var(--verde);color:#fff}
 .stato-neutro{background:var(--oro);color:#241A05}
@@ -818,10 +865,10 @@ html,body{margin:0;padding:0;-webkit-text-size-adjust:100%;text-size-adjust:100%
 .notaBox.distr b{color:var(--distr2)}
 .altList{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
 .altList button{background:var(--nero);border:1px solid var(--bordo);color:var(--bianco);
-  font-family:'Titillium Web',sans-serif;font-size:11.5px;padding:6px 10px;cursor:pointer;border-radius:2px}
+  font-family:'Saira Condensed',sans-serif;font-size:11.5px;padding:6px 10px;cursor:pointer;border-radius:2px}
 .altList button:hover{border-color:var(--blu2);color:var(--blu2)}
 .chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:14px}
-.chip{font-family:'Titillium Web',sans-serif;font-size:10.5px;letter-spacing:.06em;border:1px solid var(--bordo);
+.chip{font-family:'Saira Condensed',sans-serif;font-size:10.5px;letter-spacing:.06em;border:1px solid var(--bordo);
   color:var(--grigio2);padding:4px 8px}
 .chip.p{border-color:var(--rosso2);color:var(--rosso2)}
 .specbox{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
@@ -849,14 +896,14 @@ html,body{margin:0;padding:0;-webkit-text-size-adjust:100%;text-size-adjust:100%
 .blocco{border:1px solid var(--bordo);background:var(--nero2);padding:18px}
 .riga{display:flex;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid var(--bordo);font-size:14px;align-items:baseline}
 .riga:last-child{border-bottom:0}
-.riga .nn{font-family:'Titillium Web',sans-serif;font-size:11px;color:var(--grigio2)}
-.stit{font-size:14px;font-weight:600;color:var(--grigio2);
+.riga .nn{font-family:'Saira Condensed',sans-serif;font-size:11px;color:var(--grigio2)}
+.stit{font-family:'Saira Condensed',sans-serif;font-size:15px;font-weight:600;color:var(--grigio2);
   border-bottom:1px solid var(--bordo);padding-bottom:8px;margin:32px 0 14px;
   display:flex;justify-content:space-between;gap:10px}
 .nota{font-size:12.5px;color:var(--grigio2);line-height:1.6;margin-top:12px}
-.indietro{background:none;border:0;color:var(--grigio2);cursor:pointer;font-size:13px;padding:18px 0 6px;font-family:inherit}
+.indietro{background:none;border:0;color:var(--grigio2);cursor:pointer;font-size:13px;padding:18px 0 6px;font-family:'Saira Condensed',sans-serif}
 .slotchip{border:1px solid var(--bordo);background:var(--nero);color:var(--bianco);padding:11px;
-  cursor:pointer;font-family:'Titillium Web',sans-serif;font-size:13px;border-radius:2px}
+  cursor:pointer;font-family:'Saira Condensed',sans-serif;font-size:13px;border-radius:2px}
 .slotchip[data-on="1"]{border-color:var(--blu2);background:var(--bluSoft);color:var(--blu2)}
 .slotgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px}
 .ok{border:1px solid var(--blu);background:var(--bluSoft);padding:20px;margin:22px 0}
@@ -864,14 +911,14 @@ html,body{margin:0;padding:0;-webkit-text-size-adjust:100%;text-size-adjust:100%
 .kpigrid{display:grid;gap:14px;grid-template-columns:1fr}
 @media(min-width:620px){.kpigrid{grid-template-columns:1fr 1fr}}
 .kbox{border:1px solid var(--bordo);background:var(--nero2);padding:18px}
-.klab{font-size:12.5px;font-weight:600;color:var(--grigio2)}
+.klab{font-family:'Saira Condensed',sans-serif;font-size:13.5px;font-weight:600;color:var(--grigio2)}
 .kval{font-family:'Saira Condensed',sans-serif;font-weight:800;font-size:32px;margin-top:8px;letter-spacing:-.02em}
-.apri{background:none;border:0;color:var(--blu2);cursor:pointer;font-family:'Titillium Web',sans-serif;font-size:12px;padding:10px 0;text-align:left}
+.apri{background:none;border:0;color:var(--blu2);cursor:pointer;font-family:'Saira Condensed',sans-serif;font-size:12px;padding:10px 0;text-align:left}
 .regole{border-left:2px solid var(--bordo);padding-left:14px;margin:4px 0 0}
 .regole li{font-size:12.5px;color:var(--grigio2);line-height:1.55;margin-bottom:8px}
 .recens{border-left:2px solid var(--bordo);padding-left:14px;margin-bottom:16px}
 .recens p{font-size:14px;line-height:1.6;margin:7px 0}
-.recmeta{display:flex;gap:12px;flex-wrap:wrap;font-family:'Titillium Web',sans-serif;font-size:11.5px;color:var(--grigio2)}
+.recmeta{display:flex;gap:12px;flex-wrap:wrap;font-family:'Saira Condensed',sans-serif;font-size:11.5px;color:var(--grigio2)}
 .dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:8px;vertical-align:middle}
 .orebar{height:8px;background:var(--bordo);border-radius:4px;overflow:hidden;margin-top:14px}
 .orebarfill{height:100%;background:var(--blu2)}
@@ -888,17 +935,17 @@ html,body{margin:0;padding:0;-webkit-text-size-adjust:100%;text-size-adjust:100%
    stessa logica di visibilita' gia' usata per .navlinks/.checkgrid altrove. */
 .calNav{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:14px 0}
 .calNav .b{min-height:44px}
-.calNavLabel{font-family:'Titillium Web',sans-serif;font-size:11.5px;color:var(--grigio2);text-align:center}
+.calNavLabel{font-family:'Saira Condensed',sans-serif;font-size:11.5px;color:var(--grigio2);text-align:center}
 .calGridWrap{overflow-x:auto;margin:14px 0}
 .calGrid{display:grid;grid-template-columns:60px repeat(7,minmax(64px,1fr));gap:1px;
   background:var(--bordo);border:1px solid var(--bordo);min-width:560px}
 .calGridHeadCell{background:var(--nero2);padding:8px 4px;text-align:center;
-  font-family:'Titillium Web',sans-serif;font-size:10px;letter-spacing:.08em;color:var(--grigio2)}
+  font-family:'Saira Condensed',sans-serif;font-size:10px;letter-spacing:.08em;color:var(--grigio2)}
 .calGridHeadCell b{display:block;color:var(--bianco);font-size:15px;font-family:'Saira Condensed',sans-serif;font-weight:700}
-.calGridOra{background:var(--nero2);color:var(--grigio2);font-family:'Titillium Web',sans-serif;
+.calGridOra{background:var(--nero2);color:var(--grigio2);font-family:'Saira Condensed',sans-serif;
   font-size:10px;padding:6px 6px;display:flex;align-items:center;justify-content:flex-end}
 .calCell{background:var(--nero);border:0;color:var(--bianco);min-height:34px;cursor:pointer;
-  font-family:'Titillium Web',sans-serif;font-size:10px;padding:2px;text-align:center}
+  font-family:'Saira Condensed',sans-serif;font-size:10px;padding:2px;text-align:center}
 .calCell small{display:block;opacity:.7;font-size:8.5px}
 .calCell[data-stato="libero"]:hover{background:var(--nero3)}
 /* movimento che risponde a un'azione, non decorativo: selezionare uno slot
@@ -912,7 +959,7 @@ html,body{margin:0;padding:0;-webkit-text-size-adjust:100%;text-size-adjust:100%
 .calAgenda{display:none}
 .calAgendaRow{width:100%;min-height:44px;display:flex;justify-content:space-between;align-items:center;
   gap:10px;padding:10px 14px;border:1px solid var(--bordo);background:var(--nero2);color:var(--bianco);
-  margin-bottom:6px;font-family:'Titillium Web',sans-serif;font-size:12.5px;text-align:left;cursor:pointer}
+  margin-bottom:6px;font-family:'Saira Condensed',sans-serif;font-size:12.5px;text-align:left;cursor:pointer}
 .calAgendaRow[data-stato="selezionato"]{border-color:var(--blu2);background:var(--bluSoft);color:var(--blu2);animation:scattaSelezione .16s ease-out}
 @keyframes scattaSelezione{from{transform:scale(.94)}to{transform:scale(1)}}
 @media(prefers-reduced-motion:reduce){
@@ -924,7 +971,7 @@ html,body{margin:0;padding:0;-webkit-text-size-adjust:100%;text-size-adjust:100%
   .calGridWrap{display:none}
   .calAgenda{display:block}
 }
-.azsess{font-family:'Titillium Web',sans-serif;font-size:11.5px;letter-spacing:.04em;
+.azsess{font-family:'Saira Condensed',sans-serif;font-size:11.5px;letter-spacing:.04em;
   border:1px solid var(--bordo);background:var(--nero);padding:6px 12px;cursor:pointer;border-radius:2px}
 .azsess.sposta{color:var(--blu2)}
 .azsess.sposta:hover{border-color:var(--blu2)}
@@ -934,21 +981,21 @@ html,body{margin:0;padding:0;-webkit-text-size-adjust:100%;text-size-adjust:100%
 .azsess.avvia:hover{border-color:var(--verde)}
 .badge{display:inline-flex;align-items:center;justify-content:center;min-width:16px;height:16px;
   padding:0 4px;margin-left:7px;border-radius:8px;background:var(--ambra);color:#fff;
-  font-family:'Titillium Web',sans-serif;font-size:10px;font-weight:600;vertical-align:middle}
+  font-family:'Saira Condensed',sans-serif;font-size:10px;font-weight:600;vertical-align:middle}
 .chatBox{border:1px solid var(--bordo);background:var(--nero2);padding:16px;margin-top:20px;
   display:flex;flex-direction:column;gap:10px;max-height:60vh;overflow-y:auto}
 .msg{max-width:78%;padding:9px 12px;border-radius:3px;font-size:14px;line-height:1.5}
 .msg p{margin:0}
 .msg .msgOra{display:flex;align-items:center;gap:8px;margin-top:5px;
-  font-family:'Titillium Web',sans-serif;font-size:10px;opacity:.75}
+  font-family:'Saira Condensed',sans-serif;font-size:10px;opacity:.75}
 .msg.loro{align-self:flex-start;background:var(--nero3);color:var(--bianco);border:1px solid var(--bordo)}
 .msg.mio{align-self:flex-end;background:var(--blu);color:#fff}
-.msgAzione{background:none;border:0;padding:0;cursor:pointer;font-family:'Titillium Web',sans-serif;
+.msgAzione{background:none;border:0;padding:0;cursor:pointer;font-family:'Saira Condensed',sans-serif;
   font-size:10px;text-decoration:underline;color:inherit;opacity:.9}
 .msgAzione.fatta{text-decoration:none;cursor:default}
 .chatInput{display:flex;gap:10px;margin-top:14px}
 .chatInput input{flex:1;background:var(--nero);border:1px solid var(--bordo);color:var(--bianco);
-  padding:11px 12px;font-family:'Titillium Web',sans-serif;font-size:14px;border-radius:2px}
+  padding:11px 12px;font-family:'Saira Condensed',sans-serif;font-size:14px;border-radius:2px}
 .chatInput input:focus{outline:none;border-color:var(--grigio)}
 .citarow{display:flex;justify-content:space-between;gap:12px;width:100%;text-align:left;
   background:none;border:0;color:inherit;font:inherit;cursor:pointer;padding:10px 0;
@@ -970,18 +1017,18 @@ html,body{margin:0;padding:0;-webkit-text-size-adjust:100%;text-size-adjust:100%
 .emailBanner .chiudiBanner:hover{opacity:1}
 
 /* ---- provenienza nota: dal coach o salvata dalla chat (punto 4) ---- */
-.origineTag{font-family:'Titillium Web',sans-serif;font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;
+.origineTag{font-family:'Saira Condensed',sans-serif;font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;
   border:1px solid var(--bordo);padding:2px 6px;border-radius:2px;color:var(--grigio2)}
 .origineTag.coach{border-color:var(--blu2);color:var(--blu2)}
 
 /* ---- iRating verificato/da verificare nell'identita' in header ---- */
-.irTag{font-family:'Titillium Web',sans-serif;font-size:9.5px;letter-spacing:.06em;text-transform:uppercase;
+.irTag{font-family:'Saira Condensed',sans-serif;font-size:9.5px;letter-spacing:.06em;text-transform:uppercase;
   color:var(--oro);border:1px solid var(--oro);padding:1px 6px;border-radius:2px;margin-left:7px}
 .irTag.ok{color:var(--verde);border-color:var(--verde)}
 
 /* ---- identita' pilota, spostata nell'header accanto al logo: e' anche la
    scorciatoia per la Scheda Pilota ---- */
-.identita{background:none;border:0;color:var(--grigio);cursor:pointer;font-family:'Titillium Web',sans-serif;
+.identita{background:none;border:0;color:var(--grigio);cursor:pointer;font-family:'Saira Condensed',sans-serif;
   font-size:12.5px;padding:4px 0;text-align:left;white-space:nowrap}
 .identita:hover{color:var(--bianco)}
 .identita b{color:var(--bianco);font-weight:500}
@@ -1232,76 +1279,74 @@ function Spark({ curva, start, w = 110, h = 36 }) {
   return (
     <svg width={w} height={h} viewBox={`0 0 ${w} ${h}`} role="img" aria-label="Andamento iRating allievi"
          style={{ marginLeft: "auto", flex: "none" }}>
-      <line x1={sx} y1="0" x2={sx} y2={h} stroke="#8E1A20" strokeWidth="1" strokeDasharray="2 2" />
-      <polyline points={pts.slice(0, start + 1).join(" ")} fill="none" stroke="#6B727D" strokeWidth="1.5" />
-      <polyline points={pts.slice(start).join(" ")} fill="none" stroke="#3C6DF0" strokeWidth="2" />
+      {/* colori dal tema corrente (var(--...)), non esadecimali fissi: prima
+         sfasavano rispetto al resto della pagina a ogni cambio di identità
+         visiva — il marcatore è neutro (--grigio), il "prima" è muto
+         (--grigio2), il "dopo" è il colore del dato verificato (--blu2) */}
+      <line x1={sx} y1="0" x2={sx} y2={h} stroke="var(--grigio)" strokeWidth="1" strokeDasharray="2 2" />
+      <polyline points={pts.slice(0, start + 1).join(" ")} fill="none" stroke="var(--grigio2)" strokeWidth="1.5" />
+      <polyline points={pts.slice(start).join(" ")} fill="none" stroke="var(--blu2)" strokeWidth="2" />
     </svg>
   );
 }
 
-/* ---- il momento orchestrato del restyling --------------------------------
-   L'UNICO punto della pagina dove qualcosa si muove senza che l'utente
-   abbia agito: il numero-eroe della sezione "Il numero che conta" (la tesi
-   esplicita del prodotto: dato verificato, non dichiarazione) non compare
-   già scritto, si ASSESTA — come una misura che si stabilizza, non un
-   contatore che sale a caso. Un solo innesco, mai ripetuto, e per una
-   ragione precisa: qui e non altrove, perché è qui che il prodotto
-   argomenta la propria tesi con un numero solo.
-   - Il valore vero è SEMPRE il contenuto iniziale (nessun opacity:0, nessun
-     "aspetta il JS per apparire"): senza JavaScript, o se IntersectionObserver
-     non esiste, o se l'osservatore non parte, il numero è già quello giusto.
-   - prefers-reduced-motion: reduce -> l'effetto non parte proprio, resta il
-     valore fermo fin dal primo render.
-   - Il "rumore" (le cifre casuali) è un cambio di contenuto testuale, non
-     un'animazione CSS: la regola "solo transform/opacity" governa la resa
-     visiva del gesto (l'opacità scende leggermente mentre misura, torna a 1
-     quando si assesta), non il testo che cambia sotto — non c'è modo di far
-     scorrere delle cifre casuali animando solo transform/opacity. */
-function NumeroMisurato({ prefisso = "", valore, suffisso = "" }) {
-  const [mostrato, setMostrato] = useState(valore);
-  const [misurando, setMisurando] = useState(false);
-  const rifEl = React.useRef(null);
-  const fattoGia = React.useRef(false);
+/* ---- il momento firma di "La traiettoria" ---------------------------------
+   L'UNICO punto della pagina che si muove senza che l'utente agisca: una
+   linea sottile (--linea, il giallo del cordolo — mai usato altrove) entra
+   larga nell'hero, si stringe verso un punto — l'apice, dove il testo
+   argomenta la tesi del prodotto — e si allarga di nuovo uscendo. È il nome
+   CORDA reso struttura: la traiettoria che tocca l'apice, disegnata una
+   volta sola quando l'hero entra in vista.
+   - No-JS-safe / senza IntersectionObserver: il tracciato di default è
+     GIÀ completo (stroke-dashoffset:0) — non è contenuto in attesa del
+     JS, è un ornamento completo fin dal primo render. Il JS, quando c'è,
+     lo nasconde per un istante e lo ridisegna: un miglioramento sopra un
+     default già corretto, mai il contrario.
+   - prefers-reduced-motion:reduce -> resta così, tracciato completo, fermo.
+   - stroke-dashoffset non è transform/opacity in senso letterale, ma è
+     l'equivalente per l'SVG: solo compositing, nessun ricalcolo di layout
+     (non tocca box, non sposta altri elementi) — la stessa classe di costo
+     di un'animazione opacity, motivo per cui è l'unico modo corretto di
+     "disegnare una linea" senza infrangere lo spirito della regola. */
+function TraiettoriaApice() {
+  const rifPath = React.useRef(anyOf(null));
+  const rifSvg = React.useRef(anyOf(null));
 
   useEffect(() => {
-    if (fattoGia.current) return;
+    const path = rifPath.current;
+    const contenitore = rifSvg.current;
+    if (!path || !contenitore) return;
     if (typeof window === "undefined" || !("IntersectionObserver" in window)) return;
     if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    const el = rifEl.current;
-    if (!el) return;
-    const cifre = String(Math.abs(valore)).length;
+    let fatto = false;
+    const lunghezza = path.getTotalLength();
     const oss = new IntersectionObserver(
       (entries) => {
-        if (!entries[0].isIntersecting || fattoGia.current) return;
-        fattoGia.current = true;
+        if (!entries[0].isIntersecting || fatto) return;
+        fatto = true;
         oss.disconnect();
-        const durata = 900;
-        const inizio = performance.now();
-        setMisurando(true);
-        const passo = (ora) => {
-          const t = Math.min(1, (ora - inizio) / durata);
-          const assestamento = 1 - Math.pow(1 - t, 3); // decelera: si assesta, non conta linearmente
-          if (t < 1) {
-            const casuale = Math.floor(Math.random() * Math.pow(10, cifre));
-            setMostrato(Math.random() < assestamento ? valore : casuale);
-            requestAnimationFrame(passo);
-          } else {
-            setMostrato(valore);
-            setMisurando(false);
-          }
-        };
-        requestAnimationFrame(passo);
+        path.style.transition = "none";
+        path.style.strokeDasharray = `${lunghezza}`;
+        path.style.strokeDashoffset = `${lunghezza}`;
+        // forza il browser a registrare lo stato "nascosto" prima di animare
+        // verso 0, altrimenti il cambio di transition non ha un punto di
+        // partenza da cui interpolare
+        void path.getBoundingClientRect();
+        path.style.transition = "stroke-dashoffset 1.1s cubic-bezier(.2,.7,.2,1)";
+        path.style.strokeDashoffset = "0";
       },
-      { threshold: 0.4 }
+      { threshold: 0.3 }
     );
-    oss.observe(el);
+    oss.observe(contenitore);
     return () => oss.disconnect();
-  }, [valore]);
+  }, []);
 
   return (
-    <span ref={rifEl} className="numeroMisurato" style={{ opacity: misurando ? 0.8 : 1 }}>
-      {prefisso}{mostrato}{suffisso}
-    </span>
+    <svg ref={rifSvg} className="traiettoria" viewBox="0 0 600 320" preserveAspectRatio="none"
+         aria-hidden="true" focusable="false">
+      <path ref={rifPath} d="M 8 54 C 210 8, 300 140, 250 200 C 210 244, 120 236, 96 300"
+            fill="none" stroke="var(--linea)" strokeWidth="2.5" strokeLinecap="round" />
+    </svg>
   );
 }
 
@@ -1310,12 +1355,23 @@ function NumeroMisurato({ prefisso = "", valore, suffisso = "" }) {
 function Home({ vaiLogin, vaiCandidatura }) {
   return (
     <>
-      {/* HERO */}
+      {/* HERO — asimmetrico apposta: il testo pesa a sinistra, il video è
+          più stretto e più basso, la traiettoria attraversa lo spazio fra
+          i due invece di lasciarlo vuoto. Non è una griglia pari spezzata
+          per stile: è la stessa idea della "corda" applicata alla pagina —
+          entra largo (badge+titolo), stringe verso l'apice (il titolo si
+          scala verso sinistra riga dopo riga, come si stringe in curva),
+          esce largo di nuovo nella fascia numeri sotto. */}
       <section className="hero">
+        <TraiettoriaApice />
         <div className="w herogrid">
-          <div>
+          <div className="heroTesto">
             <BadgeIRacing />
-            <h1 className="h1">Trova il coach che ti fa salire davvero.</h1>
+            <h1 className="h1">
+              <span className="h1riga">Trova il coach</span>
+              <span className="h1riga">che ti fa salire</span>
+              <span className="h1riga"><em>davvero.</em></span>
+            </h1>
             <p className="lead">
               Su CORDA ogni coach è valutato con un solo numero: l'iRating che i suoi allievi hanno
               guadagnato dopo la prima sessione. Il dato arriva dall'account iRacing dell'allievo,
@@ -1330,8 +1386,10 @@ function Home({ vaiLogin, vaiCandidatura }) {
               </button>
             </div>
           </div>
-          <Media id="V01" ratio="16 / 10"
-                 nota="Onboard iRacing, loop breve senza audio. È la prima cosa che si vede: meglio una staccata pulita che un montaggio." />
+          <div className="heroMedia">
+            <Media id="V01" ratio="16 / 10"
+                   nota="Onboard iRacing, loop breve senza audio. È la prima cosa che si vede: meglio una staccata pulita che un montaggio." />
+          </div>
         </div>
       </section>
 
@@ -1411,9 +1469,7 @@ function Home({ vaiLogin, vaiCandidatura }) {
           </div>
           <div className="metric">
             <div className="eyebrow">Esempio reale di un allievo</div>
-            <div className="big numero-eroe" style={{ marginTop: 14 }}>
-              <NumeroMisurato prefisso="+" valore={564} suffisso=" iR" />
-            </div>
+            <div className="big numero-eroe" style={{ marginTop: 14 }}>+564 iR</div>
             <div className="sm">in 22 giorni · 179 iR a settimana · 19 gare</div>
             <div style={{ marginTop: 20 }}>
               <Media id="I01" ratio="4 / 3" tipo="immagine"
@@ -1918,7 +1974,7 @@ function Scheda({ c, mia, miaIr, iracingCollegato, walletOre, apriAcquistoOre, a
       <div className="stit"><span>Allievi verificati</span></div>
       {c.rec.map((r, i) => (
         <div className="recens" key={i}>
-          <div className="recmeta"><span style={{ color: "#fff" }}>{r.chi}</span><span>{r.auto}</span></div>
+          <div className="recmeta"><span style={{ color: "var(--bianco)" }}>{r.chi}</span><span>{r.auto}</span></div>
           <p>{r.txt}</p>
           <div className="recmeta">
             <span style={{ color: "var(--blu2)" }}>+{r.ir} iR in {r.gg} giorni</span>
@@ -3596,7 +3652,16 @@ export default function App() {
   const [notificheEmail, setNotificheEmail] = useState(true); // punto 1: preferenza disattivabile
   const [bannerChiuso, setBannerChiuso] = useState({}); // { [coachId]: conteggio al momento della chiusura del banner }
   const [iracingCollegato, setIracingCollegato] = useState(false); // punto 2
-  const [tema, setTema] = useState("attuale"); // attuale | teal | papaya | oro-bordeaux | menta-navy — A/B dei temi colore
+  // "" = la palette di base in .crd{} ("La traiettoria", l'unica identità
+  // pubblica). Gli altri quattro nomi (più "attuale", il giro precedente)
+  // restano nel codice come strumento di sviluppo nascosto: niente
+  // selettore in header, si raggiungono solo con ?tema=nome nell'URL —
+  // il colore deve poter portare significato con UNA sola palette, non
+  // funzionare con cinque in contemporanea.
+  const [tema, setTema] = useState(() => {
+    if (typeof window === "undefined") return "";
+    return new URLSearchParams(window.location.search).get("tema") || "";
+  });
 
   // iR del pilota per il matching: non e' piu' un filtro manuale, arriva
   // dall'account iRacing collegato (mock). Senza collegamento non c'e' un
@@ -3784,14 +3849,6 @@ export default function App() {
             </nav>
           )}
           <div className="navcta">
-            <select className="temaSelect" value={tema} onChange={(e) => setTema(e.target.value)}
-                    aria-label="Tema colore (test A/B)">
-              <option value="attuale">Tema: Attuale</option>
-              <option value="teal">Tema: Teal</option>
-              <option value="papaya">Tema: Papaya</option>
-              <option value="oro-bordeaux">Tema: Oro & Bordeaux</option>
-              <option value="menta-navy">Tema: Menta & Navy</option>
-            </select>
             {pagina === "app" ? (
               <button className="b b-ghost" onClick={esci}>Esci</button>
             ) : (
