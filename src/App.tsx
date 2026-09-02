@@ -657,36 +657,41 @@ html,body{margin:0;padding:0;-webkit-text-size-adjust:100%;text-size-adjust:100%
   .pistaSvg{opacity:.4}
 }
 /* bordo/asfalto: stesso <path> disegnato due volte, larghezze diverse —
-   il layer sotto (chiaro, largo) resta visibile solo ai due bordi del
-   layer sopra (scuro, piu' stretto): un margine "parallelo" per
+   il layer sotto (bianco, largo) resta visibile solo ai due bordi del
+   layer sopra (asfalto, piu' stretto): un margine "parallelo" per
    costruzione lungo qualunque curva, senza calcolare un vero offset
-   geometrico (che richiederebbe una libreria dedicata). vector-effect
-   e' necessario: il viewBox e' deformato apposta (preserveAspectRatio
-   none) per adattarsi a container di proporzioni diverse, e senza
+   geometrico (che richiederebbe una libreria dedicata) — sono i due
+   "track limits" bianchi ai bordi della fascia. vector-effect e'
+   necessario: il viewBox e' deformato apposta (preserveAspectRatio none)
+   per adattarsi a container di proporzioni diverse, e senza
    non-scaling-stroke lo spessore del tratto si deformerebbe con lui —
-   con non-scaling-stroke resta in pixel reali, costante */
+   con non-scaling-stroke resta in pixel reali, costante. --bordo (grigio
+   caldo, piu' chiaro del fondo --nero ma neutro, non colorato) e' la
+   fascia d'asfalto vera e propria, larga abbastanza da leggersi come
+   pista e non come un filo */
 .pistaLayer{stroke-linecap:round;vector-effect:non-scaling-stroke}
-.pistaBordo{stroke:var(--bianco);stroke-width:7}
-.pistaAsfalto{stroke:var(--grigio2);stroke-width:4.5}
-@media(max-width:640px){.pistaBordo{stroke-width:4.5}.pistaAsfalto{stroke-width:3}}
-/* cordolo: solo sul primo tratto della curva (PISTA_CORDOLO_D, la zona
-   dell'apice nell'hero) — tratteggio alternato rosso/bianco lungo la
-   direzione di marcia, non tacche a croce (vedi il commento su
-   PISTA_CORDOLO_D sul perché). offset:9 sul secondo layer sfalsa il
-   tratteggio esattamente di una tacca, cosi' dove l'uno mostra dash
-   l'altro mostra gap: l'alternanza rosso/bianco. Rosso di marca qui non
-   confligge con la triade di stato (verde/oro/ambra restano intatti) —
-   e' l'unico secondo uso del marchio in tutta l'home, oltre al logo */
+.pistaBordo{stroke:var(--bianco);stroke-width:19}
+.pistaAsfalto{stroke:var(--bordo);stroke-width:14}
+@media(max-width:640px){.pistaBordo{stroke-width:11}.pistaAsfalto{stroke-width:8}}
+/* cordolo: tacche vere, perpendicolari alla direzione di marcia sullo
+   SCHERMO (calcolate in JS, vedi PistaContinua — il viewBox deformato
+   rende impossibile ottenerle con un angolo fisso nel markup), solo sul
+   tratto del tornante nell'hero — non su tutto il percorso. Rosso di
+   marca qui non confligge con la triade di stato (verde/oro/ambra restano
+   intatti) — e' l'unico secondo uso del marchio in tutta l'home, oltre al
+   logo */
 .pistaCordoloGruppo{transition:opacity .5s ease}
-.pistaCordolo{stroke-width:6;vector-effect:non-scaling-stroke;fill:none;stroke-dasharray:9}
-.pistaCordolo[data-tinta="a"]{stroke:var(--rosso2)}
-.pistaCordolo[data-tinta="b"]{stroke:var(--bianco);stroke-dashoffset:9}
-/* nodo: il marcatore che "si accende" quando la linea raggiunge
-   l'aggancio di un passaggio — vedi il trigger nel commento di
-   PistaContinua. transform-origin al centro cosi' lo scale rimane
-   concentrico invece di spostare il cerchio */
-.pistaNodo{stroke:var(--linea);stroke-width:13;stroke-linecap:round;
+.pistaTacca{stroke-width:7;vector-effect:non-scaling-stroke}
+@media(max-width:640px){.pistaTacca{stroke-width:5}}
+.pistaTacca[data-tinta="a"]{stroke:var(--rosso2)}
+.pistaTacca[data-tinta="b"]{stroke:var(--bianco)}
+/* nodo: marcatore discreto (non un disco) che "si accende" quando la
+   linea raggiunge l'aggancio di un passaggio — vedi il trigger nel
+   commento di PistaContinua. transform-origin al centro cosi' lo scale
+   rimane concentrico invece di spostare il punto */
+.pistaNodo{stroke:var(--linea);stroke-width:7;stroke-linecap:round;
   transform-origin:center;transform-box:fill-box;transition:opacity .3s ease,transform .3s ease}
+@media(max-width:640px){.pistaNodo{stroke-width:6}}
 @media(prefers-reduced-motion:reduce){
   .pistaCordoloGruppo,.pistaNodo{transition:none}
 }
@@ -1393,41 +1398,143 @@ function Spark({ curva, start, w = 110, h = 36 }) {
      nota nel giro precedente). Tutto scritto via ref, mai via setState:
      un aggiornamento di stile diretto per frame, senza far ripassare
      l'intero albero React ad ogni scroll. */
+/* Tornante vero, non un arco generico: entra largo da sinistra (vicino al
+   logo), spazza largo sul video dell'hero, si stringe di scatto verso
+   l'apice — allineato alla CTA "Cerco un coach" — e riapre uscendo verso
+   il basso. Da lì attraversa la fascia numeri (nascosta sotto, invariata)
+   e prosegue nei tre passaggi restando DENTRO al corridoio fra le due
+   colonne (testo/video) di CIASCUN passo per l'intera sua altezza, non
+   solo di sfuggita: la versione precedente sceglieva un punto qualunque
+   lungo una curva ad ampie escursioni, che poteva cadere (e cadeva)
+   dentro al riquadro video invece che nel corridoio — bug #2 di questo
+   giro, il nodo restava acceso ma dentro a un riquadro con sfondo opaco,
+   invisibile. Qui invece ogni "rientro" del serpente è tarato sul
+   corridoio REALE di quel passo (~42% di larghezza per 01/03, media a
+   sinistra; ~58% per 02, inverso, media a destra — la stessa alternanza
+   sinistra/destra/sinistra viene per costruzione dai due layout). viewBox
+   0 0 100 1000: x in percentuale di larghezza, y in millesimi dell'altezza
+   reale della zona (hero+numeri+come funziona) — la stessa scala per
+   qualunque contenitore, per costruzione, perché preserveAspectRatio="none"
+   la stira in modo lineare in verticale. */
 const PISTA_PATH_D =
-  "M 10 46 C 66 18, 92 92, 54 108 C 26 122, 6 168, 26 300 " +
-  "C 42 400, 92 420, 74 470 C 58 512, 8 528, 24 610 " +
-  "C 38 660, 66 686, 50 740";
-/* cordolo: NON tacche perpendicolari calcolate punto per punto sulla
-   curva. Prima versione: getPointAtLength() + rotazione per ogni tacca —
-   corretta nello spazio del viewBox, ma il viewBox è deformato apposta
-   (preserveAspectRatio="none", per adattarsi a container di proporzioni
-   molto diverse da hero a hero) e quella deformazione non è uniforme:
-   l'angolo "giusto" nello spazio sorgente usciva storto una volta
-   stirato sullo schermo — tacche a strisce diagonali sbagliate, non
-   perpendicolari. Soluzione più robusta, dichiarata: il cordolo è lo
-   STESSO primo tratto della curva principale (stesso "d", garantisce
-   l'allineamento perfetto con l'apice) colorato a tratteggio alternato
-   rosso/bianco lungo la direzione di marcia — non incrocia la pista a
-   croce, la segue; resta leggibile come cordolo (segna un punto preciso,
-   non decora il resto del percorso) senza dipendere da una geometria che
-   la deformazione del viewBox non permette di calcolare in modo affidabile. */
-const PISTA_CORDOLO_D = "M 10 46 C 66 18, 92 92, 54 108";
-const PISTA_ANCORE = [0.42, 0.62, 0.82]; // posizione lungo il path dei 3 nodi (solo estetica: il trigger vero dei blocchi è la loro posizione reale in pagina, vedi sopra)
+  "M 10 0 C 22.5 21.7, 85.0 97.5, 85 130 " +
+  "C 70.0 150.0, 20.0 175.0, 10 195 " +
+  "C 4.0 215.0, 20.0 270.0, 42 300 " +
+  "C 51.0 332.5, 63.8 366.2, 64 390 " +
+  "C 64.2 413.8, 46.8 421.3, 43 443 " +
+  "C 39.2 464.7, 41.0 494.3, 41 520 " +
+  "C 41.0 545.7, 41.3 578.7, 43 597 " +
+  "C 44.7 615.3, 48.5 611.8, 51 630 " +
+  "C 53.5 648.2, 57.2 680.5, 58 706 " +
+  "C 58.8 731.5, 58.3 764.7, 56 783 " +
+  "C 53.7 801.3, 46.3 797.7, 44 816 " +
+  "C 41.7 834.3, 41.7 867.5, 42 893 " +
+  "C 42.3 918.5, 45.3 951.2, 46 969 " +
+  "C 46.7 986.8, 46.0 994.8, 46 1000";
+/* frazioni di lunghezza d'arco (0→1 sull'intero PISTA_PATH_D) di ogni
+   punto notevole — calcolate campionando la curva, non a occhio (script
+   in scratchpad, riportato qui perché la geometria sopra è quella
+   verificata a occhio in browser, inclusa la posizione reale dei riquadri
+   video via getBoundingClientRect). Un solo sistema di riferimento per
+   tutto: dove finisce il disegno progressivo (dashoffset) E dove si
+   accende ogni nodo/blocco E dove si accende il cordolo sono la STESSA
+   frazione, mai calcoli indipendenti — era esattamente il bug #1 di
+   questo giro (il nodo si accendeva secondo la posizione reale del
+   blocco in pagina, la linea secondo tutt'altra formula: non erano MAI
+   garantite di coincidere, il nodo restava acceso senza traccia). */
+const PISTA_APICE_INIZIO = 0.17; // poco prima di P2 (0.2336): il cordolo si accende qui
+const PISTA_APICE_FINE = 0.29; // poco dopo P2: il cordolo si spegne qui, resta solo la fascia
+// ogni ancora e' il CENTRO verticale del passo corrispondente, con la x
+// del punto della curva in quel punto già dentro al corridoio fra le due
+// colonne (non nel riquadro video) — vedi il commento sopra
+const PISTA_ANCORE = [0.520, 0.706, 0.893]; // nodo1/passo1, nodo2/passo2, nodo3/passo3
+const PISTA_FINESTRA = 0.10; // ampiezza della transizione (in frazione di progresso) prima di ogni ancora
+
+// cerca il punto della curva alla coordinata y desiderata (0-1000): la
+// curva e' monotona crescente in y per costruzione (nessun controllo
+// punto ha una y minore del precedente), quindi una scansione lineare
+// basta ed e' sempre stabile — piu' robusto che assumere che la frazione
+// di LUNGHEZZA D'ARCO coincida con la frazione di y (non coincide: il
+// tornante dell'hero percorre piu' strada orizzontale che verticale)
+function trovaPuntoPerY(path, L, targetY, campioni) {
+  let punto = path.getPointAtLength(0);
+  for (let i = 0; i <= campioni; i++) {
+    const p = path.getPointAtLength((i / campioni) * L);
+    punto = p;
+    if (p.y >= targetY) break;
+  }
+  return punto;
+}
 
 function PistaContinua({ passoRefs, children }) {
   const rifSvg = React.useRef(anyOf(null));
   const rifZona = React.useRef(anyOf(null));
   const [nodi, setNodi] = useState(anyOf([]));
+  const [tacche, setTacche] = useState(anyOf([]));
 
-  // geometria dei nodi: calcolata una sola volta al mount dal <path>
-  // reale (non indovinata a mano) — restano corretti anche se la curva
-  // sopra viene ritoccata in futuro
+  // geometria di nodi e tacche: calcolata dal <path> reale, non indovinata
+  // a mano — ricalcolata anche al resize, perché le tacche del cordolo
+  // devono restare perpendicolari ALLO SCHERMO (vedi sotto) e lo schermo
+  // cambia proporzioni.
   useEffect(() => {
-    const svg = rifSvg.current;
-    const path = svg && svg.querySelector(".pistaLayer");
-    if (!path) return;
-    const L = path.getTotalLength();
-    setNodi(PISTA_ANCORE.map((t) => path.getPointAtLength(t * L)));
+    function calcola() {
+      const svg = rifSvg.current;
+      const path = svg && svg.querySelector(".pistaLayer");
+      if (!path || typeof window === "undefined") return;
+      const L = path.getTotalLength();
+      setNodi(PISTA_ANCORE.map((f) => trovaPuntoPerY(path, L, f * 1000, 400)));
+
+      // tacche del cordolo, perpendicolari alla direzione di marcia SULLO
+      // SCHERMO — non nello spazio interno del viewBox. Il viewBox è
+      // deformato apposta (preserveAspectRatio="none", per adattarsi a
+      // contenitori di proporzioni molto diverse), quindi un angolo
+      // corretto nello spazio sorgente esce storto una volta stirato: la
+      // versione precedente lo ignorava e rinunciava a tacche vere
+      // (tratteggio parallelo alla curva, dichiarato come ripiego). Qui si
+      // calcola il fattore di scala reale (sx,sy = pixel schermo per unità
+      // di viewBox) dal bounding box dell'svg, si porta la tangente in
+      // spazio schermo, la si ruota di 90°, e si riporta la direzione
+      // risultante nello spazio del viewBox DIVIDENDO per lo stesso
+      // fattore — cosicché quando l'SVG la ristira, torni perpendicolare
+      // per davvero sullo schermo. Le tacche campionano DIRETTAMENTE il
+      // path principale (tra PISTA_APICE_INIZIO e _FINE), non una copia
+      // separata: allineamento perfetto con la fascia d'asfalto per
+      // costruzione, mai da tenere sincronizzato a mano.
+      const rect = svg.getBoundingClientRect();
+      const sx = rect.width / 100;
+      const sy = rect.height / 1000;
+      if (!sx || !sy) return;
+      const nTacche = 9;
+      // lunghezza della tacca in pixel schermo reali, non in unità di
+      // viewBox: dipende dalla LARGHEZZA della zona (rect.height è
+      // l'altezza di tutta la zona hero+numeri+passaggi, enorme e non
+      // pertinente qui), clampata a un intervallo leggibile su ogni schermo
+      const lunghezzaSchermo = Math.max(14, Math.min(26, rect.width * 0.022));
+      const nuove = anyOf([]);
+      for (let i = 0; i < nTacche; i++) {
+        const t = PISTA_APICE_INIZIO + ((i + 0.5) / nTacche) * (PISTA_APICE_FINE - PISTA_APICE_INIZIO);
+        const p = path.getPointAtLength(t * L);
+        const p2 = path.getPointAtLength(Math.min(L, t * L + 0.5));
+        const dx = p2.x - p.x, dy = p2.y - p.y;
+        const tsx = dx * sx, tsy = dy * sy; // tangente in spazio schermo
+        const tl = Math.hypot(tsx, tsy) || 1;
+        const perpSx = -tsy / tl, perpSy = tsx / tl; // perpendicolare, spazio schermo, unitaria
+        // riportata nello spazio del viewBox e scalata alla lunghezza voluta
+        const vx = (perpSx / sx) * lunghezzaSchermo;
+        const vy = (perpSy / sy) * lunghezzaSchermo;
+        nuove.push({
+          x1: p.x - vx / 2, y1: p.y - vy / 2,
+          x2: p.x + vx / 2, y2: p.y + vy / 2,
+          tinta: i % 2 === 0 ? "a" : "b",
+        });
+      }
+      setTacche(nuove);
+    }
+    calcola();
+    let t;
+    function onResize() { clearTimeout(t); t = setTimeout(calcola, 120); }
+    window.addEventListener("resize", onResize);
+    return () => { clearTimeout(t); window.removeEventListener("resize", onResize); };
   }, []);
 
   useEffect(() => {
@@ -1438,17 +1545,13 @@ function PistaContinua({ passoRefs, children }) {
     const riduciMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     if (riduciMotion) return; // resta lo stato di partenza: tutto già disegnato/in posizione
 
-    const layers = svg.querySelectorAll(".pistaLayer");
+    const clipRect = svg.querySelector(".pistaClipRect");
     const cordoloEl = svg.querySelector(".pistaCordoloGruppo");
     const nodiEl = svg.querySelectorAll(".pistaNodo");
     const blocchi = passoRefs.map((r) => r.current).filter(Boolean);
-    if (!layers.length || !blocchi.length) return;
+    if (!clipRect || !blocchi.length) return;
 
-    const L = layers[0].getTotalLength();
-    layers.forEach((l) => {
-      l.style.strokeDasharray = `${L}`;
-      l.style.strokeDashoffset = `${L}`;
-    });
+    clipRect.setAttribute("height", "0");
     if (cordoloEl) cordoloEl.style.opacity = "0";
     nodiEl.forEach((n) => { n.style.opacity = ".35"; n.style.transform = "scale(.7)"; });
 
@@ -1471,31 +1574,50 @@ function PistaContinua({ passoRefs, children }) {
       // la fine della zona ha superato la cima: il percorso avanza per
       // tutta l'estensione di hero+numeri+come-funziona, reversibile
       const progresso = Math.min(1, Math.max(0, (vh - rect.top) / (rect.height + vh)));
-      const offset = L * (1 - progresso);
-      layers.forEach((l) => { l.style.strokeDashoffset = `${offset}`; });
+      // rivelazione via ritaglio (un <rect> che cresce in altezza dentro un
+      // <clipPath>), NON piu' stroke-dasharray/dashoffset: con
+      // vector-effect="non-scaling-stroke" (necessario per uno spessore
+      // costante sotto lo stiramento non uniforme del viewBox, vedi sopra)
+      // il tratteggio veniva disegnato in un punto sbagliato della curva —
+      // un bug del motore di rendering sotto stiramento cosi' estremo (12x
+      // in larghezza contro 2x in altezza), verificato isolando le due
+      // proprietà una alla volta. Il ritaglio e' immune: agisce PRIMA dello
+      // stiramento, nello stesso spazio del path, e resta corretto qualunque
+      // sia il rapporto fra i due assi.
+      clipRect.setAttribute("height", `${progresso * 1000}`);
       if (cordoloEl) {
-        // il cordolo copre all'incirca il primo 12% della curva (stesso
-        // "d" del primo tratto): si accende un filo dopo, quando quel
-        // tratto è già stato "raggiunto" dal disegno progressivo
-        const raggiuntoApice = progresso > 0.1;
-        cordoloEl.style.opacity = raggiuntoApice ? "1" : "0";
+        // il cordolo (tornante dell'hero, y 110→300 su 1000) si accende
+        // gradualmente MENTRE il disegno progressivo attraversa proprio
+        // quel tratto — stessa fonte "progresso" del dashoffset, non una
+        // soglia indipendente
+        const cordoloIn = Math.min(1, Math.max(0, (progresso - PISTA_APICE_INIZIO) / (PISTA_APICE_FINE - PISTA_APICE_INIZIO)));
+        cordoloEl.style.opacity = `${cordoloIn}`;
       }
 
+      // Un solo valore — lo stesso "progresso" che pilota il dashoffset —
+      // decide anche quando ogni blocco entra e quando il suo nodo si
+      // accende: la linea disegnata e il blocco raggiungono lo stesso
+      // punto ESATTAMENTE nello stesso istante, per costruzione, non per
+      // coincidenza fra due formule diverse (era il bug: il nodo usava la
+      // propria posizione reale in pagina, la linea la propria — niente
+      // le teneva sincronizzate, e il nodo restava acceso senza traccia).
       blocchi.forEach((b, i) => {
-        const r = b.getBoundingClientRect();
-        // rivelato quando il blocco arriva a ~85% dell'altezza del
-        // viewport, completo dopo altri ~38% di viewport scrollati:
-        // dipende da dove si trova IL BLOCCO stesso, non dalla lunghezza
-        // percorsa sulla curva — più robusto, non deve far coincidere
-        // esattamente la forma della curva con l'impaginazione reale
-        const localeGrezzo = (vh * 0.85 - r.top) / (vh * 0.38);
-        const locale = Math.min(1, Math.max(0, localeGrezzo));
+        const soglia = PISTA_ANCORE[i];
+        const locale = Math.min(1, Math.max(0, (progresso - (soglia - PISTA_FINESTRA)) / PISTA_FINESTRA));
         b.style.transform = `translateX(${direzioni[i] * larghezzaSpostamento * (1 - locale)}px)`;
         b.style.opacity = `${locale}`;
         const nodo = nodiEl[i];
         if (nodo) {
-          nodo.style.opacity = locale > 0.02 ? "1" : ".35";
-          nodo.style.transform = `scale(${locale > 0.02 ? 1 : 0.7})`;
+          // il nodo e' fermo esattamente sul punto del path a frazione
+          // "soglia" (vedi PISTA_ANCORE): scatta acceso solo a fine
+          // transizione (locale vicino a 1), quando "progresso" ha
+          // raggiunto quella stessa frazione — cioe' quando il disegno
+          // progressivo (dashoffset) e' arrivato DAVVERO fin li'. Farlo
+          // scattare prima (a inizio transizione) lo accenderebbe mentre
+          // la linea è ancora visibilmente lontana da quel punto.
+          const acceso = locale > 0.85;
+          nodo.style.opacity = acceso ? "1" : ".35";
+          nodo.style.transform = `scale(${acceso ? 1 : 0.7})`;
         }
       });
     }
@@ -1516,22 +1638,38 @@ function PistaContinua({ passoRefs, children }) {
     };
   }, [passoRefs]);
 
+  const idClip = React.useId();
   return (
     <div ref={rifZona} className="pistaZona">
-      <svg ref={rifSvg} className="pistaSvg" viewBox="0 0 100 760" preserveAspectRatio="none"
+      <svg ref={rifSvg} className="pistaSvg" viewBox="0 0 100 1000" preserveAspectRatio="none"
            aria-hidden="true" focusable="false">
-        {/* bordo/track-limits: stroke piu' chiaro e piu' largo SOTTO,
-           l'asfalto piu' scuro e piu' stretto SOPRA lascia visibile solo
-           un margine ai due lati — parallelo per costruzione lungo
-           qualunque curva, senza calcolare un offset geometrico vero */}
-        <path className="pistaLayer pistaBordo" d={PISTA_PATH_D} fill="none" strokeLinecap="round" />
-        <path className="pistaLayer pistaAsfalto" d={PISTA_PATH_D} fill="none" strokeLinecap="round" />
-        <g className="pistaCordoloGruppo">
-          <path className="pistaCordolo" data-tinta="a" d={PISTA_CORDOLO_D} />
-          <path className="pistaCordolo" data-tinta="b" d={PISTA_CORDOLO_D} />
+        <defs>
+          {/* il ritaglio che disegna progressivamente la pista: un <rect>
+             che cresce in altezza da 0 a 1000 (l'intero viewBox) via ref,
+             mai via stroke-dasharray/dashoffset — vedi il commento nello
+             scroll-effect sul perché quella tecnica va evitata qui */}
+          <clipPath id={idClip} clipPathUnits="userSpaceOnUse">
+            <rect className="pistaClipRect" x="0" y="0" width="100" height="1000" />
+          </clipPath>
+        </defs>
+        <g clipPath={`url(#${idClip})`}>
+          {/* bordo/track-limits: stroke piu' chiaro e piu' largo SOTTO,
+             l'asfalto piu' scuro e piu' stretto SOPRA lascia visibile solo
+             un margine ai due lati — parallelo per costruzione lungo
+             qualunque curva, senza calcolare un offset geometrico vero */}
+          <path className="pistaLayer pistaBordo" d={PISTA_PATH_D} fill="none" strokeLinecap="round" />
+          <path className="pistaLayer pistaAsfalto" d={PISTA_PATH_D} fill="none" strokeLinecap="round" />
+          <g className="pistaCordoloGruppo">
+            {tacche.map((t, i) => (
+              <line key={i} className="pistaTacca" data-tinta={t.tinta}
+                    x1={t.x1} y1={t.y1} x2={t.x2} y2={t.y2} vectorEffect="non-scaling-stroke" />
+            ))}
+          </g>
         </g>
-        {/* un segmento di lunghezza zero con stroke-linecap:round e
-           non-scaling-stroke disegna un punto di diametro costante in
+        {/* i nodi restano FUORI dal ritaglio: si accendono/spengono via
+           opacity (vedi lo scroll-effect), non seguono il bordo del
+           ritaglio — un segmento di lunghezza zero con stroke-linecap:round
+           e non-scaling-stroke disegna un punto di diametro costante in
            pixel reali — un <circle> col solo raggio si sarebbe deformato
            in un'ellisse, perché il viewBox è deformato apposta
            (preserveAspectRatio="none") per adattarsi a container di
