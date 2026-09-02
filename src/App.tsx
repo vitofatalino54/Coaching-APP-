@@ -627,17 +627,69 @@ html,body{margin:0;padding:0;-webkit-text-size-adjust:100%;text-size-adjust:100%
 .media video,.media img{width:100%;height:100%;object-fit:cover;display:block}
 
 /* ---- home ---- */
-/* overflow:hidden e' la rete di sicurezza della traiettoria: l'SVG e'
-   posizionato per attraversare il bordo dell'hero apposta (l'apice "esce"
-   visivamente dalla sezione), overflow:hidden lo ritaglia pulito senza
-   mai poter aprire uno scroll orizzontale, qualunque sia la larghezza */
-.hero{padding:64px 0 56px;border-bottom:1px solid var(--bordo);position:relative;overflow:hidden}
+.hero{padding:64px 0 56px;border-bottom:1px solid var(--bordo)}
 @media(min-width:900px){.hero{padding:88px 0 76px}}
-/* la traiettoria vive DIETRO al testo (z-index sotto), attraversa l'hero
-   da un bordo all'altro: preserveAspectRatio="none" la lascia deformarsi
-   con il contenitore invece di aggiungere barre vuote — e' una linea
-   d'atmosfera, non un disegno che deve restare in un rapporto fisso */
-.traiettoria{position:absolute;inset:0;width:100%;height:100%;z-index:0;opacity:.55}
+/* ---- pista continua: un solo <svg> dietro hero + fascia numeri + "come
+   funziona" (vedi PistaContinua) --------------------------------------
+   overflow:hidden qui e' la rete di sicurezza: la curva e' pensata per
+   uscire visivamente dai bordi della zona, overflow:hidden la ritaglia
+   pulita senza MAI poter aprire uno scroll orizzontale — e vale anche
+   durante l'animazione di ingresso dei tre passaggi (translateX), non
+   solo a riposo, perche' il contenitore che clippa e' lo stesso per
+   tutta la zona. */
+/* z-index:0 qui non e' decorativo: senza un valore esplicito,
+   position:relative da solo NON crea un nuovo contesto di stacking, e lo
+   z-index:-1 dell'SVG sotto sarebbe "scappato" al contesto dell'antenato
+   piu' vicino che ne ha uno (probabilmente la radice della pagina) invece
+   di restare dietro solo al contenuto di questa zona — risultato: SVG
+   presente nel DOM, geometria corretta, ma dipinto altrove e invisibile */
+.pistaZona{position:relative;z-index:0;overflow:hidden}
+/* z-index NEGATIVO, non 0: hero/fascia numeri/"come funziona" sono div
+   statici (senza position/z-index propri) — in CSS, i discendenti statici
+   dipingono SOPRA ai discendenti posizionati con z-index:0, non sotto.
+   Con z-index negativo l'SVG dipinge nel livello sotto lo sfondo del
+   contenuto normale, che è esattamente il "dietro al testo" richiesto,
+   senza dover aggiungere z-index:1 a ogni sezione che ci sta sopra. */
+.pistaSvg{position:absolute;inset:0;width:100%;height:100%;z-index:-1;pointer-events:none;opacity:.9}
+@media(max-width:640px){
+  /* su schermi stretti la banda non deve invadere il testo: piu' sottile
+     e piu' tenue, non sparita — resta "riconoscibile come pista" */
+  .pistaSvg{opacity:.4}
+}
+/* bordo/asfalto: stesso <path> disegnato due volte, larghezze diverse —
+   il layer sotto (chiaro, largo) resta visibile solo ai due bordi del
+   layer sopra (scuro, piu' stretto): un margine "parallelo" per
+   costruzione lungo qualunque curva, senza calcolare un vero offset
+   geometrico (che richiederebbe una libreria dedicata). vector-effect
+   e' necessario: il viewBox e' deformato apposta (preserveAspectRatio
+   none) per adattarsi a container di proporzioni diverse, e senza
+   non-scaling-stroke lo spessore del tratto si deformerebbe con lui —
+   con non-scaling-stroke resta in pixel reali, costante */
+.pistaLayer{stroke-linecap:round;vector-effect:non-scaling-stroke}
+.pistaBordo{stroke:var(--bianco);stroke-width:7}
+.pistaAsfalto{stroke:var(--grigio2);stroke-width:4.5}
+@media(max-width:640px){.pistaBordo{stroke-width:4.5}.pistaAsfalto{stroke-width:3}}
+/* cordolo: solo sul primo tratto della curva (PISTA_CORDOLO_D, la zona
+   dell'apice nell'hero) — tratteggio alternato rosso/bianco lungo la
+   direzione di marcia, non tacche a croce (vedi il commento su
+   PISTA_CORDOLO_D sul perché). offset:9 sul secondo layer sfalsa il
+   tratteggio esattamente di una tacca, cosi' dove l'uno mostra dash
+   l'altro mostra gap: l'alternanza rosso/bianco. Rosso di marca qui non
+   confligge con la triade di stato (verde/oro/ambra restano intatti) —
+   e' l'unico secondo uso del marchio in tutta l'home, oltre al logo */
+.pistaCordoloGruppo{transition:opacity .5s ease}
+.pistaCordolo{stroke-width:6;vector-effect:non-scaling-stroke;fill:none;stroke-dasharray:9}
+.pistaCordolo[data-tinta="a"]{stroke:var(--rosso2)}
+.pistaCordolo[data-tinta="b"]{stroke:var(--bianco);stroke-dashoffset:9}
+/* nodo: il marcatore che "si accende" quando la linea raggiunge
+   l'aggancio di un passaggio — vedi il trigger nel commento di
+   PistaContinua. transform-origin al centro cosi' lo scale rimane
+   concentrico invece di spostare il cerchio */
+.pistaNodo{stroke:var(--linea);stroke-width:13;stroke-linecap:round;
+  transform-origin:center;transform-box:fill-box;transition:opacity .3s ease,transform .3s ease}
+@media(prefers-reduced-motion:reduce){
+  .pistaCordoloGruppo,.pistaNodo{transition:none}
+}
 .herogrid{display:grid;gap:38px;grid-template-columns:1fr;align-items:start;position:relative;z-index:1}
 @media(min-width:900px){.herogrid{grid-template-columns:1.28fr .72fr;gap:44px}}
 .heroMedia{width:100%}
@@ -684,15 +736,33 @@ html,body{margin:0;padding:0;-webkit-text-size-adjust:100%;text-size-adjust:100%
 .h2{font-size:clamp(28px,4.6vw,40px);margin-top:12px}
 .p{color:var(--grigio);font-size:16px;line-height:1.65;margin-top:14px}
 
-.passi{display:grid;gap:20px;grid-template-columns:1fr}
-@media(min-width:820px){.passi{grid-template-columns:repeat(3,1fr);gap:24px}}
-/* numero nudo, non "PASSO 01": la sequenza è già leggibile dalla posizione
-   nella riga di tre — il numero da solo basta, senza la parola davanti a
-   urlare "questa è una sequenza". Grigio, non rosso: non serve il colore
-   di marca per giustificare un contatore */
+/* i tre passaggi in fila, non piu' affiancati: e' l'ordine in cui la
+   pista li raggiunge scendendo (vedi PistaContinua), non una scelta di
+   stile. position:relative+z-index:1 li tiene sopra alla curva (che
+   passa dietro, z-index:-1) senza bisogno di un fondo opaco proprio —
+   restano "sulla pista", non su un riquadro che la copre. */
+.passi{display:flex;flex-direction:column;gap:56px;position:relative;z-index:1}
+@media(min-width:900px){.passi{gap:76px}}
+/* transform e' l'UNICA proprieta' che PistaContinua scrive qui via ref
+   (mai left/margin/width, vedi il vincolo anti-overflow): translateX
+   parte gia' a 0 di default (nessuno stile in JSX), lo sposta solo
+   l'effect quando puo' partire — stato di riposo sempre corretto senza
+   JS. will-change lo dichiara al browser solo dove serve */
+.passo{display:grid;gap:24px;grid-template-columns:1fr;align-items:center;will-change:transform,opacity}
+@media(min-width:820px){
+  .passo{grid-template-columns:1fr 1.15fr;gap:40px}
+  /* l'alternanza testo/video rispecchia da che lato "entra" ogni
+     passaggio scorrendo (01 sinistra, 02 destra, 03 sinistra): non solo
+     l'animazione, anche la composizione a riposo lo racconta */
+  .passo.passoInverso{grid-template-columns:1.15fr 1fr}
+  .passo.passoInverso .passoMedia{order:2}
+  .passo.passoInverso .passoTesto{order:1}
+}
+.passoMedia{width:100%}
 .passo .num{font-family:'Saira Condensed',sans-serif;font-size:28px;font-weight:800;color:var(--grigio2);margin-bottom:10px}
 .passo h3{font-size:21px;margin-bottom:8px}
 .passo p{color:var(--grigio);font-size:14.5px;line-height:1.6;margin:0 0 16px}
+@media(prefers-reduced-motion:reduce){.passo{transform:none !important;opacity:1 !important}}
 
 .duo{display:grid;gap:34px;grid-template-columns:1fr;align-items:center}
 @media(min-width:900px){.duo{grid-template-columns:1fr 1fr;gap:52px}}
@@ -1290,164 +1360,319 @@ function Spark({ curva, start, w = 110, h = 36 }) {
   );
 }
 
-/* ---- il momento firma di "La traiettoria" ---------------------------------
-   L'UNICO punto della pagina che si muove senza che l'utente agisca: una
-   linea sottile (--linea, il giallo del cordolo — mai usato altrove) entra
-   larga nell'hero, si stringe verso un punto — l'apice, dove il testo
-   argomenta la tesi del prodotto — e si allarga di nuovo uscendo. È il nome
-   CORDA reso struttura: la traiettoria che tocca l'apice, disegnata una
-   volta sola quando l'hero entra in vista.
-   - No-JS-safe / senza IntersectionObserver: il tracciato di default è
-     GIÀ completo (stroke-dashoffset:0) — non è contenuto in attesa del
-     JS, è un ornamento completo fin dal primo render. Il JS, quando c'è,
-     lo nasconde per un istante e lo ridisegna: un miglioramento sopra un
-     default già corretto, mai il contrario.
-   - prefers-reduced-motion:reduce -> resta così, tracciato completo, fermo.
-   - stroke-dashoffset non è transform/opacity in senso letterale, ma è
-     l'equivalente per l'SVG: solo compositing, nessun ricalcolo di layout
-     (non tocca box, non sposta altri elementi) — la stessa classe di costo
-     di un'animazione opacity, motivo per cui è l'unico modo corretto di
-     "disegnare una linea" senza infrangere lo spirito della regola. */
-function TraiettoriaApice() {
-  const rifPath = React.useRef(anyOf(null));
-  const rifSvg = React.useRef(anyOf(null));
+/* ---- il momento firma di "La traiettoria", esteso (giro 4) ----------------
+   Non più un tratto isolato nell'hero: UN SOLO percorso SVG continuo che
+   attraversa hero + fascia numeri + "come funziona", con i tre passaggi
+   agganciati a punti precisi lungo la curva. Un solo <svg>, non uno per
+   sezione — i "salti" fra pezzi separati sarebbero l'errore più visibile.
 
+   Architettura, in breve:
+   - PistaContinua possiede l'unico <svg> (tre copie sovrapposte dello
+     STESSO <path> — asfalto largo, bordo chiaro sotto, cordolo a strisce
+     solo vicino all'apice — così avanzano insieme per costruzione, non
+     per sincronizzazione manuale) e riceve dall'esterno i ref dei tre
+     blocchi ".passo": è l'unico punto che legge lo scroll, quindi è anche
+     l'unico punto che deve scrivere sia sull'SVG sia sui tre blocchi.
+   - Il progresso è UNA lettura dal vivo dello scroll (rAF-throttled), non
+     un'animazione a durata fissa: si scrolla, la linea avanza; si torna
+     indietro, si ritira. Stessa logica per i tre blocchi, calcolata dalla
+     LORO posizione nel viewport (non dalla lunghezza percorsa sul path:
+     più robusta, non richiede far coincidere esattamente la geometria
+     della curva con l'impaginazione reale) — la luce sul nodo segue lo
+     stesso trigger del blocco a cui appartiene, quindi restano coerenti
+     anche se il calcolo è per due vie diverse.
+   - Stato di partenza SEMPRE corretto senza JS: l'SVG è disegnato per
+     intero (nessun dasharray in JSX) e i blocchi sono nella loro
+     posizione naturale (nessun transform in JSX) — l'effect, quando può
+     partire, li porta temporaneamente allo stato "non ancora rivelato"
+     e da lì li riporta indietro seguendo lo scroll. Se prefers-reduced-
+     motion è attivo, l'effect non parte mai: resta la versione già
+     corretta e ferma vista dal primissimo render.
+   - Solo transform/opacity per i blocchi; per l'SVG, stroke-dashoffset
+     (nessun ricalcolo di layout, stessa classe di costo di opacity — vedi
+     nota nel giro precedente). Tutto scritto via ref, mai via setState:
+     un aggiornamento di stile diretto per frame, senza far ripassare
+     l'intero albero React ad ogni scroll. */
+const PISTA_PATH_D =
+  "M 10 46 C 66 18, 92 92, 54 108 C 26 122, 6 168, 26 300 " +
+  "C 42 400, 92 420, 74 470 C 58 512, 8 528, 24 610 " +
+  "C 38 660, 66 686, 50 740";
+/* cordolo: NON tacche perpendicolari calcolate punto per punto sulla
+   curva. Prima versione: getPointAtLength() + rotazione per ogni tacca —
+   corretta nello spazio del viewBox, ma il viewBox è deformato apposta
+   (preserveAspectRatio="none", per adattarsi a container di proporzioni
+   molto diverse da hero a hero) e quella deformazione non è uniforme:
+   l'angolo "giusto" nello spazio sorgente usciva storto una volta
+   stirato sullo schermo — tacche a strisce diagonali sbagliate, non
+   perpendicolari. Soluzione più robusta, dichiarata: il cordolo è lo
+   STESSO primo tratto della curva principale (stesso "d", garantisce
+   l'allineamento perfetto con l'apice) colorato a tratteggio alternato
+   rosso/bianco lungo la direzione di marcia — non incrocia la pista a
+   croce, la segue; resta leggibile come cordolo (segna un punto preciso,
+   non decora il resto del percorso) senza dipendere da una geometria che
+   la deformazione del viewBox non permette di calcolare in modo affidabile. */
+const PISTA_CORDOLO_D = "M 10 46 C 66 18, 92 92, 54 108";
+const PISTA_ANCORE = [0.42, 0.62, 0.82]; // posizione lungo il path dei 3 nodi (solo estetica: il trigger vero dei blocchi è la loro posizione reale in pagina, vedi sopra)
+
+function PistaContinua({ passoRefs, children }) {
+  const rifSvg = React.useRef(anyOf(null));
+  const rifZona = React.useRef(anyOf(null));
+  const [nodi, setNodi] = useState(anyOf([]));
+
+  // geometria dei nodi: calcolata una sola volta al mount dal <path>
+  // reale (non indovinata a mano) — restano corretti anche se la curva
+  // sopra viene ritoccata in futuro
   useEffect(() => {
-    const path = rifPath.current;
-    const contenitore = rifSvg.current;
-    if (!path || !contenitore) return;
-    if (typeof window === "undefined" || !("IntersectionObserver" in window)) return;
-    if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    let fatto = false;
-    const lunghezza = path.getTotalLength();
-    const oss = new IntersectionObserver(
-      (entries) => {
-        if (!entries[0].isIntersecting || fatto) return;
-        fatto = true;
-        oss.disconnect();
-        path.style.transition = "none";
-        path.style.strokeDasharray = `${lunghezza}`;
-        path.style.strokeDashoffset = `${lunghezza}`;
-        // forza il browser a registrare lo stato "nascosto" prima di animare
-        // verso 0, altrimenti il cambio di transition non ha un punto di
-        // partenza da cui interpolare
-        void path.getBoundingClientRect();
-        path.style.transition = "stroke-dashoffset 1.1s cubic-bezier(.2,.7,.2,1)";
-        path.style.strokeDashoffset = "0";
-      },
-      { threshold: 0.3 }
-    );
-    oss.observe(contenitore);
-    return () => oss.disconnect();
+    const svg = rifSvg.current;
+    const path = svg && svg.querySelector(".pistaLayer");
+    if (!path) return;
+    const L = path.getTotalLength();
+    setNodi(PISTA_ANCORE.map((t) => path.getPointAtLength(t * L)));
   }, []);
 
+  useEffect(() => {
+    const svg = rifSvg.current;
+    const zona = rifZona.current;
+    if (!svg || !zona) return;
+    if (typeof window === "undefined") return;
+    const riduciMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (riduciMotion) return; // resta lo stato di partenza: tutto già disegnato/in posizione
+
+    const layers = svg.querySelectorAll(".pistaLayer");
+    const cordoloEl = svg.querySelector(".pistaCordoloGruppo");
+    const nodiEl = svg.querySelectorAll(".pistaNodo");
+    const blocchi = passoRefs.map((r) => r.current).filter(Boolean);
+    if (!layers.length || !blocchi.length) return;
+
+    const L = layers[0].getTotalLength();
+    layers.forEach((l) => {
+      l.style.strokeDasharray = `${L}`;
+      l.style.strokeDashoffset = `${L}`;
+    });
+    if (cordoloEl) cordoloEl.style.opacity = "0";
+    nodiEl.forEach((n) => { n.style.opacity = ".35"; n.style.transform = "scale(.7)"; });
+
+    const larghezzaSpostamento = window.innerWidth < 640 ? 40 : 70;
+    const direzioni = [-1, 1, -1]; // 01 da sinistra, 02 da destra, 03 da sinistra
+    blocchi.forEach((b, i) => {
+      b.style.transform = `translateX(${direzioni[i] * larghezzaSpostamento}px)`;
+      b.style.opacity = "0";
+    });
+
+    let ticking = false;
+    let attivo = true;
+
+    function aggiorna() {
+      if (!attivo) return;
+      ticking = false;
+      const rect = zona.getBoundingClientRect();
+      const vh = window.innerHeight;
+      // 0 quando l'inizio della zona tocca il fondo del viewport, 1 quando
+      // la fine della zona ha superato la cima: il percorso avanza per
+      // tutta l'estensione di hero+numeri+come-funziona, reversibile
+      const progresso = Math.min(1, Math.max(0, (vh - rect.top) / (rect.height + vh)));
+      const offset = L * (1 - progresso);
+      layers.forEach((l) => { l.style.strokeDashoffset = `${offset}`; });
+      if (cordoloEl) {
+        // il cordolo copre all'incirca il primo 12% della curva (stesso
+        // "d" del primo tratto): si accende un filo dopo, quando quel
+        // tratto è già stato "raggiunto" dal disegno progressivo
+        const raggiuntoApice = progresso > 0.1;
+        cordoloEl.style.opacity = raggiuntoApice ? "1" : "0";
+      }
+
+      blocchi.forEach((b, i) => {
+        const r = b.getBoundingClientRect();
+        // rivelato quando il blocco arriva a ~85% dell'altezza del
+        // viewport, completo dopo altri ~38% di viewport scrollati:
+        // dipende da dove si trova IL BLOCCO stesso, non dalla lunghezza
+        // percorsa sulla curva — più robusto, non deve far coincidere
+        // esattamente la forma della curva con l'impaginazione reale
+        const localeGrezzo = (vh * 0.85 - r.top) / (vh * 0.38);
+        const locale = Math.min(1, Math.max(0, localeGrezzo));
+        b.style.transform = `translateX(${direzioni[i] * larghezzaSpostamento * (1 - locale)}px)`;
+        b.style.opacity = `${locale}`;
+        const nodo = nodiEl[i];
+        if (nodo) {
+          nodo.style.opacity = locale > 0.02 ? "1" : ".35";
+          nodo.style.transform = `scale(${locale > 0.02 ? 1 : 0.7})`;
+        }
+      });
+    }
+
+    function onScroll() {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(aggiorna);
+    }
+
+    aggiorna();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll);
+    return () => {
+      attivo = false;
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+    };
+  }, [passoRefs]);
+
   return (
-    <svg ref={rifSvg} className="traiettoria" viewBox="0 0 600 320" preserveAspectRatio="none"
-         aria-hidden="true" focusable="false">
-      <path ref={rifPath} d="M 8 54 C 210 8, 300 140, 250 200 C 210 244, 120 236, 96 300"
-            fill="none" stroke="var(--linea)" strokeWidth="2.5" strokeLinecap="round" />
-    </svg>
+    <div ref={rifZona} className="pistaZona">
+      <svg ref={rifSvg} className="pistaSvg" viewBox="0 0 100 760" preserveAspectRatio="none"
+           aria-hidden="true" focusable="false">
+        {/* bordo/track-limits: stroke piu' chiaro e piu' largo SOTTO,
+           l'asfalto piu' scuro e piu' stretto SOPRA lascia visibile solo
+           un margine ai due lati — parallelo per costruzione lungo
+           qualunque curva, senza calcolare un offset geometrico vero */}
+        <path className="pistaLayer pistaBordo" d={PISTA_PATH_D} fill="none" strokeLinecap="round" />
+        <path className="pistaLayer pistaAsfalto" d={PISTA_PATH_D} fill="none" strokeLinecap="round" />
+        <g className="pistaCordoloGruppo">
+          <path className="pistaCordolo" data-tinta="a" d={PISTA_CORDOLO_D} />
+          <path className="pistaCordolo" data-tinta="b" d={PISTA_CORDOLO_D} />
+        </g>
+        {/* un segmento di lunghezza zero con stroke-linecap:round e
+           non-scaling-stroke disegna un punto di diametro costante in
+           pixel reali — un <circle> col solo raggio si sarebbe deformato
+           in un'ellisse, perché il viewBox è deformato apposta
+           (preserveAspectRatio="none") per adattarsi a container di
+           proporzioni diverse */}
+        {nodi.map((n, i) => (
+          <line key={i} className="pistaNodo" x1={n.x} y1={n.y} x2={n.x} y2={n.y} vectorEffect="non-scaling-stroke" />
+        ))}
+      </svg>
+      {children}
+    </div>
   );
 }
 
 /* ---------------------------------- HOME ---------------------------------- */
 
 function Home({ vaiLogin, vaiCandidatura }) {
+  // tre ref, non tre stati: PistaContinua legge e scrive direttamente su
+  // questi nodi a ogni frame di scroll, senza passare da un re-render di
+  // Home — vedi il commento su PistaContinua per il perché
+  const passo1 = React.useRef(anyOf(null));
+  const passo2 = React.useRef(anyOf(null));
+  const passo3 = React.useRef(anyOf(null));
+  const passoRefs = anyOf([passo1, passo2, passo3]);
+
   return (
     <>
-      {/* HERO — asimmetrico apposta: il testo pesa a sinistra, il video è
-          più stretto e più basso, la traiettoria attraversa lo spazio fra
-          i due invece di lasciarlo vuoto. Non è una griglia pari spezzata
-          per stile: è la stessa idea della "corda" applicata alla pagina —
-          entra largo (badge+titolo), stringe verso l'apice (il titolo si
-          scala verso sinistra riga dopo riga, come si stringe in curva),
-          esce largo di nuovo nella fascia numeri sotto. */}
-      <section className="hero">
-        <TraiettoriaApice />
-        <div className="w herogrid">
-          <div className="heroTesto">
-            <BadgeIRacing />
-            <h1 className="h1">
-              <span className="h1riga">Trova il coach</span>
-              <span className="h1riga">che ti fa salire</span>
-              <span className="h1riga"><em>davvero.</em></span>
-            </h1>
-            <p className="lead">
-              Su CORDA ogni coach è valutato con un solo numero: l'iRating che i suoi allievi hanno
-              guadagnato dopo la prima sessione. Il dato arriva dall'account iRacing dell'allievo,
-              non da una recensione.
-            </p>
-            <div className="ctas">
-              <button className="b b-blu b-lg" onClick={() => vaiLogin("pilota")}>
-                Cerco un coach
-              </button>
-              <button className="b b-ghost b-lg" onClick={vaiCandidatura}>
-                Voglio fare coaching
-              </button>
-            </div>
-          </div>
-          <div className="heroMedia">
-            <Media id="V01" ratio="16 / 10"
-                   nota="Onboard iRacing, loop breve senza audio. È la prima cosa che si vede: meglio una staccata pulita che un montaggio." />
-          </div>
-        </div>
-      </section>
-
-      {/* NUMERI */}
-      <section className="band">
-        <div className="w">
-          <div className="bandin">
-            <div className="bcell"><b>18</b><span>coach verificati</span></div>
-            <div className="bcell"><b>+412</b><span>iR mediani per allievo</span></div>
-            <div className="bcell"><b>30 gg</b><span>tempo mediano</span></div>
-            <div className="bcell"><b>iRacing</b><span>unica piattaforma supportata</span></div>
-          </div>
-        </div>
-      </section>
-
-      {/* COME FUNZIONA */}
-      <section className="sez" id="come">
-        <div className="w">
-          <div className="sezhead">
-            <div className="eyebrow">Come funziona</div>
-            <h2 className="h2">Tre passaggi, nessuna sorpresa.</h2>
-            <p className="p">
-              Colleghi il tuo account iRacing una volta sola. Da lì in poi la piattaforma sa da dove
-              parti e misura dove arrivi.
-            </p>
-          </div>
-
-          <div className="passi">
-            <div className="passo">
-              <div className="num">01</div>
-              <h3>Dici da dove parti</h3>
-              <p>
-                Categoria, vettura, obiettivo e il tuo iRating attuale. Ti mostriamo solo i coach
-                che hanno risultati con piloti della tua fascia, non i più veloci in assoluto.
+      {/* PistaContinua avvolge hero + fascia numeri + "come funziona": UN
+         SOLO <svg> dietro alle tre sezioni, non uno per blocco — i "salti"
+         fra pezzi separati sarebbero l'errore più visibile. Dove il
+         percorso passa sotto alla fascia numeri (che ha già un fondo
+         opaco, invariata) semplicemente sparisce e riappare dopo, come
+         una pista che passa sotto un cavalcavia: nessuna modifica a
+         quella sezione. */}
+      <PistaContinua passoRefs={passoRefs}>
+        {/* HERO — asimmetrico apposta: il testo pesa a sinistra, il video è
+            più stretto e più basso, la traiettoria attraversa lo spazio fra
+            i due invece di lasciarlo vuoto. Entra largo (badge+titolo),
+            stringe verso l'apice (il cordolo, il titolo si scala riga dopo
+            riga), esce largo di nuovo nella fascia numeri sotto. */}
+        <section className="hero">
+          <div className="w herogrid">
+            <div className="heroTesto">
+              <BadgeIRacing />
+              <h1 className="h1">
+                <span className="h1riga">Trova il coach</span>
+                <span className="h1riga">che ti fa salire</span>
+                <span className="h1riga"><em>davvero.</em></span>
+              </h1>
+              <p className="lead">
+                Su CORDA ogni coach è valutato con un solo numero: l'iRating che i suoi allievi hanno
+                guadagnato dopo la prima sessione. Il dato arriva dall'account iRacing dell'allievo,
+                non da una recensione.
               </p>
-              <Media id="V02" ratio="4 / 3" nota="Schermata di ricerca coach, con i filtri che si muovono." />
+              <div className="ctas">
+                <button className="b b-blu b-lg" onClick={() => vaiLogin("pilota")}>
+                  Cerco un coach
+                </button>
+                <button className="b b-ghost b-lg" onClick={vaiCandidatura}>
+                  Voglio fare coaching
+                </button>
+              </div>
             </div>
-            <div className="passo">
-              <div className="num">02</div>
-              <h3>Guidi con il coach</h3>
-              <p>
-                Sessione da un'ora in pista insieme. Il pagamento resta in deposito fino a 24 ore
-                dopo: se il coach non si presenta, torna a te.
-              </p>
-              <Media id="V03" ratio="4 / 3" nota="Sessione live: schermo del coach con telemetria e onboard dell'allievo." />
-            </div>
-            <div className="passo">
-              <div className="num">03</div>
-              <h3>Vedi se è servito</h3>
-              <p>
-                Corri le tue gare normalmente. La piattaforma confronta la tua curva iRating con i
-                trenta giorni precedenti e dice se il lavoro ha funzionato.
-              </p>
-              <Media id="V04" ratio="4 / 3" nota="Curva iRating che sale, con il marcatore della prima sessione." />
+            <div className="heroMedia">
+              <Media id="V01" ratio="16 / 10"
+                     nota="Onboard iRacing, loop breve senza audio. È la prima cosa che si vede: meglio una staccata pulita che un montaggio." />
             </div>
           </div>
-        </div>
-      </section>
+        </section>
+
+        {/* NUMERI */}
+        <section className="band">
+          <div className="w">
+            <div className="bandin">
+              <div className="bcell"><b>18</b><span>coach verificati</span></div>
+              <div className="bcell"><b>+412</b><span>iR mediani per allievo</span></div>
+              <div className="bcell"><b>30 gg</b><span>tempo mediano</span></div>
+              <div className="bcell"><b>iRacing</b><span>unica piattaforma supportata</span></div>
+            </div>
+          </div>
+        </section>
+
+        {/* COME FUNZIONA — i tre passaggi sono in fila, non più affiancati:
+           è la sequenza in cui la traiettoria li raggiunge scendendo, non
+           un layout scelto per stile. Ognuno alterna testo/video (e il
+           lato da cui "entra" scorrendo): 01 da sinistra, 02 da destra,
+           03 da sinistra — la stessa alternanza della curva sopra. */}
+        <section className="sez" id="come">
+          <div className="w">
+            <div className="sezhead">
+              <div className="eyebrow">Come funziona</div>
+              <h2 className="h2">Tre passaggi, nessuna sorpresa.</h2>
+              <p className="p">
+                Colleghi il tuo account iRacing una volta sola. Da lì in poi la piattaforma sa da dove
+                parti e misura dove arrivi.
+              </p>
+            </div>
+
+            <div className="passi">
+              <div className="passo" ref={passo1}>
+                <div className="passoMedia">
+                  <Media id="V02" ratio="4 / 3" nota="Schermata di ricerca coach, con i filtri che si muovono." />
+                </div>
+                <div className="passoTesto">
+                  <div className="num">01</div>
+                  <h3>Dici da dove parti</h3>
+                  <p>
+                    Categoria, vettura, obiettivo e il tuo iRating attuale. Ti mostriamo solo i coach
+                    che hanno risultati con piloti della tua fascia, non i più veloci in assoluto.
+                  </p>
+                </div>
+              </div>
+              <div className="passo passoInverso" ref={passo2}>
+                <div className="passoMedia">
+                  <Media id="V03" ratio="4 / 3" nota="Sessione live: schermo del coach con telemetria e onboard dell'allievo." />
+                </div>
+                <div className="passoTesto">
+                  <div className="num">02</div>
+                  <h3>Guidi con il coach</h3>
+                  <p>
+                    Sessione da un'ora in pista insieme. Il pagamento resta in deposito fino a 24 ore
+                    dopo: se il coach non si presenta, torna a te.
+                  </p>
+                </div>
+              </div>
+              <div className="passo" ref={passo3}>
+                <div className="passoMedia">
+                  <Media id="V04" ratio="4 / 3" nota="Curva iRating che sale, con il marcatore della prima sessione." />
+                </div>
+                <div className="passoTesto">
+                  <div className="num">03</div>
+                  <h3>Vedi se è servito</h3>
+                  <p>
+                    Corri le tue gare normalmente. La piattaforma confronta la tua curva iRating con i
+                    trenta giorni precedenti e dice se il lavoro ha funzionato.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </PistaContinua>
 
       {/* IL NUMERO */}
       <section className="sez">
