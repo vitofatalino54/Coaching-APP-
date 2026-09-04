@@ -854,8 +854,14 @@ html,body{margin:0;padding:0;-webkit-text-size-adjust:100%;text-size-adjust:100%
 /* ---- app ---- */
 .appbar{border-bottom:1px solid var(--bordo);background:var(--nero2)}
 .appbarin{display:flex;align-items:center;gap:4px;height:50px;overflow-x:auto}
+/* flex:none e' necessario, non cosmetico: con nove schede (l'area coach)
+   i bottoni flex si restringono sotto il proprio contenuto e le etichette
+   si sovrappongono l'una sull'altra. Con flex:none conservano la loro
+   larghezza e la barra scorre in orizzontale, come gia' previsto da
+   overflow-x:auto qui sopra. */
 .appbarin button{background:none;border:0;border-bottom:2px solid transparent;color:var(--grigio);
-  padding:14px 12px;cursor:pointer;font-family:'Saira Condensed',sans-serif;font-weight:600;font-size:14px;white-space:nowrap}
+  padding:14px 12px;cursor:pointer;font-family:'Saira Condensed',sans-serif;font-weight:600;font-size:14px;
+  white-space:nowrap;flex:none}
 /* la scheda attiva si segnala col bianco pieno, non col rosso di marca:
    "dove sono" è uno stato dell'interfaccia, non un momento di marchio —
    tenerli separati evita che il rosso perda significato a forza di
@@ -1114,6 +1120,109 @@ html,body{margin:0;padding:0;-webkit-text-size-adjust:100%;text-size-adjust:100%
 .storicoRiga:last-child{border-bottom:0}
 @media(min-width:640px){.storicoRiga{flex-direction:row;justify-content:space-between;align-items:baseline;gap:14px}}
 
+/* ---- bersagli tap: 44px anche fuori dalla griglia dei filtri ----
+   .campo (usato da Scheda Pilota, Candidatura e da tutta l'area coach) non
+   era coperto dalla regola dei 44px, che valeva solo per .frow: su mobile i
+   suoi input restavano a 40px. .opz e' la classe di OpzioneCheck, che prima
+   era una <label> nuda: dentro .checkgrid la sua resa non cambia (quelle
+   regole sono piu' specifiche), fuori diventa un bersaglio vero invece di
+   una riga da 17px. */
+.opz{display:flex;align-items:flex-start;gap:10px;min-height:44px;padding:7px 0;cursor:pointer;
+  font-size:14px;line-height:1.5}
+.opz > input{accent-color:var(--blu2);flex:none;margin-top:4px;width:18px;height:18px}
+.opz > span{min-width:0}
+@media(max-width:640px){
+  .campo input:not([type="checkbox"]):not([type="radio"]),.campo select{min-height:44px}
+}
+
+/* ---- area coach --------------------------------------------------------
+   Regola valida per tutte le viste qui sotto: mai una <table>. Le tabelle
+   (compensi, allievi) sono la causa tipica di sfondamento orizzontale su
+   mobile — qui una "riga" è una griglia che sotto i 760px torna a una
+   colonna sola, con l'etichetta del campo (.et) accanto al valore. Sopra i
+   760px l'etichetta sparisce e ricompare la riga di intestazione. */
+.tab{margin-top:8px}
+.tabTesta{display:none;font-family:'Saira Condensed',sans-serif;font-size:11.5px;letter-spacing:.04em;
+  color:var(--grigio2);padding-bottom:8px;border-bottom:1px solid var(--bordo);gap:12px}
+.tabRiga{display:grid;grid-template-columns:1fr;gap:3px 12px;padding:13px 0;border-bottom:1px solid var(--bordo);
+  font-size:14px;align-items:baseline;min-width:0}
+.tabRiga:last-child{border-bottom:0}
+.tabRiga > span{min-width:0;overflow-wrap:anywhere}
+.tabRiga .et{display:inline;font-family:'Saira Condensed',sans-serif;font-size:11px;font-style:normal;
+  color:var(--grigio2);margin-right:8px}
+button.tabRiga{width:100%;text-align:left;background:none;border-left:0;border-right:0;border-top:0;
+  color:inherit;font:inherit;cursor:pointer;min-height:44px}
+button.tabRiga:hover{background:var(--nero2)}
+button.tabRiga:focus-visible{outline:2px solid var(--blu2);outline-offset:-2px}
+@media(min-width:760px){
+  .tabTesta{display:grid}
+  .tabRiga .et{display:none}
+  .tab3 .tabRiga,.tab3 .tabTesta{grid-template-columns:1.5fr 1fr 1.6fr}
+  .tab4 .tabRiga,.tab4 .tabTesta{grid-template-columns:1.4fr 1fr 1fr 1.1fr}
+}
+/* riga con titolo a sinistra e dato a destra, che si impila su mobile
+   invece di stringere il testo fino a spezzarlo */
+.rigaTop{display:flex;gap:14px;justify-content:space-between;align-items:flex-start;flex-wrap:wrap}
+.azioni{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px}
+.azioni .b{flex:0 1 auto}
+.subnav{display:flex;flex-wrap:wrap;gap:8px;margin:18px 0 4px}
+.subnav button{background:var(--nero);border:1px solid var(--bordo);color:var(--grigio);cursor:pointer;
+  font-family:'Saira Condensed',sans-serif;font-size:13.5px;padding:10px 14px;min-height:44px;border-radius:2px}
+.subnav button[data-on="1"]{border-color:var(--bianco);color:var(--bianco)}
+.filtriNote{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.filtriNote button{background:var(--nero);border:1px solid var(--bordo);color:var(--grigio);cursor:pointer;
+  font-family:'Saira Condensed',sans-serif;font-size:12.5px;padding:9px 12px;min-height:44px;border-radius:2px;
+  max-width:100%;overflow-wrap:anywhere;text-align:left}
+.filtriNote button[data-on="1"]{border-color:var(--blu2);color:var(--blu2);background:var(--bluSoft)}
+.campiAffiancati{display:grid;grid-template-columns:1fr;gap:0 14px}
+@media(min-width:640px){.campiAffiancati{grid-template-columns:repeat(auto-fit,minmax(150px,1fr))}}
+
+/* etichetta "Anteprima": la funzione si vede ma non è operativa. Grigia e
+   piccola apposta — deve informare, non gridare */
+.tagAnt{font-family:'Saira Condensed',sans-serif;font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;
+  border:1px solid var(--grigio2);color:var(--grigio2);padding:1px 6px;border-radius:2px;margin-left:7px;white-space:nowrap}
+.tagPiano{font-family:'Saira Condensed',sans-serif;font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;
+  border:1px solid var(--linea);color:var(--linea);padding:1px 6px;border-radius:2px;margin-left:7px;white-space:nowrap}
+.tagPiano[data-p="ultra"]{border-color:var(--distr2);color:var(--distr2)}
+
+/* agenda del coach: una colonna per giorno, scroll orizzontale SOLO dentro
+   il proprio contenitore (mai la pagina) — la griglia settimanale non entra
+   in 320px e stringerla la renderebbe intoccabile col dito */
+.agendaCoach{display:flex;gap:6px;overflow-x:auto;padding-bottom:8px;margin-top:12px;-webkit-overflow-scrolling:touch}
+.agendaCol{flex:0 0 auto;width:64px;display:flex;flex-direction:column;gap:4px}
+.agendaTesta{font-family:'Saira Condensed',sans-serif;font-size:12px;color:var(--grigio2);text-align:center;padding-bottom:4px}
+.agendaSlot{min-height:44px;border:1px solid var(--bordo);background:var(--nero);color:var(--grigio2);
+  cursor:pointer;font-family:'Saira Condensed',sans-serif;font-size:12px;border-radius:2px}
+.agendaSlot[data-stato="aperto"]{border-color:var(--blu2);background:var(--bluSoft);color:var(--blu2)}
+.agendaSlot[data-stato="occupato"]{border-color:var(--verde);background:var(--nero3);color:var(--verde)}
+.agendaSlot[data-stato="passato"]{opacity:.35;cursor:default}
+.agendaSlot:focus-visible{outline:2px solid var(--bianco);outline-offset:-2px}
+.legenda{display:flex;flex-wrap:wrap;gap:14px;margin-top:10px;font-family:'Saira Condensed',sans-serif;
+  font-size:11.5px;color:var(--grigio2)}
+.legenda i{display:inline-block;width:12px;height:12px;margin-right:6px;vertical-align:-2px;border:1px solid var(--bordo)}
+.legenda i[data-stato="aperto"]{border-color:var(--blu2);background:var(--bluSoft)}
+.legenda i[data-stato="occupato"]{border-color:var(--verde);background:var(--nero3)}
+.legenda i[data-stato="passato"]{opacity:.35}
+
+.msgRiga{display:flex;margin-bottom:8px}
+.msgRiga[data-da="coach"]{justify-content:flex-end}
+.msgBolla{max-width:min(78%,52ch);border:1px solid var(--bordo);background:var(--nero);padding:10px 12px;
+  font-size:14px;line-height:1.5;overflow-wrap:anywhere}
+.msgRiga[data-da="coach"] .msgBolla{border-color:var(--blu);background:var(--bluSoft)}
+
+.statoPag{font-family:'Saira Condensed',sans-serif;font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;
+  border:1px solid var(--bordo);color:var(--grigio2);padding:2px 7px;border-radius:2px;white-space:nowrap}
+.statoPag.maturato{border-color:var(--oro);color:var(--oro)}
+.statoPag[class~="in-liquidazione"]{border-color:var(--ambra);color:var(--ambra)}
+.statoPag.liquidato{border-color:var(--verde);color:var(--verde)}
+
+.telemetria{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-top:14px}
+.telBox{border:1px dashed var(--bordo);background:var(--nero);padding:14px;min-width:0}
+.pianiGrid{display:grid;grid-template-columns:1fr;gap:14px;margin-top:14px}
+@media(min-width:820px){.pianiGrid{grid-template-columns:repeat(3,1fr)}}
+.pianoCard{border:1px solid var(--bordo);background:var(--nero2);padding:20px;min-width:0}
+.pianoCard[data-corrente="1"]{border-color:var(--bianco)}
+
 @media (prefers-reduced-motion:reduce){.crd *{transition:none!important}}
 `;
 
@@ -1137,7 +1246,7 @@ const anyOf = (x) => x;
 // vale per ogni chiamante, presente o futuro, senza doverla ripetere.
 function OpzioneCheck({ checked, disabled = false, onChange, children }) {
   return (
-    <label>
+    <label className="opz">
       <input type="checkbox" checked={checked} disabled={disabled} onChange={onChange} />
       <span>{children}</span>
     </label>
@@ -2398,7 +2507,7 @@ function Scheda({ c, mia, miaIr, iracingCollegato, walletOre, apriAcquistoOre, a
    cosi' non serve rilevare il viewport in JS e non c'e' rischio di mismatch fra le due viste.
    La disponibilita' del coach passa TUTTA da fasciaDiOrario(): quando esistera' un calendario
    coach vero, si sostituisce quella funzione e questo componente non cambia. */
-function CalendarioAllocazione({ coach: c, walletOre, prenotazioni, fusoPilota, onConferma, chiudi, vaiPercorso }) {
+function CalendarioAllocazione({ coach: c, walletOre, prenotazioni, fusoPilota, onConferma, chiudi, vaiPercorso, disponibilita }) {
   const [dataRif, setDataRif] = useState(() => new Date());
   const [selezionati, setSelezionati] = useState(anyOf([])); // [{ giornoIso, ora }]
   const [motivo, setMotivo] = useState(""); // spiegazione mostrata al tocco di uno slot non selezionabile
@@ -2412,8 +2521,16 @@ function CalendarioAllocazione({ coach: c, walletOre, prenotazioni, fusoPilota, 
   // cosi' le due viste non possono disallinearsi fra loro
   function statoSlot(giornoJs, ora) {
     if (slotPassato(giornoJs, ora)) return "passato";
-    const fascia = fasciaDiOrario(giornoJs, ora);
-    if (!fascia || !c.fasceOrarie.includes(fascia)) return "non-disponibile";
+    // Se il coach ha una disponibilità vera (regole + slot aperti/chiusi a
+    // mano + periodo di stop, gestita dalla sua Agenda) si legge quella: è
+    // il punto che il commento in cima a fasciaDiOrario prevedeva di
+    // sostituire. Senza, si ricade sulle fasce dichiarate come prima.
+    if (disponibilita) {
+      if (!slotApertoDaRegole(disponibilita, giornoJs, ora)) return "non-disponibile";
+    } else {
+      const fascia = fasciaDiOrario(giornoJs, ora);
+      if (!fascia || !c.fasceOrarie.includes(fascia)) return "non-disponibile";
+    }
     if (slotOccupato(prenotazioni, c.id, dataIso(giornoJs), `${String(ora).padStart(2, "0")}:00`)) return "occupato";
     if (selezionati.some((s) => s.giornoIso === dataIso(giornoJs) && s.ora === ora)) return "selezionato";
     return "libero";
@@ -2422,8 +2539,12 @@ function CalendarioAllocazione({ coach: c, walletOre, prenotazioni, fusoPilota, 
   function motivoBlocco(stato, giornoJs) {
     if (stato === "passato") return "Questo slot è nel passato.";
     if (stato === "occupato") return "Slot già occupato da un'altra sessione con questo coach.";
-    if (stato === "non-disponibile")
+    if (stato === "non-disponibile") {
+      if (disponibilita && disponibilita.stop && dataIso(giornoJs) >= disponibilita.stop.da && dataIso(giornoJs) <= disponibilita.stop.a)
+        return `${c.nome} non prende prenotazioni dal ${fmtData(disponibilita.stop.da)} al ${fmtData(disponibilita.stop.a)}.`;
+      if (disponibilita) return `${c.nome} non ha aperto questo slot nella sua agenda.`;
       return `${c.nome} non è disponibile in questa fascia: le sue fasce dichiarate sono ${c.fasceOrarie.join(", ")}.`;
+    }
     return "";
   }
 
@@ -2852,9 +2973,11 @@ function Chat({ coachId, chiudi, note, setNote, messaggi: tuttiMessaggi, setMess
    il coach preferisce condurla altrove.
    Niente registrazione: fuori scope per questo giro (consenso di entrambe le
    parti, storage, obblighi GDPR aggiuntivi — si valuta a parte). */
-function StanzaSessione({ prenotazione, coach, chiudi, onTermina, vaiScheda }) {
+function StanzaSessione({ prenotazione, coach, chiudi, onTermina, vaiScheda = null, lato = "pilota", allievoNome = "" }) {
+  const daCoach = lato === "coach";
   const [terminata, setTerminata] = useState(false);
   const [confermaTermina, setConfermaTermina] = useState(false);
+  const apriScheda = anyOf(vaiScheda);
   const dataOrario = prenotazione.orario.includes("·")
     ? prenotazione.orario
     : `${fmtData(prenotazione.data)} · ${prenotazione.orario}`;
@@ -2876,22 +2999,26 @@ function StanzaSessione({ prenotazione, coach, chiudi, onTermina, vaiScheda }) {
         </div>
         <div className="blocco">
           <div className="riga"><span>Conteggio sessioni</span><b className="mn" style={{ color: "var(--blu2)" }}>aggiornato</b></div>
-          <div className="riga"><span>Richiesta di nota</span><b className="mn" style={{ color: "var(--blu2)" }}>inviata a {coach?.nome}</b></div>
+          <div className="riga"><span>Richiesta di nota</span><b className="mn" style={{ color: "var(--blu2)" }}>{daCoach ? "da scrivere" : `inviata a ${coach?.nome}`}</b></div>
           <div className="riga"><span>Richiesta di recensione</span><b className="mn" style={{ color: "var(--blu2)" }}>avviata</b></div>
         </div>
         <div style={{ margin: "20px 0 40px", display: "flex", gap: 10, flexWrap: "wrap" }}>
-          <button className="b b-blu" onClick={() => { chiudi(); vaiScheda?.(coach); }}>
-            Prenota la prossima sessione
-          </button>
-          <button className="b b-ghost" onClick={chiudi}>Torna al percorso</button>
+          {!daCoach && (
+            <button className="b b-blu" onClick={() => { chiudi(); if (apriScheda) apriScheda(coach); }}>
+              Prenota la prossima sessione
+            </button>
+          )}
+          <button className="b b-ghost" onClick={chiudi}>{daCoach ? "Torna all'area coach" : "Torna al percorso"}</button>
         </div>
       </div>
     );
 
   return (
     <div className="w">
-      <button className="indietro" onClick={chiudi}>← Torna al percorso</button>
-      <div className="stit" style={{ marginTop: 8 }}><span>Sessione con {coach?.nome}</span><span>{dataOrario}</span></div>
+      <button className="indietro" onClick={chiudi}>{daCoach ? "← Torna all'area coach" : "← Torna al percorso"}</button>
+      <div className="stit" style={{ marginTop: 8 }}>
+        <span>Sessione con {daCoach ? allievoNome : coach?.nome}</span><span>{dataOrario}</span>
+      </div>
 
       <div className="stanzaVideo">
         <div>
@@ -2906,7 +3033,7 @@ function StanzaSessione({ prenotazione, coach, chiudi, onTermina, vaiScheda }) {
       <div className="blocco" style={{ marginTop: 16 }}>
         <div className="riga"><span>Coach</span><span>{coach?.nome}</span></div>
         <div className="riga"><span>Sessione</span><span>{dataOrario}</span></div>
-        <div className="riga"><span>Pilota</span><span>{PILOTA_DEMO.nome}</span></div>
+        <div className="riga"><span>Pilota</span><span>{daCoach ? allievoNome : PILOTA_DEMO.nome}</span></div>
       </div>
 
       <p className="nota">
@@ -3254,6 +3381,10 @@ function Percorso({
   apriAcquistoOre, apriCalendario,
 }) {
   const [gareIds, setGareIds] = useState(PERCORSO.garePianificateIds);
+  // i compiti assegnati dal coach sono note con tipo "compito": si spuntano,
+  // il resto resta archivio in lettura
+  const compiti = note.filter((n) => n.tipo === "compito");
+  const archivio = note.filter((n) => n.tipo !== "compito");
   const [pickerAperto, setPickerAperto] = useState(false);
   const [ricaricaApertaPer, setRicaricaApertaPer] = useState(0); // coachId con il pannello offerte aperto, 0 = nessuno (gli id coach partono da 1)
   const [spostaAperto, setSpostaAperto] = useState(""); // id della prenotazione in modifica, "" = nessuna
@@ -3681,11 +3812,33 @@ function Percorso({
         )}
       </div>
 
-      {/* 6. note & consigli del coach — archivio in lettura */}
+      {/* 6a. compiti assegnati dal coach — spuntabili, non un archivio.
+         Sono le STESSE voci che il coach vede nella sua area (tipo:
+         "compito"): quando le spunti qui, di là risultano svolte. */}
+      <div className="stit"><span>Compiti dal coach</span><span>{compiti.filter((c) => !c.fatto).length} da fare</span></div>
+      <div className="blocco">
+        {compiti.length === 0 && <p className="nota" style={{ marginTop: 0 }}>Nessun compito assegnato.</p>}
+        {compiti.map((c) => {
+          const co = COACHES.find((x) => x.id === c.coachId);
+          return (
+            <div key={c.id} style={{ padding: "6px 0" }}>
+              <OpzioneCheck checked={!!c.fatto}
+                            onChange={() => setNote((prev) => prev.map((x) => (x.id === c.id ? { ...x, fatto: !x.fatto } : x)))}>
+                <span>{c.testo}</span>
+              </OpzioneCheck>
+              <div className="recmeta" style={{ marginTop: 4 }}>
+                <span>{co?.nome}</span><span>{fmtData(c.data)}</span>{c.pista && <span>· {c.pista}</span>}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* 6b. note & consigli del coach — archivio in lettura */}
       <div className="stit"><span>Note & consigli del coach</span></div>
       <div className="blocco" style={{ marginBottom: 40 }}>
-        {note.length === 0 && <p className="nota" style={{ marginTop: 0 }}>Ancora nessuna nota.</p>}
-        {note.map((n) => {
+        {archivio.length === 0 && <p className="nota" style={{ marginTop: 0 }}>Ancora nessuna nota.</p>}
+        {archivio.map((n) => {
           const co = COACHES.find((c) => c.id === n.coachId);
           return (
             <div className="recens" key={n.id}>
@@ -3704,69 +3857,1983 @@ function Percorso({
   );
 }
 
-/* -------------------------------- AREA COACH -------------------------------- */
+/* ==========================================================================
+   AREA COACH
+   ==========================================================================
+   Demo approfondita, pensata per essere mostrata a coach reali: dati finti ma
+   plausibili, tutto navigabile, niente backend. Regola di onestà applicata in
+   modo sistematico: ciò che oggi NON è realmente operativo porta l'etichetta
+   "Anteprima" (vedi TagAnteprima) — un coach che entra e scopre da solo che
+   una funzione non c'è non torna indietro.
 
-function AreaCoach() {
-  const allievi = [
-    { n: "L. Moretti", p: "Monza · Huracán", ir: 564, gg: 22, w: 82, s: "in regola · 19 gare" },
-    { n: "S. Danieli", p: "Spa · Ferrari 296", ir: 318, gg: 35, w: 54, s: "in regola · 11 gare" },
-    { n: "F. Curci", p: "Imola · Huracán", ir: 42, gg: 12, w: 12, s: "fermo da 9 giorni", warn: true },
-  ];
+   Cosa è davvero funzionante in questa demo (stato React, niente finzione):
+   modifica profilo, regole di disponibilità (che alimentano DAVVERO il
+   calendario lato pilota), offerte di ore, note indicizzate e ricerca, piano
+   di lavoro, compiti (che arrivano DAVVERO nel percorso del pilota), scheda
+   di preparazione, riepilogo post-sessione, chat, lista d'attesa, estratto
+   compensi e contatore fiscale.
+   Cosa è marcato "Anteprima": sincronizzazione calendario esterno, telemetria,
+   tutto ciò che dipende dall'integrazione iRacing (curva iRating, gare corse),
+   invio reale di promemoria e messaggi di gruppo, generazione di ricevute e
+   export, contatore visite del link pubblico, pagamenti e abbonamento.
+   ------------------------------------------------------------------------ */
+
+const COACH_DEMO_ID = 1; // Marco Bertolini, lo stesso coach della demo pilota
+const ANNO_DEMO = "2026"; // anno di riferimento dei dati demo
+const MESE_DEMO = "2026-08"; // mese "corrente" della demo
+
+/* ---- variabili di configurazione: una riga da cambiare, mai numeri sparsi ----
+   SOGLIA_FISCALE_EUR è la soglia oltre cui, per un compenso occasionale, in
+   Italia serve aprire la partita IVA. Il valore qui è un PROMEMORIA, non una
+   consulenza: va confermato con un commercialista prima di mostrarlo come
+   definitivo (l'avvertenza è scritta anche in pagina, accanto al contatore). */
+const SOGLIA_FISCALE_EUR = 5000;
+const AVVISO_SOGLIA_PCT = 0.7; // sopra questa quota della soglia scatta l'avviso
+const LIMITE_ALLIEVI_FREE = 5;
+const SETTIMANE_RISCHIO_ABBANDONO = 3;
+const PROMEMORIA_ORE = [24, 1]; // quanto prima avvisare l'allievo
+const COMMISSIONI_PIANO = { free: COMMISSIONE_CORDA_PCT, pro: 0.12, ultra: 0.09 };
+const PIANO_COACH_DEMO = "free"; // il piano con cui il coach della demo sta guardando
+
+const PIANI = [
+  {
+    id: "free", nome: "Free", prezzo: 0,
+    riga: `Fino a ${LIMITE_ALLIEVI_FREE} allievi attivi`,
+    funzioni: ["Profilo e pagina pubblica", "Disponibilità e slot", "Offerte di ore",
+      "Chat con gli allievi", "Stanza sessione", "Elenco allievi e note libere",
+      "Riscossione, ricevute e contatore fiscale", "Promemoria automatici agli allievi",
+      "Link pubblico condivisibile", "Storico risultati"],
+  },
+  {
+    id: "pro", nome: "Pro", prezzo: 19,
+    riga: "Allievi illimitati",
+    funzioni: ["Scheda di preparazione sessione", "Riepilogo post-sessione precompilato",
+      "Note indicizzate per argomento e circuito", "Piano di lavoro e compiti",
+      "Modelli di note riutilizzabili", "Sincronizzazione calendario esterno",
+      "Regole di disponibilità ricorrenti", "Avviso allievi a rischio abbandono",
+      "Lista d'attesa e promozioni", "Confronto progressi fra allievi",
+      "Export per il commercialista", "Supporto prioritario"],
+  },
+  {
+    id: "ultra", nome: "Ultra", prezzo: 49,
+    riga: "Per accademie e team",
+    funzioni: ["Dashboard telemetria e correlazione col percorso",
+      "Gestione multi-coach / accademia", "Ruoli staff", "Gruppi di allievi"],
+  },
+];
+
+// a quale piano appartiene una funzione: serve al segno discreto sparso
+// nell'interfaccia (mai un blocco: nella demo si prova tutto)
+const PIANO_DI = {
+  preparazione: "pro", riepilogo: "pro", noteIndicizzate: "pro", pianoLavoro: "pro",
+  modelli: "pro", sincroCalendario: "pro", regoleRicorrenti: "pro", abbandono: "pro",
+  listaAttesa: "pro", promozioni: "pro", confronto: "pro", export: "pro",
+  telemetria: "ultra", accademia: "ultra",
+};
+
+const ARGOMENTI_NOTA = ["Frenata", "Traiettorie", "Gestione gomme", "Race craft", "Setup", "Qualifica", "Passo gara"];
+
+const MODELLI_NOTA = [
+  { id: "mn1", titolo: "Trail braking — impostazione", argomento: "Frenata",
+    testo: "Rilascio del freno troppo netto in ingresso: prova a tenere 15-20 bar fino al punto di corda, poi rilascia progressivo. Riferimento visivo: cartello dei 100 m, non il cordolo." },
+  { id: "mn2", titolo: "Degrado nel terzo stint", argomento: "Gestione gomme",
+    testo: "Pressioni sopra range dopo 8 giri: parti 0.2 psi più basso a freddo e alleggerisci il primo giro dopo l'uscita dai box. Controlla le temperature interne sul settore 2." },
+  { id: "mn3", titolo: "Difesa pulita in staccata", argomento: "Race craft",
+    testo: "Scegli la traiettoria un giro prima, non in staccata. Una sola mossa difensiva, poi torna sulla linea: cambiare due volte è la causa più frequente di contatto." },
+  { id: "mn4", titolo: "Giro di qualifica", argomento: "Qualifica",
+    testo: "Out lap: due giri di preparazione gomme, non uno. Nel giro buono non cercare il tempo nel primo settore: si perde in uscita dall'ultima curva, dove il gas va aperto prima." },
+];
+
+/* ---- allievi del coach ----------------------------------------------------
+   a1 è L. Moretti, cioè LO STESSO pilota della demo lato allievo: ore residue,
+   prenotazioni, chat e compiti di questo allievo non sono un doppione, sono la
+   stessa identica sorgente di stato (vedi le props che AreaCoach riceve). */
+const ALLIEVI_COACH = [
+  {
+    id: "a1", nome: "L. Moretti", pilotaDemo: true, ir: PILOTA_DEMO.ir, licenza: PILOTA_DEMO.licenza,
+    auto: "Ferrari 296 GT3", categoria: "GT3 · coperte", obiettivo: "Trail braking e giro di qualifica",
+    lingua: "Italiano", fuso: "Europe/Rome", orari: "Feriali sera",
+    dal: "2026-08-02", ultimaSessione: "2026-08-30", sessioni: 4, oreResidueMock: 6,
+    curva: [1720, 1735, 1712, 1744, 1768, 1802, 1826, 1842], curvaStart: 3,
+    note: [
+      { id: "na1", data: "2026-08-30", argomento: "Frenata", circuito: "Monza", testo: "Prima variante: frena ancora dritta, rilascio troppo netto. Il tempo perso è tutto lì." },
+      { id: "na2", data: "2026-08-30", argomento: "Traiettorie", circuito: "Monza", testo: "Lesmo 1: entra lunga per compensare il sottosterzo invece di anticipare il rilascio." },
+      { id: "na3", data: "2026-08-23", argomento: "Gestione gomme", circuito: "Spa", testo: "Terzo stint: pressioni sopra range dopo otto giri. Partire 0.2 più bassi a freddo." },
+      { id: "na4", data: "2026-08-16", argomento: "Race craft", circuito: "Spa", testo: "Difesa a Les Combes: sceglie la traiettoria in staccata, troppo tardi. Deciderla un giro prima." },
+      { id: "na5", data: "2026-08-09", argomento: "Qualifica", circuito: "Monza", testo: "Giro secco: due decimi persi in uscita di Parabolica, apre il gas troppo tardi." },
+    ],
+    piano: {
+      obiettivo: "Passare stabilmente sopra i 2.000 iR entro fine stagione",
+      scadenza: "2026-10-31",
+      tappe: [
+        { id: "t1", testo: "Frenata pulita a Monza senza bloccaggi in prima variante", fatta: true },
+        { id: "t2", testo: "Giro di qualifica sotto 1:47.5 a Monza", fatta: false },
+        { id: "t3", testo: "Tre gare consecutive chiuse senza incidenti", fatta: false },
+      ],
+    },
+  },
+  {
+    id: "a2", nome: "S. Danieli", ir: 2410, licenza: "A 4.12", auto: "Porsche 911 GT3 R (992)",
+    categoria: "GT3 · coperte", obiettivo: "Passo gara costante sulla distanza",
+    lingua: "Italiano", fuso: "Europe/Rome", orari: "Feriali sera",
+    dal: "2026-06-14", ultimaSessione: "2026-08-26", sessioni: 9, oreResidueMock: 3,
+    curva: [2180, 2210, 2264, 2240, 2302, 2350, 2388, 2410], curvaStart: 2,
+    note: [
+      { id: "nb1", data: "2026-08-26", argomento: "Passo gara", circuito: "Spa", testo: "Buon ritmo nei primi cinque giri, poi perde sei decimi al giro: gestione gomme, non guida." },
+      { id: "nb2", data: "2026-08-12", argomento: "Gestione gomme", circuito: "Spa", testo: "Eau Rouge in pieno anche a gomme finite: va bene finché la pressione resta in range, non dopo." },
+      { id: "nb3", data: "2026-07-29", argomento: "Setup", circuito: "Monza", testo: "Ala posteriore troppo carica per Monza: prova due click in meno e riferisci in staccata." },
+    ],
+    piano: {
+      obiettivo: "Chiudere una gara di 60 minuti perdendo meno di 3 decimi al giro",
+      scadenza: "2026-09-30",
+      tappe: [
+        { id: "t1", testo: "Stint da 20 giri con delta sotto mezzo secondo", fatta: true },
+        { id: "t2", testo: "Gestione pressioni a Spa con temperatura sopra 25°", fatta: false },
+      ],
+    },
+  },
+  {
+    id: "a3", nome: "F. Curci", ir: 1180, licenza: "B 3.40", auto: "Lamborghini Huracán GT3 EVO",
+    categoria: "GT3 · coperte", obiettivo: "Chiudere le gare senza incidenti",
+    lingua: "Italiano", fuso: "Europe/Rome", orari: "Weekend giorno",
+    dal: "2026-05-03", ultimaSessione: "2026-08-09", sessioni: 6, oreResidueMock: 1,
+    curva: [1020, 1064, 1042, 1098, 1130, 1158, 1174, 1180], curvaStart: 1,
+    note: [
+      { id: "nc1", data: "2026-08-09", argomento: "Race craft", circuito: "Imola", testo: "Primo giro: entra nel gruppo senza margine. Meglio perdere due posizioni e restare in gara." },
+      { id: "nc2", data: "2026-07-19", argomento: "Traiettorie", circuito: "Imola", testo: "Acque Minerali: taglia il cordolo interno, la macchina rimbalza e perde il posteriore in uscita." },
+    ],
+    piano: {
+      obiettivo: "Tre gare consecutive senza incidenti",
+      scadenza: "2026-09-15",
+      tappe: [{ id: "t1", testo: "Primo giro conservativo, obiettivo arrivare al traguardo", fatta: false }],
+    },
+  },
+  {
+    id: "a4", nome: "A. Rinaldi", ir: 2680, licenza: "A 3.95", auto: "BMW M4 GT3 EVO",
+    categoria: "GT3 · coperte", obiettivo: "Giro secco e qualifica",
+    lingua: "Italiano", fuso: "Europe/London", orari: "Feriali sera",
+    dal: "2026-07-05", ultimaSessione: "2026-08-28", sessioni: 5, oreResidueMock: 5,
+    curva: [2480, 2512, 2496, 2548, 2590, 2624, 2662, 2680], curvaStart: 2,
+    note: [
+      { id: "nd1", data: "2026-08-28", argomento: "Qualifica", circuito: "Silverstone", testo: "Copse: perde il giro cercando il decimo dove non c'è. Il tempo sta a Stowe, in frenata." },
+      { id: "nd2", data: "2026-08-14", argomento: "Frenata", circuito: "Silverstone", testo: "Stowe: frena 15 metri prima del necessario, poi riaccelera a metà curva. Ritardare in due passaggi." },
+    ],
+    piano: {
+      obiettivo: "Entrare nella top 5 in qualifica nella propria split",
+      scadenza: "2026-10-15",
+      tappe: [{ id: "t1", testo: "Giro di riferimento a Silverstone entro 0.4 dal record personale", fatta: true }],
+    },
+  },
+  {
+    id: "a5", nome: "M. Loprete", ir: 990, licenza: "C 2.80", auto: "Ferrari 296 GT3",
+    categoria: "GT3 · coperte", obiettivo: "Fondamentali e riferimenti",
+    lingua: "Italiano", fuso: "Europe/Rome", orari: "Weekend sera",
+    dal: "2026-03-11", ultimaSessione: "2026-07-15", sessioni: 8, oreResidueMock: 0,
+    curva: [820, 856, 878, 902, 936, 958, 974, 990], curvaStart: 1,
+    note: [
+      { id: "ne1", data: "2026-07-15", argomento: "Traiettorie", circuito: "Watkins Glen", testo: "Esse: guarda il cordolo invece dell'uscita. Sposta lo sguardo avanti di due riferimenti." },
+    ],
+    piano: { obiettivo: "Passare la licenza B", scadenza: "2026-08-31", tappe: [{ id: "t1", testo: "Quattro gare consecutive con SR in crescita", fatta: true }] },
+  },
+];
+
+// sessioni future degli allievi diversi dal pilota della demo (per a1 le
+// prenotazioni vere arrivano dallo stato dell'app, non da qui)
+const SESSIONI_MOCK_COACH = [
+  { id: "cs1", allievoId: "a2", data: "2026-09-06", orario: "21:00" },
+  { id: "cs2", allievoId: "a4", data: "2026-09-07", orario: "20:00" },
+  { id: "cs3", allievoId: "a2", data: "2026-09-13", orario: "21:00" },
+];
+
+// sessioni già svolte in attesa di riepilogo (il "da fare" della dashboard)
+const SESSIONI_SENZA_RIEPILOGO = [
+  { id: "sr1", allievoId: "a2", data: "2026-08-26", orario: "21:00" },
+  { id: "sr2", allievoId: "a4", data: "2026-08-28", orario: "20:00" },
+];
+
+/* ---- compensi: una riga per sessione svolta, stato del pagamento ----------
+   I totali della dashboard e dell'estratto sono CALCOLATI da qui, non scritti
+   a mano da un'altra parte: due numeri diversi per la stessa cosa sono il
+   primo modo per perdere la fiducia di chi legge. */
+const COMPENSI_MOCK = anyOf([
+  ["2026-03-14", "a5", 37.5, "liquidato"], ["2026-03-28", "a5", 37.5, "liquidato"],
+  ["2026-04-11", "a5", 37.5, "liquidato"], ["2026-04-25", "a5", 37.5, "liquidato"],
+  ["2026-05-09", "a3", 42.5, "liquidato"], ["2026-05-23", "a3", 42.5, "liquidato"],
+  ["2026-06-06", "a3", 42.5, "liquidato"], ["2026-06-20", "a2", 40, "liquidato"],
+  ["2026-06-27", "a2", 40, "liquidato"], ["2026-07-04", "a2", 40, "liquidato"],
+  ["2026-07-11", "a4", 40, "liquidato"], ["2026-07-15", "a5", 37.5, "liquidato"],
+  ["2026-07-18", "a4", 40, "liquidato"], ["2026-07-25", "a2", 40, "liquidato"],
+  ["2026-08-09", "a3", 42.5, "liquidato"],
+  ["2026-08-09", "a1", 42.5, "liquidato"], ["2026-08-14", "a4", 40, "in-liquidazione"],
+  ["2026-08-16", "a1", 42.5, "in-liquidazione"], ["2026-08-23", "a1", 42.5, "in-liquidazione"],
+  ["2026-08-26", "a2", 40, "maturato"], ["2026-08-28", "a4", 40, "maturato"],
+  ["2026-08-30", "a1", 42.5, "maturato"],
+]).map(([data, allievoId, lordo, stato], i) => ({ id: `k${i + 1}`, data, allievoId, lordo, stato }));
+
+const STATO_COMPENSO = {
+  maturato: "Maturato", "in-liquidazione": "In liquidazione", liquidato: "Liquidato",
+};
+
+const LISTA_ATTESA = [
+  { id: "w1", nome: "G. Fabbri", ir: 1620, quando: "2026-08-28", nota: "Vuole lavorare sulla frenata. Disponibile feriali sera." },
+  { id: "w2", nome: "R. Meli", ir: 2240, quando: "2026-08-25", nota: "Arriva da un altro coach, cerca continuità sul passo gara." },
+];
+
+/* ---- disponibilità del coach ----------------------------------------------
+   Questa è la SORGENTE che alimenta il calendario di allocazione lato pilota
+   (vedi slotApertoDaRegole e la prop `disponibilita` di CalendarioAllocazione):
+   il coach la modifica qui, il pilota vede cambiare gli slot prenotabili. Non
+   è una seconda copia della disponibilità, è l'unica. */
+const DISPONIBILITA_COACH_INIZIALE = {
+  regole: [
+    { id: "r1", giorni: ["Mar", "Gio"], da: 21, a: 23, attiva: true },
+    { id: "r2", giorni: ["Sab"], da: 15, a: 19, attiva: true },
+    { id: "r3", giorni: ["Dom"], da: 18, a: 22, attiva: true },
+  ],
+  slotExtra: [],   // "2026-09-10@21" aperti a mano oltre alle regole
+  slotBloccati: [], // "2026-09-10@21" chiusi a mano nonostante le regole
+  stop: null,      // { da: "2026-09-20", a: "2026-09-30" } periodo di indisponibilità
+};
+
+const chiaveSlot = (giornoIso, ora) => `${giornoIso}@${ora}`;
+
+// un solo punto di verità su "questo slot è prenotabile?", usato sia dalla
+// vista coach sia dal calendario del pilota
+function slotApertoDaRegole(disp, giornoJs, ora) {
+  if (!disp) return false;
+  const iso = dataIso(giornoJs);
+  if (disp.stop && iso >= disp.stop.da && iso <= disp.stop.a) return false;
+  const k = chiaveSlot(iso, ora);
+  if (disp.slotBloccati.indexOf(k) !== -1) return false;
+  if (disp.slotExtra.indexOf(k) !== -1) return true;
+  const g = GIORNI_SETTIMANA[(giornoJs.getDay() + 6) % 7];
+  return disp.regole.some((r) => r.attiva && r.giorni.indexOf(g) !== -1 && ora >= r.da && ora < r.a);
+}
+
+const eur = (n) => `${n.toLocaleString("it-IT", { minimumFractionDigits: n % 1 ? 2 : 0, maximumFractionDigits: 2 })} €`;
+const nettoCoach = (lordo, piano) => lordo * (1 - COMMISSIONI_PIANO[piano]);
+const settimaneDa = (iso) => Math.floor((Date.now() - new Date(iso + "T00:00:00").getTime()) / (7 * 864e5));
+
+/* ---- etichette oneste ------------------------------------------------------
+   TagAnteprima: la funzione si vede e si naviga, ma NON è operativa. Va messa
+   ovunque ci sia un pezzo che oggi non funziona davvero — è il patto con i
+   primi coach, e vale più di qualunque schermata in più.
+   TagPiano: segno discreto di quale piano coprirebbe quella funzione. Non
+   blocca niente: nella demo si prova tutto, altrimenti non si può giudicare. */
+function TagAnteprima({ titolo = "" }) {
+  return <span className="tagAnt" title={titolo || "Funzione non ancora operativa: in questa demo è solo mostrata"}>Anteprima</span>;
+}
+
+function TagPiano({ f }) {
+  const p = PIANO_DI[f];
+  if (!p || p === PIANO_COACH_DEMO) return null;
+  return <span className="tagPiano" data-p={p} title={`Funzione del piano ${p === "pro" ? "Pro" : "Ultra"} — nella demo è sbloccata`}>{p === "pro" ? "Pro" : "Ultra"}</span>;
+}
+
+// dato verificato (arriva da iRacing/CORDA) vs dichiarazione del coach: due
+// cose diverse, e devono restare visibilmente diverse ovunque
+function Fonte({ tipo }) {
+  return tipo === "verificato"
+    ? <span className="irTag ok">Verificato</span>
+    : <span className="irTag">Dichiarato</span>;
+}
+
+function VuotoEsplicito({ children }) {
+  return <p className="nota" style={{ marginTop: 0 }}>{children}</p>;
+}
+
+/* ------------------------------ AREA COACH: shell ------------------------------ */
+
+function AreaCoach({
+  vista, setVista, note, setNote, prenotazioni, chatMessaggi, aggiornaMessaggi,
+  walletPerCoach, disponibilita, setDisponibilita, apriStanza,
+}) {
+  const coach = anyOf(COACHES.find((c) => c.id === COACH_DEMO_ID));
+
+  // stato locale dell'area coach: tutto ciò che non è già condiviso col lato
+  // pilota vive qui (le cose condivise arrivano per props e NON vengono
+  // duplicate: ore residue, prenotazioni, chat e compiti del pilota demo)
+  const [allievoId, setAllievoId] = useState("");
+  const [preparazione, setPreparazione] = useState(anyOf(null)); // sessione in preparazione
+  const [riepilogo, setRiepilogo] = useState(anyOf(null)); // sessione da riepilogare
+  const [noteAllievi, setNoteAllievi] = useState(() => {
+    const m = anyOf({});
+    ALLIEVI_COACH.forEach((a) => { m[a.id] = a.note; });
+    return m;
+  });
+  const [piani, setPiani] = useState(() => {
+    const m = anyOf({});
+    ALLIEVI_COACH.forEach((a) => { m[a.id] = a.piano; });
+    return m;
+  });
+  const [compitiAltri, setCompitiAltri] = useState(anyOf({})); // compiti degli allievi diversi dal pilota demo
+  const [riepiloghi, setRiepiloghi] = useState(anyOf({})); // { [sessioneId]: { fatto, migliorare, compito } }
+  const [obiettiviSessione, setObiettiviSessione] = useState(anyOf({})); // { [sessioneId]: testo }
+  const [profilo, setProfilo] = useState({
+    nome: coach.nome, bio: coach.bio, auto: coach.auto.join(", "),
+    lingue: "Italiano, Inglese", fuso: coach.fuso, fasciaDichiarata: coach.fasciaDichiarata,
+  });
+  const [offerte, setOfferte] = useState(() =>
+    coach.offerte.map((o, i) => ({
+      id: `o${i + 1}`, nome: ["Pacchetto prova", "Pacchetto stagione", "Percorso completo"][i] || `Pacchetto ${o.ore} ore`,
+      ore: o.ore, prezzo: o.prezzo, attiva: true,
+    })));
+  const [promo, setPromo] = useState(anyOf(null)); // { tipo, valore, fino, allievoId }
+
+  // cambiare scheda in alto deve uscire da scheda allievo / preparazione /
+  // riepilogo: senza questo, la vista di dettaglio resta aperta e i tab
+  // sembrano non rispondere (il tab cambia davvero, ma non si vede)
+  useEffect(() => { setAllievoId(""); setPreparazione(null); setRiepilogo(null); }, [vista]);
+
+  const allieviAttivi = ALLIEVI_COACH.filter((a) => settimaneDa(a.ultimaSessione) < 8);
+
+  // ore residue: per il pilota della demo è LO STESSO portafoglio del lato
+  // pilota (nessun doppione), per gli altri il mock
+  const oreDi = (a) => (a.pilotaDemo ? (walletPerCoach[COACH_DEMO_ID] || { disponibili: 0 }).disponibili : a.oreResidueMock);
+
+  // compiti: per il pilota della demo sono le note dell'app (le stesse che
+  // lui vede e spunta nel suo percorso), per gli altri stato locale
+  const compitiDi = (a) => (a.pilotaDemo
+    ? note.filter((n) => n.coachId === COACH_DEMO_ID && n.tipo === "compito")
+    : (compitiAltri[a.id] || []));
+
+  const assegnaCompito = (a, testo, pista) => {
+    const nuovo = {
+      id: `cp-${Date.now()}`, coachId: COACH_DEMO_ID, data: dataIso(new Date()),
+      pista: pista || null, origine: "coach", tipo: "compito", testo, fatto: false,
+    };
+    if (a.pilotaDemo) setNote((prev) => [nuovo, ...prev]);
+    else setCompitiAltri((prev) => ({ ...prev, [a.id]: [nuovo, ...(prev[a.id] || [])] }));
+  };
+
+  const aggiungiNota = (a, nota) =>
+    setNoteAllievi((prev) => ({ ...prev, [a.id]: [{ ...nota, id: `n-${Date.now()}` }, ...(prev[a.id] || [])] }));
+
+  // prossime sessioni: quelle del pilota demo sono le prenotazioni VERE
+  // dell'app (se lui cancella, spariscono anche qui), le altre sono mock
+  const prossime = anyOf([]);
+  prenotazioni
+    .filter((p) => p.coachId === COACH_DEMO_ID && p.stato === "allocata")
+    .forEach((p) => prossime.push({ id: p.id, allievoId: "a1", data: p.data, orario: p.orario, reale: true }));
+  SESSIONI_MOCK_COACH.forEach((s) => prossime.push({ ...s, reale: false }));
+  prossime.sort((x, y) => (x.data + x.orario < y.data + y.orario ? -1 : 1));
+
+  const senzaRiepilogo = SESSIONI_SENZA_RIEPILOGO.filter((s) => !riepiloghi[s.id]);
+  const compitiNonVerificati = ALLIEVI_COACH.reduce((n, a) => n + compitiDi(a).filter((c) => !c.fatto).length, 0);
+  const aRischio = ALLIEVI_COACH.filter((a) => settimaneDa(a.ultimaSessione) >= SETTIMANE_RISCHIO_ABBANDONO && settimaneDa(a.ultimaSessione) < 12);
+
+  const compensiAnno = COMPENSI_MOCK.filter((k) => k.data.slice(0, 4) === ANNO_DEMO);
+  const totaleAnno = compensiAnno.reduce((s, k) => s + k.lordo, 0);
+  const nettoAnno = nettoCoach(totaleAnno, PIANO_COACH_DEMO);
+  const meseCorrente = MESE_DEMO;
+  const maturatoMese = compensiAnno.filter((k) => k.data.slice(0, 7) === meseCorrente).reduce((s, k) => s + k.lordo, 0);
+  const inAttesa = compensiAnno.filter((k) => k.stato !== "liquidato").reduce((s, k) => s + k.lordo, 0);
+  // quota del mese in corso ANCORA da liquidare: "maturato nel mese" comprende
+  // anche sessioni gia' pagate, quindi non e' un sottoinsieme di "in attesa" —
+  // due numeri che si contraddicono in pagina valgono meno di nessun numero
+  const inAttesaMese = compensiAnno
+    .filter((k) => k.data.slice(0, 7) === meseCorrente && k.stato !== "liquidato")
+    .reduce((s, k) => s + k.lordo, 0);
+
+  const allievo = ALLIEVI_COACH.find((a) => a.id === allievoId);
+  const nomeAllievo = (id) => (ALLIEVI_COACH.find((a) => a.id === id) || { nome: "—" }).nome;
+
+  const comune = {
+    coach, allievi: ALLIEVI_COACH, allieviAttivi, oreDi, compitiDi, assegnaCompito, aggiungiNota,
+    noteAllievi, piani, setPiani, prossime, senzaRiepilogo, riepiloghi, setRiepiloghi,
+    obiettiviSessione, setObiettiviSessione, aRischio, nomeAllievo, apriAllievo: setAllievoId,
+    setPreparazione, setRiepilogo, apriStanza, compensiAnno, totaleAnno, nettoAnno, maturatoMese,
+    inAttesa, inAttesaMese, compitiNonVerificati, note, setNote,
+  };
+
+  if (preparazione)
+    return <CoachPreparazione s={preparazione} {...comune} chiudi={() => setPreparazione(null)} />;
+  if (riepilogo)
+    return <CoachRiepilogo s={riepilogo} {...comune} chiudi={() => setRiepilogo(null)} />;
+  if (allievo)
+    return <CoachAllievo a={allievo} {...comune} chiudi={() => setAllievoId("")} />;
+
+  return (
+    <>
+      {vista === "oggi" && <CoachOggi {...comune} />}
+      {vista === "allievi" && <CoachAllievi {...comune} />}
+      {vista === "agenda" && <CoachAgenda disponibilita={disponibilita} setDisponibilita={setDisponibilita} prossime={prossime} nomeAllievo={nomeAllievo} />}
+      {vista === "offerte" && <CoachOfferte offerte={offerte} setOfferte={setOfferte} promo={promo} setPromo={setPromo} allievi={ALLIEVI_COACH} />}
+      {vista === "profilo" && <CoachProfilo coach={coach} profilo={profilo} setProfilo={setProfilo} />}
+      {vista === "messaggi" && <CoachMessaggi allievi={ALLIEVI_COACH} allieviAttivi={allieviAttivi} chatMessaggi={chatMessaggi} aggiornaMessaggi={aggiornaMessaggi} />}
+      {vista === "compensi" && <CoachCompensi {...comune} />}
+      {vista === "risultati" && <CoachRisultati {...comune} />}
+      {vista === "piani" && <CoachPiani />}
+    </>
+  );
+}
+
+/* -------------------------------- 1. DASHBOARD -------------------------------- */
+
+function CoachOggi({
+  coach, allieviAttivi, oreDi, prossime, senzaRiepilogo, aRischio, nomeAllievo,
+  apriAllievo, setPreparazione, setRiepilogo, apriStanza, maturatoMese, inAttesa, inAttesaMese,
+  totaleAnno, nettoAnno, compitiNonVerificati,
+}) {
+  const vicinoSoglia = totaleAnno >= SOGLIA_FISCALE_EUR * AVVISO_SOGLIA_PCT;
+  const oltreLimiteFree = allieviAttivi.length > LIMITE_ALLIEVI_FREE;
+
   return (
     <div className="w">
-      <div className="stit" style={{ marginTop: 26 }}><span>Il tuo punteggio</span><span>agg. 6 ore fa</span></div>
-      <div className="kpigrid">
-        <div className="kbox">
-          <div className="klab">Mediana allievi</div>
-          <div className="kval" style={{ color: "var(--blu2)" }}>+412 iR</div>
-          <div className="ccsm" style={{ marginTop: 6 }}>in 30 giorni · 14 allievi tracciati</div>
-        </div>
-        <div className="kbox">
-          <div className="klab">Incassato in agosto</div>
-          <div className="kval">1.147 €</div>
-          <div className="ccsm" style={{ marginTop: 6 }}>su 1.350 € lordi · 27 sessioni</div>
-        </div>
+      <div className="stit" style={{ marginTop: 26 }}>
+        <span>Prossime sessioni</span><span>{prossime.length} in programma</span>
       </div>
-
-      <div className="avviso" style={{ marginTop: 20 }}>
-        Un allievo non corre da 9 giorni. Sotto le otto gare mensili esce dal conteggio e il tuo
-        punteggio scende senza che tu abbia sbagliato niente.
-      </div>
-
-      <div className="stit"><span>I tuoi allievi</span></div>
-      {allievi.map((a) => (
-        <div key={a.n} style={{ marginBottom: 16 }}>
-          <div className="riga" style={{ borderBottom: 0, paddingBottom: 6 }}>
-            <span>{a.n} <span className="nn">· {a.p}</span></span>
-            <b className="mn" style={{ color: a.warn ? "var(--rosso2)" : "var(--blu2)" }}>+{a.ir} iR / {a.gg} gg</b>
+      {prossime.length === 0 && (
+        <div className="blocco"><VuotoEsplicito>Nessuna sessione prenotata. Gli allievi prenotano dagli slot che apri in Agenda.</VuotoEsplicito></div>
+      )}
+      {prossime.slice(0, 4).map((s) => (
+        <div className="blocco" key={s.id} style={{ marginBottom: 10 }}>
+          <div className="rigaTop">
+            <div style={{ minWidth: 0 }}>
+              <b style={{ fontSize: 16 }}>{nomeAllievo(s.allievoId)}</b>
+              <div className="ccsm" style={{ marginTop: 4 }}>
+                {fmtData(s.data)} · {s.orario} · {(ALLIEVI_COACH.find((a) => a.id === s.allievoId) || {}).auto}
+              </div>
+            </div>
+            <span className="mn" style={{ color: "var(--blu2)", whiteSpace: "nowrap" }}>1 ora</span>
           </div>
-          <div style={{ height: 6, background: "var(--nero3)" }}>
-            <i style={{ display: "block", height: "100%", width: a.w + "%", background: a.warn ? "var(--rosso2)" : "var(--blu)" }} />
+          <div className="azioni">
+            <button className="b b-blu" onClick={() => apriStanza(s)}>Apri la stanza</button>
+            <button className="b b-ghost" onClick={() => setPreparazione(s)}>
+              Scheda di preparazione <TagPiano f="preparazione" />
+            </button>
+            <button className="b b-ghost" onClick={() => apriAllievo(s.allievoId)}>Vedi l'allievo</button>
           </div>
-          <div className="ccsm" style={{ marginTop: 6, color: a.warn ? "var(--rosso2)" : undefined }}>{a.s}</div>
         </div>
       ))}
 
-      <div className="stit"><span>Dove sei forte</span></div>
+      <div className="stit"><span>Da fare</span></div>
       <div className="blocco">
-        <div className="riga"><span>Sotto 1.5k</span><b className="mn" style={{ color: "var(--blu2)" }}>+520 iR · 4 allievi</b></div>
-        <div className="riga"><span>1.5k – 2.5k</span><b className="mn" style={{ color: "var(--blu2)" }}>+470 iR · 6 allievi</b></div>
-        <div className="riga"><span>2.5k – 4k</span><b className="mn" style={{ color: "var(--blu2)" }}>+210 iR · 3 allievi</b></div>
-        <div className="riga"><span>Sopra 4k</span><span className="nn">1 allievo · non mostrato</span></div>
+        <div className="riga">
+          <span>Sessioni senza riepilogo</span>
+          <b className="mn" style={{ color: senzaRiepilogo.length ? "var(--ambra)" : "var(--grigio2)" }}>{senzaRiepilogo.length}</b>
+        </div>
+        {senzaRiepilogo.map((s) => (
+          <div className="riga" key={s.id}>
+            <span className="nn">{nomeAllievo(s.allievoId)} · {fmtData(s.data)}</span>
+            <button className="apri" onClick={() => setRiepilogo(s)}>Scrivi il riepilogo →</button>
+          </div>
+        ))}
+        <div className="riga">
+          <span>Richieste in attesa <span className="nn">· lista d'attesa</span></span>
+          <b className="mn">{LISTA_ATTESA.length}</b>
+        </div>
+        <div className="riga">
+          <span>Compiti non ancora verificati</span>
+          <b className="mn">{compitiNonVerificati}</b>
+        </div>
+      </div>
+
+      <div className="stit"><span>Allievi attivi</span><span>{allieviAttivi.length} allievi</span></div>
+      <div className="tab tab4">
+        <div className="tabTesta">
+          <span>Allievo</span><span>Ore residue</span><span>Ultima sessione</span><span>Prossima</span>
+        </div>
+        {allieviAttivi.map((a) => {
+          const p = prossime.find((s) => s.allievoId === a.id);
+          return (
+            <button className="tabRiga cliccabile" key={a.id} onClick={() => apriAllievo(a.id)}>
+              <span><b>{a.nome}</b> <span className="nn">· {a.ir} iR</span></span>
+              <span><i className="et">Ore residue</i>{oreDi(a)} {oreDi(a) === 1 ? "ora" : "ore"}</span>
+              <span><i className="et">Ultima sessione</i>{fmtData(a.ultimaSessione)}</span>
+              <span><i className="et">Prossima</i>{p ? `${fmtData(p.data)} · ${p.orario}` : "—"}</span>
+            </button>
+          );
+        })}
+      </div>
+
+      <div className="stit"><span>Compensi</span><span>agosto {ANNO_DEMO}</span></div>
+      <div className="kpigrid">
+        <div className="kbox">
+          <div className="klab">Maturato nel mese</div>
+          <div className="kval">{eur(maturatoMese)}</div>
+          <div className="ccsm" style={{ marginTop: 6 }}>
+            lordo · netto stimato {eur(nettoCoach(maturatoMese, PIANO_COACH_DEMO))} con commissione {Math.round(COMMISSIONI_PIANO[PIANO_COACH_DEMO] * 100)}%
+          </div>
+        </div>
+        <div className="kbox">
+          <div className="klab">In attesa di liquidazione</div>
+          <div className="kval">{eur(inAttesa)}</div>
+          <div className="ccsm" style={{ marginTop: 6 }}>di cui {eur(inAttesaMese)} maturati questo mese</div>
+        </div>
+        <div className="kbox">
+          <div className="klab">Totale {ANNO_DEMO}</div>
+          <div className="kval">{eur(totaleAnno)}</div>
+          <div className="ccsm" style={{ marginTop: 6 }}>netto stimato {eur(nettoAnno)}</div>
+        </div>
+        <div className="kbox">
+          <div className="klab">Soglia fiscale</div>
+          <div className="kval" style={{ color: vicinoSoglia ? "var(--ambra)" : "var(--bianco)" }}>
+            {Math.round((totaleAnno / SOGLIA_FISCALE_EUR) * 100)}%
+          </div>
+          <div className="ccsm" style={{ marginTop: 6 }}>di {eur(SOGLIA_FISCALE_EUR)} — valore da confermare</div>
+        </div>
+      </div>
+
+      {(aRischio.length > 0 || vicinoSoglia || oltreLimiteFree) && (
+        <>
+          <div className="stit"><span>Avvisi</span></div>
+          {aRischio.map((a) => (
+            <div className="notaBox ambra" key={a.id}>
+              <p>
+                <b>{a.nome} non prenota da {settimaneDa(a.ultimaSessione)} settimane.</b>{" "}
+                Ultima sessione il {fmtData(a.ultimaSessione)}, gli restano {oreDi(a)} {oreDi(a) === 1 ? "ora" : "ore"}.
+                Un messaggio ora costa meno che riconquistarlo dopo. <TagPiano f="abbandono" />
+              </p>
+              <div className="azioni">
+                <button className="b b-ghost" onClick={() => apriAllievo(a.id)}>Apri la scheda</button>
+              </div>
+            </div>
+          ))}
+          {vicinoSoglia && (
+            <div className="notaBox ambra">
+              <p>
+                <b>Hai superato il {Math.round(AVVISO_SOGLIA_PCT * 100)}% della soglia di {eur(SOGLIA_FISCALE_EUR)}.</b>{" "}
+                Promemoria informativo, non consulenza fiscale: oltre quella cifra la prestazione occasionale
+                non basta più e serve la partita IVA. Il valore esatto va confermato con il tuo commercialista.
+              </p>
+            </div>
+          )}
+          {oltreLimiteFree && (
+            <div className="notaBox">
+              <p>
+                Hai {allieviAttivi.length} allievi attivi: il piano Free ne prevede {LIMITE_ALLIEVI_FREE}.
+                In questa demo non è bloccato nulla. <TagPiano f="pianoLavoro" />
+              </p>
+            </div>
+          )}
+        </>
+      )}
+      <div style={{ height: 40 }} />
+    </div>
+  );
+}
+
+/* ------------------------------- 5. ALLIEVI ------------------------------- */
+
+function CoachAllievi({ allievi, oreDi, prossime, compitiDi, apriAllievo, nomeAllievo }) {
+  const [cerca, setCerca] = useState("");
+  const q = cerca.trim().toLowerCase();
+  const lista = q
+    ? allievi.filter((a) => (a.nome + a.auto + a.obiettivo).toLowerCase().indexOf(q) !== -1)
+    : allievi;
+
+  return (
+    <div className="w">
+      <div className="stit" style={{ marginTop: 26 }}>
+        <span>I tuoi allievi</span><span>{allievi.length} in totale</span>
+      </div>
+      <div className="campo">
+        <label htmlFor="cercaAllievo">Cerca per nome, vettura o obiettivo</label>
+        <input id="cercaAllievo" value={cerca} onChange={(e) => setCerca(e.target.value)} placeholder="es. Moretti, Ferrari, frenata" />
+      </div>
+
+      {lista.length === 0 && <div className="blocco"><VuotoEsplicito>Nessun allievo corrisponde alla ricerca.</VuotoEsplicito></div>}
+
+      <div className="lista">
+        {lista.map((a) => {
+          const p = prossime.find((s) => s.allievoId === a.id);
+          const sett = settimaneDa(a.ultimaSessione);
+          const rischio = sett >= SETTIMANE_RISCHIO_ABBANDONO;
+          const compiti = compitiDi(a);
+          return (
+            <button className="cc" key={a.id} onClick={() => apriAllievo(a.id)}>
+              <div className="cctop">
+                <div className="avat">{a.nome.split(" ").map((x) => x[0]).join("")}</div>
+                <div style={{ minWidth: 0 }}>
+                  <div className="ccnome">{a.nome}</div>
+                  <div className="ccsub">{a.ir} iR · {a.auto}</div>
+                </div>
+              </div>
+              <div className="ccmetr">
+                <div>
+                  <div className="ccbig">{oreDi(a)}</div>
+                  <div className="ccsm">ore residue con te</div>
+                </div>
+                <div className="ccsm" style={{ marginLeft: "auto", textAlign: "right" }}>
+                  Ultima: {fmtData(a.ultimaSessione)}<br />
+                  Prossima: {p ? `${fmtData(p.data)} · ${p.orario}` : "non prenotata"}
+                </div>
+              </div>
+              <div className="chips">
+                <span className="chip">{a.obiettivo}</span>
+                {compiti.filter((c) => !c.fatto).length > 0 && (
+                  <span className="chip">{compiti.filter((c) => !c.fatto).length} compiti aperti</span>
+                )}
+                {rischio && <span className="chip p">fermo da {sett} settimane</span>}
+              </div>
+            </button>
+          );
+        })}
+      </div>
+      <div style={{ height: 20 }} />
+    </div>
+  );
+}
+
+/* ---- scheda allievo: la memoria del percorso ------------------------------
+   Il punto non è "una pagina per allievo": è che ritrovare cosa gli avevo
+   detto su Spa deve costare secondi, non una risalita nella chat. Per questo
+   le note hanno argomento + circuito e una ricerca libera sopra. */
+function CoachAllievo({
+  a, chiudi, oreDi, noteAllievi, aggiungiNota, piani, setPiani, compitiDi, assegnaCompito,
+  prossime, setPreparazione, setRiepilogo, apriStanza, compensiAnno, note, setNote,
+}) {
+  const [sezione, setSezione] = useState("percorso"); // percorso | note | piano | andamento
+  const [cerca, setCerca] = useState("");
+  const [filtroArg, setFiltroArg] = useState("");
+  const [filtroPista, setFiltroPista] = useState("");
+  const [bozzaNota, setBozzaNota] = useState({ argomento: ARGOMENTI_NOTA[0], circuito: "", testo: "" });
+  const [bozzaCompito, setBozzaCompito] = useState("");
+
+  const noteA = noteAllievi[a.id] || [];
+  const piano = piani[a.id];
+  const compiti = compitiDi(a);
+  const prossima = prossime.find((s) => s.allievoId === a.id);
+  const piste = noteA.map((n) => n.circuito).filter((v, i, arr) => v && arr.indexOf(v) === i);
+  const sessioniPagate = compensiAnno.filter((k) => k.allievoId === a.id);
+
+  const q = cerca.trim().toLowerCase();
+  const noteFiltrate = noteA.filter((n) =>
+    (!filtroArg || n.argomento === filtroArg) &&
+    (!filtroPista || n.circuito === filtroPista) &&
+    (!q || (n.testo + n.argomento + (n.circuito || "")).toLowerCase().indexOf(q) !== -1));
+
+  const salvaNota = () => {
+    const t = bozzaNota.testo.trim();
+    if (!t) return;
+    aggiungiNota(a, { data: dataIso(new Date()), argomento: bozzaNota.argomento, circuito: bozzaNota.circuito.trim() || null, testo: t });
+    setBozzaNota({ argomento: bozzaNota.argomento, circuito: bozzaNota.circuito, testo: "" });
+  };
+
+  const salvaCompito = () => {
+    const t = bozzaCompito.trim();
+    if (!t) return;
+    assegnaCompito(a, t, null);
+    setBozzaCompito("");
+  };
+
+  const togglaTappa = (id) =>
+    setPiani((prev) => ({
+      ...prev,
+      [a.id]: { ...prev[a.id], tappe: prev[a.id].tappe.map((t) => (t.id === id ? { ...t, fatta: !t.fatta } : t)) },
+    }));
+
+  // il coach può segnare un compito come verificato: se l'allievo è il pilota
+  // della demo, la spunta è LA STESSA che lui vede nel suo percorso
+  const verificaCompito = (c) => {
+    if (a.pilotaDemo) setNote((prev) => prev.map((n) => (n.id === c.id ? { ...n, fatto: !n.fatto } : n)));
+  };
+
+  return (
+    <div className="w">
+      <button className="indietro" onClick={chiudi}>← Torna agli allievi</button>
+
+      <div className="rigaTop" style={{ marginTop: 6 }}>
+        <div style={{ minWidth: 0 }}>
+          <h2 style={{ fontSize: 26 }}>{a.nome}</h2>
+          <div className="ccsm" style={{ marginTop: 6 }}>
+            {a.ir} iR <Fonte tipo="verificato" /> · licenza {a.licenza} · dal {fmtData(a.dal)}
+          </div>
+        </div>
+        <div style={{ textAlign: "right", flex: "none" }}>
+          <div className="ccbig">{oreDi(a)}</div>
+          <div className="ccsm">ore residue con te</div>
+        </div>
+      </div>
+
+      <div className="azioni" style={{ marginTop: 14 }}>
+        {prossima && <button className="b b-blu" onClick={() => setPreparazione(prossima)}>Scheda di preparazione <TagPiano f="preparazione" /></button>}
+        {prossima && <button className="b b-ghost" onClick={() => apriStanza(prossima)}>Apri la stanza</button>}
+        <button className="b b-ghost" onClick={() => setRiepilogo({ id: `libero-${a.id}`, allievoId: a.id, data: dataIso(new Date()), orario: "—" })}>
+          Scrivi un riepilogo
+        </button>
+      </div>
+
+      <div className="subnav">
+        {[["percorso", "Percorso"], ["note", "Note"], ["piano", "Piano e compiti"], ["andamento", "Andamento"]].map(([k, l]) => (
+          <button key={k} data-on={sezione === k ? "1" : "0"} onClick={() => setSezione(k)}>{l}</button>
+        ))}
+      </div>
+
+      {sezione === "percorso" && (
+        <>
+          <div className="stit"><span>Chi è</span><span>dalla Scheda Pilota</span></div>
+          <div className="blocco">
+            <div className="riga"><span>Obiettivo dichiarato</span><span>{a.obiettivo} <Fonte tipo="dichiarato" /></span></div>
+            <div className="riga"><span>Vettura e categoria</span><span>{a.auto} · {a.categoria}</span></div>
+            <div className="riga"><span>iRating</span><span>{a.ir} iR <Fonte tipo="verificato" /></span></div>
+            <div className="riga"><span>Licenza</span><span>{a.licenza} <Fonte tipo="verificato" /></span></div>
+            <div className="riga"><span>Lingua e fuso</span><span>{a.lingua} · {a.fuso}</span></div>
+            <div className="riga"><span>Quando può</span><span>{a.orari} <Fonte tipo="dichiarato" /></span></div>
+            <p className="nota">
+              Questi dati non li scrivi tu: arrivano dalla Scheda Pilota che l'allievo compila una
+              volta sola. Quello che aggiungi tu è tutto il resto di questa pagina.
+            </p>
+          </div>
+
+          <div className="stit"><span>Storico sessioni</span><span>{a.sessioni} svolte</span></div>
+          <div className="tab tab3">
+            <div className="tabTesta"><span>Data</span><span>Argomento</span><span>Nota</span></div>
+            {noteA.length === 0 && <VuotoEsplicito>Nessuna sessione registrata con nota.</VuotoEsplicito>}
+            {noteA.slice(0, 6).map((n) => (
+              <div className="tabRiga" key={n.id}>
+                <span><i className="et">Data</i>{fmtData(n.data)}</span>
+                <span><i className="et">Argomento</i>{n.argomento}{n.circuito ? ` · ${n.circuito}` : ""}</span>
+                <span><i className="et">Nota</i>{n.testo}</span>
+              </div>
+            ))}
+          </div>
+          {sessioniPagate.length > 0 && (
+            <p className="nota">
+              {sessioniPagate.length} sessioni pagate quest'anno da questo allievo, per {eur(sessioniPagate.reduce((s, k) => s + k.lordo, 0))} lordi.
+            </p>
+          )}
+        </>
+      )}
+
+      {sezione === "note" && (
+        <>
+          <div className="stit">
+            <span>Note indicizzate <TagPiano f="noteIndicizzate" /></span><span>{noteA.length} note</span>
+          </div>
+          <div className="campo">
+            <label htmlFor="cercaNote">Cerca dentro le note</label>
+            <input id="cercaNote" value={cerca} onChange={(e) => setCerca(e.target.value)} placeholder='es. "gomme", "Spa", "staccata"' />
+          </div>
+          <div className="filtriNote">
+            <button data-on={filtroArg === "" ? "1" : "0"} onClick={() => setFiltroArg("")}>Tutti gli argomenti</button>
+            {ARGOMENTI_NOTA.filter((x) => noteA.some((n) => n.argomento === x)).map((x) => (
+              <button key={x} data-on={filtroArg === x ? "1" : "0"} onClick={() => setFiltroArg(filtroArg === x ? "" : x)}>{x}</button>
+            ))}
+          </div>
+          {piste.length > 0 && (
+            <div className="filtriNote">
+              <button data-on={filtroPista === "" ? "1" : "0"} onClick={() => setFiltroPista("")}>Tutti i circuiti</button>
+              {piste.map((p) => (
+                <button key={p} data-on={filtroPista === p ? "1" : "0"} onClick={() => setFiltroPista(filtroPista === p ? "" : p)}>{p}</button>
+              ))}
+            </div>
+          )}
+
+          <div className="blocco" style={{ marginTop: 14 }}>
+            {noteFiltrate.length === 0 && <VuotoEsplicito>Nessuna nota con questi filtri.</VuotoEsplicito>}
+            {noteFiltrate.map((n) => (
+              <div className="recens" key={n.id}>
+                <div className="recmeta">
+                  <span>{fmtData(n.data)}</span>
+                  <span className="origineTag coach">{n.argomento}</span>
+                  {n.circuito && <span className="origineTag">{n.circuito}</span>}
+                </div>
+                <p>{n.testo}</p>
+              </div>
+            ))}
+          </div>
+
+          <div className="stit"><span>Aggiungi una nota</span></div>
+          <div className="blocco">
+            <div className="campo">
+              <label htmlFor="argNota">Argomento</label>
+              <select id="argNota" value={bozzaNota.argomento} onChange={(e) => setBozzaNota({ ...bozzaNota, argomento: e.target.value })}>
+                {ARGOMENTI_NOTA.map((x) => <option key={x} value={x}>{x}</option>)}
+              </select>
+            </div>
+            <div className="campo">
+              <label htmlFor="pistaNota">Circuito (facoltativo)</label>
+              <input id="pistaNota" value={bozzaNota.circuito} onChange={(e) => setBozzaNota({ ...bozzaNota, circuito: e.target.value })} placeholder="es. Monza" />
+            </div>
+            <div className="campo">
+              <label htmlFor="testoNota">Nota</label>
+              <textarea id="testoNota" value={bozzaNota.testo} onChange={(e) => setBozzaNota({ ...bozzaNota, testo: e.target.value })} placeholder="Cosa hai visto, cosa deve provare." />
+            </div>
+            <div className="stit" style={{ marginTop: 0 }}><span>Modelli riutilizzabili <TagPiano f="modelli" /></span></div>
+            <div className="filtriNote">
+              {MODELLI_NOTA.map((m) => (
+                <button key={m.id} onClick={() => setBozzaNota({ argomento: m.argomento, circuito: bozzaNota.circuito, testo: m.testo })}>
+                  {m.titolo}
+                </button>
+              ))}
+            </div>
+            <div className="azioni">
+              <button className="b b-blu" onClick={salvaNota} disabled={!bozzaNota.testo.trim()}>Salva la nota</button>
+            </div>
+          </div>
+        </>
+      )}
+
+      {sezione === "piano" && (
+        <>
+          <div className="stit"><span>Piano di lavoro <TagPiano f="pianoLavoro" /></span><span>scadenza {fmtData(piano.scadenza)}</span></div>
+          <div className="blocco">
+            <p style={{ fontSize: 15, lineHeight: 1.6 }}><b>{piano.obiettivo}</b></p>
+            <div style={{ marginTop: 12 }}>
+              {piano.tappe.map((t) => (
+                <OpzioneCheck key={t.id} checked={t.fatta} onChange={() => togglaTappa(t.id)}>
+                  <span>{t.testo}</span>
+                </OpzioneCheck>
+              ))}
+            </div>
+          </div>
+
+          <div className="stit">
+            <span>Compiti fra una sessione e l'altra</span>
+            <span>{compiti.filter((c) => !c.fatto).length} aperti</span>
+          </div>
+          <div className="blocco">
+            {compiti.length === 0 && <VuotoEsplicito>Nessun compito assegnato.</VuotoEsplicito>}
+            {compiti.map((c) => (
+              <div className="riga" key={c.id}>
+                <span style={{ minWidth: 0 }}>{c.testo}</span>
+                {a.pilotaDemo ? (
+                  <button className="apri" style={{ whiteSpace: "nowrap" }} onClick={() => verificaCompito(c)}>
+                    {c.fatto ? "✓ svolto" : "non ancora svolto"}
+                  </button>
+                ) : (
+                  <span className="nn" style={{ whiteSpace: "nowrap" }}>{c.fatto ? "svolto" : "in attesa"}</span>
+                )}
+              </div>
+            ))}
+            <div className="campo" style={{ marginTop: 14 }}>
+              <label htmlFor="nuovoCompito">Assegna un compito</label>
+              <input id="nuovoCompito" value={bozzaCompito} onChange={(e) => setBozzaCompito(e.target.value)}
+                     placeholder="es. Dieci giri a Monza concentrandoti solo sul rilascio del freno" />
+            </div>
+            <div className="azioni">
+              <button className="b b-blu" onClick={salvaCompito} disabled={!bozzaCompito.trim()}>Assegna</button>
+            </div>
+            {a.pilotaDemo && (
+              <p className="nota">
+                Questo compito compare davvero nel percorso di {a.nome}, come voce spuntabile: è lo
+                stesso elenco, non una copia. Quando lo spunta, qui lo vedi segnato.
+              </p>
+            )}
+          </div>
+        </>
+      )}
+
+      {sezione === "andamento" && (
+        <>
+          <div className="stit"><span>Andamento iRating <TagAnteprima /></span></div>
+          <div className="blocco">
+            <div className="rigaTop">
+              <div>
+                <div className="klab">Curva iRating</div>
+                <div className="ccsm" style={{ marginTop: 4 }}>marcatore sulla prima sessione con te</div>
+              </div>
+              <Spark curva={a.curva} start={a.curvaStart} />
+            </div>
+            <p className="nota">
+              Segnaposto: la curva vera arriva dall'account iRacing dell'allievo, e l'integrazione
+              non c'è ancora. Finché non c'è, questo grafico non è un risultato: è un esempio di
+              come sarà. Non usarlo per dire a nessuno quanto è migliorato.
+            </p>
+          </div>
+          <div className="stit"><span>Gare corse dall'ultima sessione <TagAnteprima /></span></div>
+          <div className="blocco" style={{ marginBottom: 40 }}>
+            <VuotoEsplicito>
+              Nessun dato: serve l'integrazione con iRacing. Quando ci sarà, qui vedrai cosa ha
+              corso fra una sessione e l'altra, senza doverglielo chiedere.
+            </VuotoEsplicito>
+          </div>
+        </>
+      )}
+      <div style={{ height: 30 }} />
+    </div>
+  );
+}
+
+/* --------------------- 6. SCHEDA DI PREPARAZIONE SESSIONE ---------------------
+   La funzione da mettere in evidenza nella demo: è la risposta al problema più
+   sentito — arrivare alla sessione senza ricordare cosa si era deciso la volta
+   prima. Si compone da sola da quello che c'è già (note, compiti, piano di
+   lavoro): al coach resta da scrivere una riga, l'obiettivo di oggi. */
+function CoachPreparazione({
+  s, chiudi, allievi, noteAllievi, piani, compitiDi, obiettiviSessione, setObiettiviSessione,
+  apriStanza, nomeAllievo,
+}) {
+  const a = allievi.find((x) => x.id === s.allievoId);
+  const noteA = noteAllievi[a.id] || [];
+  const piano = piani[a.id];
+  const compiti = compitiDi(a);
+  const ultima = noteA[0];
+  const obiettivo = obiettiviSessione[s.id] !== undefined
+    ? obiettiviSessione[s.id]
+    : (ultima ? `Riprendere: ${ultima.testo}` : "");
+  const [condivisa, setCondivisa] = useState(false);
+
+  return (
+    <div className="w">
+      <button className="indietro" onClick={chiudi}>← Torna indietro</button>
+      <div className="stit" style={{ marginTop: 6 }}>
+        <span>Scheda di preparazione <TagPiano f="preparazione" /></span>
+        <span>{fmtData(s.data)} · {s.orario}</span>
+      </div>
+
+      <div className="blocco">
+        <div className="riga"><span>Allievo</span><span><b>{a.nome}</b> · {a.ir} iR <Fonte tipo="verificato" /></span></div>
+        <div className="riga"><span>Vettura</span><span>{a.auto}</span></div>
+        <div className="riga"><span>A che punto è</span><span style={{ textAlign: "right" }}>{piano.obiettivo}</span></div>
+        <div className="riga"><span>Sessioni insieme</span><span>{a.sessioni}</span></div>
+      </div>
+
+      <div className="stit"><span>Cosa si era deciso l'ultima volta</span></div>
+      <div className="blocco">
+        {!ultima && <VuotoEsplicito>Prima sessione insieme: non c'è ancora niente da riprendere.</VuotoEsplicito>}
+        {noteA.slice(0, 3).map((n) => (
+          <div className="recens" key={n.id}>
+            <div className="recmeta">
+              <span>{fmtData(n.data)}</span>
+              <span className="origineTag coach">{n.argomento}</span>
+              {n.circuito && <span className="origineTag">{n.circuito}</span>}
+            </div>
+            <p>{n.testo}</p>
+          </div>
+        ))}
+      </div>
+
+      <div className="stit"><span>Compiti assegnati</span><span>{compiti.filter((c) => c.fatto).length} su {compiti.length} svolti</span></div>
+      <div className="blocco">
+        {compiti.length === 0 && <VuotoEsplicito>Nessun compito assegnato dopo l'ultima sessione.</VuotoEsplicito>}
+        {compiti.map((c) => (
+          <div className="riga" key={c.id}>
+            <span style={{ minWidth: 0 }}>{c.testo}</span>
+            <span className="mn" style={{ color: c.fatto ? "var(--verde)" : "var(--ambra)", whiteSpace: "nowrap" }}>
+              {c.fatto ? "svolto" : "non svolto"}
+            </span>
+          </div>
+        ))}
+      </div>
+
+      <div className="stit"><span>Cosa è successo nel frattempo <TagAnteprima /></span></div>
+      <div className="blocco">
+        <VuotoEsplicito>
+          Gare corse fra le due sessioni: servirà l'integrazione con iRacing. Oggi, se vuoi saperlo,
+          devi ancora chiederglielo.
+        </VuotoEsplicito>
+      </div>
+
+      <div className="stit"><span>Obiettivo di oggi</span></div>
+      <div className="blocco">
+        <div className="campo">
+          <label htmlFor="obiettivoOggi">Lo decidi tu, la scheda propone</label>
+          <textarea id="obiettivoOggi" value={obiettivo}
+                    onChange={(e) => setObiettiviSessione((prev) => ({ ...prev, [s.id]: e.target.value }))}
+                    placeholder="Su cosa lavorate oggi." />
+        </div>
+        <div className="azioni">
+          <button className="b b-blu" onClick={() => setCondivisa(true)}>Condividi con l'allievo</button>
+          <button className="b b-ghost" onClick={() => apriStanza(s)}>Apri la stanza</button>
+        </div>
+        {condivisa && (
+          <div className="notaBox" style={{ marginTop: 12 }}>
+            <p>
+              <b>Scheda condivisa con {a.nome}.</b> La vede nel suo percorso: arrivate in due
+              sapendo cosa si fa, che è il punto di tutta questa pagina.
+            </p>
+          </div>
+        )}
+      </div>
+      <div style={{ height: 40 }} />
+    </div>
+  );
+}
+
+/* ------------------------- 7. RIEPILOGO POST-SESSIONE ------------------------- */
+
+function CoachRiepilogo({
+  s, chiudi, allievi, obiettiviSessione, riepiloghi, setRiepiloghi, aggiungiNota,
+  assegnaCompito, noteAllievi,
+}) {
+  const a = allievi.find((x) => x.id === s.allievoId);
+  const noteA = noteAllievi[a.id] || [];
+  const suggerito = obiettiviSessione[s.id] || (noteA[0] ? noteA[0].testo : "");
+  const salvato = riepiloghi[s.id];
+  const [fatto, setFatto] = useState(suggerito);
+  const [migliorare, setMigliorare] = useState("");
+  const [compito, setCompito] = useState("");
+  const [argomento, setArgomento] = useState(noteA[0] ? noteA[0].argomento : ARGOMENTI_NOTA[0]);
+  const [circuito, setCircuito] = useState(noteA[0] ? (noteA[0].circuito || "") : "");
+
+  const invia = () => {
+    setRiepiloghi((prev) => ({ ...prev, [s.id]: { fatto, migliorare, compito } }));
+    if (fatto.trim()) aggiungiNota(a, { data: s.data, argomento, circuito: circuito.trim() || null, testo: fatto.trim() });
+    if (migliorare.trim()) aggiungiNota(a, { data: s.data, argomento, circuito: circuito.trim() || null, testo: migliorare.trim() });
+    if (compito.trim()) assegnaCompito(a, compito.trim(), circuito.trim() || null);
+  };
+
+  if (salvato)
+    return (
+      <div className="w">
+        <div className="ok" style={{ marginTop: 26 }}>
+          <h2 style={{ fontSize: 22, color: "var(--blu2)" }}>Riepilogo inviato a {a.nome}</h2>
+          <p style={{ marginTop: 10, fontSize: 14.5, lineHeight: 1.6 }}>
+            Le note sono finite nell'archivio dell'allievo, il compito nel suo percorso, e la
+            prossima scheda di preparazione parte già da qui. Niente da ricopiare.
+          </p>
+        </div>
+        <div className="blocco">
+          <div className="riga"><span>Note aggiunte all'archivio</span><b className="mn" style={{ color: "var(--blu2)" }}>{(salvato.fatto ? 1 : 0) + (salvato.migliorare ? 1 : 0)}</b></div>
+          <div className="riga"><span>Compito assegnato</span><b className="mn" style={{ color: "var(--blu2)" }}>{salvato.compito ? "sì" : "no"}</b></div>
+        </div>
+        <div className="azioni" style={{ margin: "20px 0 40px" }}>
+          <button className="b b-ghost" onClick={chiudi}>Torna indietro</button>
+        </div>
+      </div>
+    );
+
+  return (
+    <div className="w">
+      <button className="indietro" onClick={chiudi}>← Torna indietro</button>
+      <div className="stit" style={{ marginTop: 6 }}>
+        <span>Riepilogo della sessione <TagPiano f="riepilogo" /></span>
+        <span>{a.nome} · {fmtData(s.data)}</span>
+      </div>
+
+      <div className="blocco">
+        <p className="nota" style={{ marginTop: 0 }}>
+          Precompilato dall'obiettivo che avevi messo nella scheda di preparazione. Correggi e invia:
+          tre righe, non un tema.
+        </p>
+        <div className="campo" style={{ marginTop: 14 }}>
+          <label htmlFor="rFatto">Cosa avete fatto</label>
+          <textarea id="rFatto" value={fatto} onChange={(e) => setFatto(e.target.value)} />
+        </div>
+        <div className="campo">
+          <label htmlFor="rMigliorare">Cosa deve migliorare</label>
+          <textarea id="rMigliorare" value={migliorare} onChange={(e) => setMigliorare(e.target.value)} />
+        </div>
+        <div className="campo">
+          <label htmlFor="rCompito">Compito per la prossima volta</label>
+          <input id="rCompito" value={compito} onChange={(e) => setCompito(e.target.value)}
+                 placeholder="es. Venti giri a Monza guardando solo il rilascio del freno" />
+        </div>
+
+        <div className="stit" style={{ marginTop: 6 }}><span>Modelli <TagPiano f="modelli" /></span></div>
+        <div className="filtriNote">
+          {MODELLI_NOTA.map((m) => (
+            <button key={m.id} onClick={() => { setMigliorare(m.testo); setArgomento(m.argomento); }}>{m.titolo}</button>
+          ))}
+        </div>
+
+        <div className="campiAffiancati">
+          <div className="campo">
+            <label htmlFor="rArg">Argomento (per l'indice delle note)</label>
+            <select id="rArg" value={argomento} onChange={(e) => setArgomento(e.target.value)}>
+              {ARGOMENTI_NOTA.map((x) => <option key={x} value={x}>{x}</option>)}
+            </select>
+          </div>
+          <div className="campo">
+            <label htmlFor="rPista">Circuito</label>
+            <input id="rPista" value={circuito} onChange={(e) => setCircuito(e.target.value)} placeholder="es. Monza" />
+          </div>
+        </div>
+
+        <div className="azioni">
+          <button className="b b-blu b-lg" onClick={invia} disabled={!fatto.trim() && !migliorare.trim()}>
+            Invia il riepilogo
+          </button>
+        </div>
+      </div>
+      <div style={{ height: 40 }} />
+    </div>
+  );
+}
+
+/* -------------------------------- 3. AGENDA -------------------------------- */
+
+function CoachAgenda({ disponibilita, setDisponibilita, prossime, nomeAllievo }) {
+  const [settimana, setSettimana] = useState(() => lunediDellaSettimana(new Date()));
+  const [nuovaRegola, setNuovaRegola] = useState({ giorni: anyOf([]), da: 21, a: 23 });
+  const [stopDa, setStopDa] = useState("");
+  const [stopA, setStopA] = useState("");
+  const [sincro, setSincro] = useState(false);
+
+  const giorni = anyOf([]);
+  for (let i = 0; i < 7; i++) giorni.push(addGiorni(settimana, i));
+  const ORE = anyOf([]);
+  for (let o = ORA_CALENDARIO_INIZIO; o < ORA_CALENDARIO_FINE; o++) ORE.push(o);
+
+  const togglaGiornoRegola = (g) =>
+    setNuovaRegola((prev) => ({
+      ...prev,
+      giorni: prev.giorni.indexOf(g) !== -1 ? prev.giorni.filter((x) => x !== g) : [...prev.giorni, g],
+    }));
+
+  const aggiungiRegola = () => {
+    if (nuovaRegola.giorni.length === 0 || nuovaRegola.a <= nuovaRegola.da) return;
+    setDisponibilita((prev) => ({
+      ...prev,
+      regole: [...prev.regole, { id: `r-${Date.now()}`, giorni: nuovaRegola.giorni, da: nuovaRegola.da, a: nuovaRegola.a, attiva: true }],
+    }));
+    setNuovaRegola({ giorni: anyOf([]), da: 21, a: 23 });
+  };
+
+  const togglaRegola = (id) =>
+    setDisponibilita((prev) => ({ ...prev, regole: prev.regole.map((r) => (r.id === id ? { ...r, attiva: !r.attiva } : r)) }));
+  const eliminaRegola = (id) =>
+    setDisponibilita((prev) => ({ ...prev, regole: prev.regole.filter((r) => r.id !== id) }));
+
+  // clic su uno slot: se è aperto lo blocca, se è chiuso lo apre — le due
+  // liste (extra/bloccati) restano sempre esclusive fra loro
+  const clickSlot = (giornoJs, ora) => {
+    const k = chiaveSlot(dataIso(giornoJs), ora);
+    const aperto = slotApertoDaRegole(disponibilita, giornoJs, ora);
+    setDisponibilita((prev) => ({
+      ...prev,
+      slotExtra: aperto ? prev.slotExtra.filter((x) => x !== k) : [...prev.slotExtra.filter((x) => x !== k), k],
+      slotBloccati: aperto ? [...prev.slotBloccati.filter((x) => x !== k), k] : prev.slotBloccati.filter((x) => x !== k),
+    }));
+  };
+
+  const impostaStop = () => {
+    if (!stopDa || !stopA || stopA < stopDa) return;
+    setDisponibilita((prev) => ({ ...prev, stop: { da: stopDa, a: stopA } }));
+  };
+
+  const slotAperti = giorni.reduce((n, g) => n + ORE.filter((o) => slotApertoDaRegole(disponibilita, g, o)).length, 0);
+
+  return (
+    <div className="w">
+      <div className="stit" style={{ marginTop: 26 }}>
+        <span>Regole ricorrenti <TagPiano f="regoleRicorrenti" /></span>
+        <span>ogni slot vale 1 ora</span>
+      </div>
+      <div className="blocco">
+        {disponibilita.regole.length === 0 && <VuotoEsplicito>Nessuna regola: nessuno slot prenotabile.</VuotoEsplicito>}
+        {disponibilita.regole.map((r) => (
+          <div className="riga" key={r.id}>
+            <span style={{ minWidth: 0 }}>
+              {r.giorni.join(", ")} · {String(r.da).padStart(2, "0")}:00–{String(r.a).padStart(2, "0")}:00
+              {!r.attiva && <span className="nn"> · sospesa</span>}
+            </span>
+            <span style={{ display: "flex", gap: 12, flex: "none" }}>
+              <button className="apri" onClick={() => togglaRegola(r.id)}>{r.attiva ? "Sospendi" : "Riattiva"}</button>
+              <button className="apri" onClick={() => eliminaRegola(r.id)}>Elimina</button>
+            </span>
+          </div>
+        ))}
+
+        <div className="stit" style={{ marginTop: 18 }}><span>Aggiungi una regola</span></div>
+        <div className="campo">
+          <label>Giorni</label>
+          <div className="checkgrid">
+            {GIORNI_SETTIMANA.map((g) => (
+              <OpzioneCheck key={g} checked={nuovaRegola.giorni.indexOf(g) !== -1} onChange={() => togglaGiornoRegola(g)}>
+                <span>{g}</span>
+              </OpzioneCheck>
+            ))}
+          </div>
+        </div>
+        <div className="campiAffiancati">
+          <div className="campo">
+            <label htmlFor="regolaDa">Dalle</label>
+            <select id="regolaDa" value={nuovaRegola.da} onChange={(e) => setNuovaRegola({ ...nuovaRegola, da: Number(e.target.value) })}>
+              {ORE.map((o) => <option key={o} value={o}>{String(o).padStart(2, "0")}:00</option>)}
+            </select>
+          </div>
+          <div className="campo">
+            <label htmlFor="regolaA">Alle</label>
+            <select id="regolaA" value={nuovaRegola.a} onChange={(e) => setNuovaRegola({ ...nuovaRegola, a: Number(e.target.value) })}>
+              {ORE.concat([ORA_CALENDARIO_FINE]).map((o) => <option key={o} value={o}>{String(o).padStart(2, "0")}:00</option>)}
+            </select>
+          </div>
+        </div>
+        <div className="azioni">
+          <button className="b b-blu" onClick={aggiungiRegola} disabled={nuovaRegola.giorni.length === 0 || nuovaRegola.a <= nuovaRegola.da}>
+            Aggiungi la regola
+          </button>
+        </div>
+      </div>
+
+      <div className="stit">
+        <span>Slot della settimana</span>
+        <span>{slotAperti} aperti</span>
+      </div>
+      <div className="azioni" style={{ marginBottom: 12 }}>
+        <button className="b b-ghost" onClick={() => setSettimana(addGiorni(settimana, -7))}>← Settimana precedente</button>
+        <button className="b b-ghost" onClick={() => setSettimana(addGiorni(settimana, 7))}>Settimana successiva →</button>
+      </div>
+      <p className="nota" style={{ marginTop: 0 }}>
+        Tocca uno slot per aprirlo o chiuderlo a mano, oltre alle regole. Quello che vedi qui è
+        esattamente quello che l'allievo trova nel suo calendario di allocazione: non sono due
+        calendari, è lo stesso.
+      </p>
+      <div className="agendaCoach">
+        {giorni.map((g) => (
+          <div className="agendaCol" key={dataIso(g)}>
+            <div className="agendaTesta">
+              {GIORNI_SETTIMANA[(g.getDay() + 6) % 7]} <span className="nn">{g.getDate()}</span>
+            </div>
+            {ORE.map((o) => {
+              const aperto = slotApertoDaRegole(disponibilita, g, o);
+              const passato = slotPassato(g, o);
+              const occupato = prossime.some((p) => p.data === dataIso(g) && p.orario.slice(0, 2) === String(o).padStart(2, "0"));
+              return (
+                <button key={o} className="agendaSlot" disabled={passato}
+                        data-stato={passato ? "passato" : occupato ? "occupato" : aperto ? "aperto" : "chiuso"}
+                        onClick={() => clickSlot(g, o)}
+                        aria-label={`${String(o).padStart(2, "0")}:00 del ${dataIso(g)}`}>
+                  {String(o).padStart(2, "0")}
+                </button>
+              );
+            })}
+          </div>
+        ))}
+      </div>
+      <div className="legenda">
+        <span><i data-stato="aperto" /> aperto</span>
+        <span><i data-stato="occupato" /> prenotato</span>
+        <span><i data-stato="chiuso" /> chiuso</span>
+        <span><i data-stato="passato" /> passato</span>
+      </div>
+
+      <div className="stit"><span>Periodo di indisponibilità</span><span>ferie, pausa</span></div>
+      <div className="blocco">
+        {disponibilita.stop ? (
+          <>
+            <div className="riga">
+              <span>Prenotazioni sospese</span>
+              <span className="mn" style={{ color: "var(--ambra)" }}>
+                dal {fmtData(disponibilita.stop.da)} al {fmtData(disponibilita.stop.a)}
+              </span>
+            </div>
+            <p className="nota">
+              Le sessioni già prenotate restano: un periodo di stop blocca le nuove prenotazioni,
+              non cancella gli impegni presi.
+            </p>
+            <div className="azioni">
+              <button className="b b-ghost" onClick={() => setDisponibilita((prev) => ({ ...prev, stop: null }))}>Rimuovi</button>
+            </div>
+          </>
+        ) : (
+          <>
+            <div className="campiAffiancati">
+              <div className="campo">
+                <label htmlFor="stopDa">Dal</label>
+                <input id="stopDa" type="date" value={stopDa} onChange={(e) => setStopDa(e.target.value)} />
+              </div>
+              <div className="campo">
+                <label htmlFor="stopA">Al</label>
+                <input id="stopA" type="date" value={stopA} onChange={(e) => setStopA(e.target.value)} />
+              </div>
+            </div>
+            <div className="azioni">
+              <button className="b b-blu" onClick={impostaStop} disabled={!stopDa || !stopA || stopA < stopDa}>Sospendi le prenotazioni</button>
+            </div>
+          </>
+        )}
+      </div>
+
+      <div className="stit"><span>Calendario personale <TagAnteprima /> <TagPiano f="sincroCalendario" /></span></div>
+      <div className="blocco" style={{ marginBottom: 40 }}>
+        {!sincro ? (
+          <>
+            <p style={{ fontSize: 14.5, lineHeight: 1.6 }}>
+              Collegando Google Calendar o Outlook, gli impegni che hai già chiudono da soli gli
+              slot qui dentro: niente doppia prenotazione perché avevi dimenticato una cena.
+            </p>
+            <div className="azioni">
+              <button className="b b-ghost" onClick={() => setSincro(true)}>Collega Google Calendar</button>
+              <button className="b b-ghost" onClick={() => setSincro(true)}>Collega Outlook</button>
+            </div>
+          </>
+        ) : (
+          <div className="notaBox ambra">
+            <p>
+              <b>Non è ancora attivo.</b> Il flusso di collegamento è quello che vedi, ma la
+              sincronizzazione vera non è realizzata: preferiamo dirtelo qui piuttosto che
+              fartelo scoprire con una sessione doppia in calendario.
+            </p>
+            <div className="azioni">
+              <button className="b b-ghost" onClick={() => setSincro(false)}>Ho capito</button>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+/* ------------------------------ 4. OFFERTE DI ORE ------------------------------ */
+
+function CoachOfferte({ offerte, setOfferte, promo, setPromo, allievi }) {
+  const [bozza, setBozza] = useState({ nome: "", ore: 4, prezzo: 170 });
+  const [nuovaPromo, setNuovaPromo] = useState({ tipo: "sconto", valore: 15, fino: "", allievoId: "" });
+
+  const aggiorna = (id, campo, valore) =>
+    setOfferte((prev) => prev.map((o) => (o.id === id ? { ...o, [campo]: valore } : o)));
+  const sposta = (i, d) =>
+    setOfferte((prev) => {
+      const n = prev.slice();
+      const j = i + d;
+      if (j < 0 || j >= n.length) return prev;
+      const t = n[i]; n[i] = n[j]; n[j] = t;
+      return n;
+    });
+  const duplica = (o) =>
+    setOfferte((prev) => [...prev, { ...o, id: `o-${Date.now()}`, nome: `${o.nome} (copia)`, attiva: false }]);
+  const crea = () => {
+    if (!bozza.nome.trim() || bozza.ore < 1 || bozza.prezzo <= 0) return;
+    setOfferte((prev) => [...prev, { id: `o-${Date.now()}`, nome: bozza.nome.trim(), ore: Number(bozza.ore), prezzo: Number(bozza.prezzo), attiva: true }]);
+    setBozza({ nome: "", ore: 4, prezzo: 170 });
+  };
+
+  const commissione = COMMISSIONI_PIANO[PIANO_COACH_DEMO];
+
+  return (
+    <div className="w">
+      <div className="stit" style={{ marginTop: 26 }}>
+        <span>Pacchetti di ore</span><span>quello che vendi è il pacchetto</span>
+      </div>
+      <p className="nota" style={{ marginTop: 0 }}>
+        Il prezzo orario è un'informazione, non il prodotto: l'allievo compra un pacchetto, e le ore
+        valgono solo con te. Ogni ora prenotata scala 1 ora dal suo portafoglio.
+      </p>
+
+      {offerte.map((o, i) => {
+        const orario = o.prezzo / o.ore;
+        const netto = nettoCoach(o.prezzo, PIANO_COACH_DEMO);
+        return (
+          <div className="blocco" key={o.id} style={{ marginBottom: 12, opacity: o.attiva ? 1 : 0.62 }}>
+            <div className="campiAffiancati">
+              <div className="campo">
+                <label htmlFor={`nome-${o.id}`}>Nome</label>
+                <input id={`nome-${o.id}`} value={o.nome} onChange={(e) => aggiorna(o.id, "nome", e.target.value)} />
+              </div>
+              <div className="campo">
+                <label htmlFor={`ore-${o.id}`}>Ore</label>
+                <input id={`ore-${o.id}`} type="number" min="1" max={TETTO_ORE_MENSILI} value={o.ore}
+                       onChange={(e) => aggiorna(o.id, "ore", Math.max(1, Number(e.target.value) || 1))} />
+              </div>
+              <div className="campo">
+                <label htmlFor={`prezzo-${o.id}`}>Prezzo totale (€)</label>
+                <input id={`prezzo-${o.id}`} type="number" min="1" value={o.prezzo}
+                       onChange={(e) => aggiorna(o.id, "prezzo", Math.max(1, Number(e.target.value) || 1))} />
+              </div>
+            </div>
+            <div className="riga"><span>Prezzo orario implicito</span><b className="mn">{eur(orario)} / ora</b></div>
+            <div className="riga"><span>Commissione CORDA ({Math.round(commissione * 100)}%)</span><span className="mn">− {eur(o.prezzo - netto)}</span></div>
+            <div className="riga"><span>Netto per te</span><b className="mn" style={{ color: "var(--blu2)" }}>{eur(netto)}</b></div>
+            <div className="azioni">
+              <button className="b b-ghost" onClick={() => aggiorna(o.id, "attiva", !o.attiva)}>{o.attiva ? "Disattiva" : "Attiva"}</button>
+              <button className="b b-ghost" onClick={() => duplica(o)}>Duplica</button>
+              <button className="b b-ghost" onClick={() => sposta(i, -1)} disabled={i === 0}>↑ Su</button>
+              <button className="b b-ghost" onClick={() => sposta(i, 1)} disabled={i === offerte.length - 1}>↓ Giù</button>
+            </div>
+          </div>
+        );
+      })}
+
+      <div className="stit"><span>Nuovo pacchetto</span></div>
+      <div className="blocco">
+        <div className="campiAffiancati">
+          <div className="campo">
+            <label htmlFor="nuovoNome">Nome descrittivo</label>
+            <input id="nuovoNome" value={bozza.nome} onChange={(e) => setBozza({ ...bozza, nome: e.target.value })} placeholder="es. Preparazione gara" />
+          </div>
+          <div className="campo">
+            <label htmlFor="nuovoOre">Ore</label>
+            <input id="nuovoOre" type="number" min="1" value={bozza.ore} onChange={(e) => setBozza({ ...bozza, ore: Number(e.target.value) || 1 })} />
+          </div>
+          <div className="campo">
+            <label htmlFor="nuovoPrezzo">Prezzo totale (€)</label>
+            <input id="nuovoPrezzo" type="number" min="1" value={bozza.prezzo} onChange={(e) => setBozza({ ...bozza, prezzo: Number(e.target.value) || 1 })} />
+          </div>
+        </div>
+        <div className="azioni">
+          <button className="b b-blu" onClick={crea} disabled={!bozza.nome.trim()}>Crea il pacchetto</button>
+        </div>
+      </div>
+
+      <div className="stit"><span>Promozioni <TagPiano f="promozioni" /></span></div>
+      <div className="blocco">
+        {promo ? (
+          <>
+            <div className="riga">
+              <span>Attiva</span>
+              <span className="mn" style={{ color: "var(--blu2)" }}>
+                {promo.tipo === "sconto" ? `−${promo.valore}% fino al ${promo.fino ? fmtData(promo.fino) : "—"}` : `riservata a ${(allievi.find((a) => a.id === promo.allievoId) || {}).nome}`}
+              </span>
+            </div>
+            <div className="azioni"><button className="b b-ghost" onClick={() => setPromo(null)}>Termina la promozione</button></div>
+          </>
+        ) : (
+          <>
+            <div className="campo">
+              <label htmlFor="tipoPromo">Tipo</label>
+              <select id="tipoPromo" value={nuovaPromo.tipo} onChange={(e) => setNuovaPromo({ ...nuovaPromo, tipo: e.target.value })}>
+                <option value="sconto">Sconto a tempo su tutti i pacchetti</option>
+                <option value="riservata">Pacchetto riservato a un singolo allievo</option>
+              </select>
+            </div>
+            {nuovaPromo.tipo === "sconto" ? (
+              <div className="campiAffiancati">
+                <div className="campo">
+                  <label htmlFor="valPromo">Sconto (%)</label>
+                  <input id="valPromo" type="number" min="1" max="50" value={nuovaPromo.valore}
+                         onChange={(e) => setNuovaPromo({ ...nuovaPromo, valore: Number(e.target.value) || 0 })} />
+                </div>
+                <div className="campo">
+                  <label htmlFor="finoPromo">Fino al</label>
+                  <input id="finoPromo" type="date" value={nuovaPromo.fino} onChange={(e) => setNuovaPromo({ ...nuovaPromo, fino: e.target.value })} />
+                </div>
+              </div>
+            ) : (
+              <div className="campo">
+                <label htmlFor="allievoPromo">Allievo</label>
+                <select id="allievoPromo" value={nuovaPromo.allievoId} onChange={(e) => setNuovaPromo({ ...nuovaPromo, allievoId: e.target.value })}>
+                  <option value="">Scegli…</option>
+                  {allievi.map((a) => <option key={a.id} value={a.id}>{a.nome}</option>)}
+                </select>
+              </div>
+            )}
+            <div className="azioni">
+              <button className="b b-blu" onClick={() => setPromo(nuovaPromo)}
+                      disabled={nuovaPromo.tipo === "riservata" ? !nuovaPromo.allievoId : !nuovaPromo.fino}>
+                Attiva la promozione
+              </button>
+            </div>
+          </>
+        )}
+      </div>
+
+      <div className="stit">
+        <span>Lista d'attesa <TagPiano f="listaAttesa" /></span><span>{LISTA_ATTESA.length} in coda</span>
+      </div>
+      <div className="blocco" style={{ marginBottom: 40 }}>
+        <p className="nota" style={{ marginTop: 0 }}>
+          Quando sei al completo, chi ti cerca non se ne va: si segnala qui e lo richiami tu quando
+          si libera un posto.
+        </p>
+        {LISTA_ATTESA.map((w) => (
+          <div className="recens" key={w.id}>
+            <div className="recmeta">
+              <span><b>{w.nome}</b></span><span>{w.ir} iR</span><span>segnalato il {fmtData(w.quando)}</span>
+            </div>
+            <p>{w.nota}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/* ------------------------- 2. PROFILO E PAGINA PUBBLICA ------------------------- */
+
+function CoachProfilo({ coach, profilo, setProfilo }) {
+  const [anteprima, setAnteprima] = useState(false);
+  const [copiato, setCopiato] = useState(false);
+  const link = `corda.gg/c/${coach.tag}`;
+  const set = (k, v) => setProfilo((prev) => ({ ...prev, [k]: v }));
+
+  if (anteprima)
+    return (
+      <div className="w">
+        <button className="indietro" onClick={() => setAnteprima(false)}>← Torna al profilo</button>
+        <div className="notaBox" style={{ marginTop: 6 }}>
+          <p><b>Così ti vede un pilota.</b> Dati verificati e dichiarazioni restano separati: è la
+            regola su cui è costruita CORDA, e vale anche per te.</p>
+        </div>
+
+        <div className="stit"><span>{profilo.nome}</span><span>{coach.ir} iR</span></div>
+        <div className="blocco">
+          <div className="riga"><span>Licenza</span><span>{coach.lic} <Fonte tipo="verificato" /></span></div>
+          <div className="riga"><span>Anni su iRacing</span><span>10 <Fonte tipo="verificato" /></span></div>
+          <div className="riga"><span>iRating</span><span>{coach.ir} <Fonte tipo="verificato" /></span></div>
+          <div className="riga"><span>Fascia di allievi</span><span>{FASCE_FRASE[profilo.fasciaDichiarata]} <Fonte tipo="dichiarato" /></span></div>
+          <div className="riga"><span>Vetture</span><span style={{ textAlign: "right" }}>{profilo.auto} <Fonte tipo="dichiarato" /></span></div>
+        </div>
+
+        <div className="stit"><span>Risultati degli allievi</span><span>variazione iRating mediana</span></div>
+        <div className="blocco">
+          {FASCE.map((f) => {
+            const d = coach.fasce[f.k];
+            return (
+              <div className="riga" key={f.k}>
+                <span>{f.l}</span>
+                {d
+                  ? <b className="mn" style={{ color: "var(--blu2)" }}>+{d[0]} iR · {d[1]} gg · {d[2]} allievi</b>
+                  : <span className="nn">nessun allievo tracciato in questa fascia</span>}
+              </div>
+            );
+          })}
+          <p className="nota">
+            Dove non c'è storico non c'è un numero: meglio una riga vuota che una media costruita su
+            un allievo solo. <Fonte tipo="verificato" />
+          </p>
+        </div>
+
+        <div className="stit"><span>Come lavora</span></div>
+        <div className="blocco" style={{ marginBottom: 40 }}>
+          <p style={{ fontSize: 14.5, lineHeight: 1.65 }}>{profilo.bio}</p>
+          <ul className="regole" style={{ marginTop: 14 }}>
+            {coach.metodo.map((m) => <li key={m}>{m}</li>)}
+          </ul>
+        </div>
+      </div>
+    );
+
+  return (
+    <div className="w">
+      <div className="stit" style={{ marginTop: 26 }}><span>Profilo</span><span>quello che vede il pilota</span></div>
+      <div className="blocco">
+        <div className="campo">
+          <label htmlFor="pNome">Nome</label>
+          <input id="pNome" value={profilo.nome} onChange={(e) => set("nome", e.target.value)} />
+        </div>
+        <div className="campo">
+          <label htmlFor="pBio">Bio</label>
+          <textarea id="pBio" value={profilo.bio} onChange={(e) => set("bio", e.target.value)} />
+        </div>
+        <div className="campo">
+          <label htmlFor="pAuto">Vetture e categorie</label>
+          <input id="pAuto" value={profilo.auto} onChange={(e) => set("auto", e.target.value)} />
+        </div>
+        <div className="campiAffiancati">
+          <div className="campo">
+            <label htmlFor="pLingue">Lingue</label>
+            <input id="pLingue" value={profilo.lingue} onChange={(e) => set("lingue", e.target.value)} />
+          </div>
+          <div className="campo">
+            <label htmlFor="pFuso">Fuso orario</label>
+            <select id="pFuso" value={profilo.fuso} onChange={(e) => set("fuso", e.target.value)}>
+              {FUSI.map((f) => <option key={f} value={f}>{f}</option>)}
+            </select>
+          </div>
+        </div>
+        <div className="campo">
+          <label htmlFor="pFascia">Fascia di allievi a cui ti rivolgi</label>
+          <select id="pFascia" value={profilo.fasciaDichiarata} onChange={(e) => set("fasciaDichiarata", e.target.value)}>
+            {FASCE.map((f) => <option key={f.k} value={f.k}>{f.l}</option>)}
+          </select>
+        </div>
+        <div className="campo">
+          <label>Foto</label>
+          <div className="lockbox" style={{ padding: 14 }}>
+            <span className="ccsm">Caricamento foto <TagAnteprima /> — serve lo storage, non ancora collegato.</span>
+          </div>
+        </div>
         <p className="nota">
-          Ti conviene farti trovare da chi parte sotto i 2.5k: è lì che i tuoi numeri parlano.
+          Quello che scrivi qui è una <b>dichiarazione</b> e viene mostrato come tale. Licenza, anni
+          di account e iRating arrivano invece da iRacing e restano marcati come verificati: non
+          puoi modificarli, ed è esattamente il motivo per cui valgono qualcosa.
+        </p>
+        <div className="azioni">
+          <button className="b b-blu" onClick={() => setAnteprima(true)}>Anteprima pagina pubblica</button>
+        </div>
+      </div>
+
+      <div className="stit"><span>Link pubblico</span></div>
+      <div className="blocco" style={{ marginBottom: 40 }}>
+        <div className="riga">
+          <span style={{ minWidth: 0, wordBreak: "break-all" }}>{link}</span>
+          <button className="apri" style={{ flex: "none" }} onClick={() => setCopiato(true)}>{copiato ? "Copiato" : "Copia"}</button>
+        </div>
+        <div className="riga">
+          <span>Visite negli ultimi 30 giorni <TagAnteprima /></span>
+          <span className="nn">nessun dato: il conteggio non è ancora attivo</span>
+        </div>
+        <p className="nota">
+          Mettilo nel tuo Discord o nella descrizione dei video: chi arriva da lì vede la tua pagina
+          con i dati verificati, non uno screenshot che potrebbe aver fatto chiunque.
+        </p>
+      </div>
+    </div>
+  );
+}
+
+/* ------------------------------ 8. COMUNICAZIONE ------------------------------ */
+
+function CoachMessaggi({ allievi, allieviAttivi, chatMessaggi, aggiornaMessaggi }) {
+  const [aperto, setAperto] = useState("a1");
+  const [bozza, setBozza] = useState("");
+  const [gruppo, setGruppo] = useState("");
+  const [gruppoInviato, setGruppoInviato] = useState(false);
+  const [promemoria, setPromemoria] = useState({ h24: true, h1: true });
+  const a = allievi.find((x) => x.id === aperto);
+  const collegato = a && a.pilotaDemo; // solo il pilota della demo ha un thread vero
+
+  const messaggi = collegato ? (chatMessaggi[COACH_DEMO_ID] || []) : [];
+
+  const invia = () => {
+    const t = bozza.trim();
+    if (!t || !collegato) return;
+    aggiornaMessaggi(COACH_DEMO_ID, (prev) => [
+      ...prev,
+      { id: `mc-${Date.now()}`, da: "coach", testo: t, quando: new Date().toISOString(), letto: false },
+    ]);
+    setBozza("");
+  };
+
+  return (
+    <div className="w">
+      <div className="stit" style={{ marginTop: 26 }}><span>Messaggi</span><span>{allieviAttivi.length} allievi attivi</span></div>
+      <div className="filtriNote">
+        {allievi.map((x) => (
+          <button key={x.id} data-on={aperto === x.id ? "1" : "0"} onClick={() => setAperto(x.id)}>{x.nome}</button>
+        ))}
+      </div>
+
+      <div className="blocco" style={{ marginTop: 12 }}>
+        {!collegato && (
+          <VuotoEsplicito>
+            In questa demo è collegato il thread reale con {ALLIEVI_COACH[0].nome} — lo stesso che
+            lui vede dal suo lato. Per gli altri allievi la conversazione è vuota: preferiamo una
+            schermata vuota a una finta.
+          </VuotoEsplicito>
+        )}
+        {collegato && messaggi.map((m) => (
+          <div className="msgRiga" key={m.id} data-da={m.da}>
+            <div className="msgBolla">{m.testo}</div>
+          </div>
+        ))}
+        {collegato && (
+          <>
+            <div className="campo" style={{ marginTop: 14 }}>
+              <label htmlFor="msgCoach">Scrivi a {a.nome}</label>
+              <textarea id="msgCoach" value={bozza} onChange={(e) => setBozza(e.target.value)} placeholder="Il messaggio arriva davvero nel suo percorso." />
+            </div>
+            <div className="azioni">
+              <button className="b b-blu" onClick={invia} disabled={!bozza.trim()}>Invia</button>
+            </div>
+            <p className="nota">
+              Dal suo lato ogni messaggio può essere salvato come nota: la logistica resta qui,
+              non su Discord dove si perde.
+            </p>
+          </>
+        )}
+      </div>
+
+      <div className="stit"><span>Promemoria automatici <TagAnteprima /></span></div>
+      <div className="blocco">
+        <p className="nota" style={{ marginTop: 0 }}>
+          Le impostazioni si salvano, l'invio no: il canale di notifica non è ancora collegato.
+          Quando lo sarà, questi sono gli orari con cui partirà.
+        </p>
+        {PROMEMORIA_ORE.map((h) => (
+          <OpzioneCheck key={h} checked={h === 24 ? promemoria.h24 : promemoria.h1}
+                        onChange={() => setPromemoria((p) => (h === 24 ? { ...p, h24: !p.h24 } : { ...p, h1: !p.h1 }))}>
+            <span>Avvisa l'allievo {h} {h === 1 ? "ora" : "ore"} prima della sessione</span>
+          </OpzioneCheck>
+        ))}
+      </div>
+
+      <div className="stit"><span>Messaggio a tutti gli allievi attivi <TagAnteprima /></span></div>
+      <div className="blocco" style={{ marginBottom: 40 }}>
+        <div className="campo">
+          <label htmlFor="msgGruppo">Un solo messaggio, {allieviAttivi.length} destinatari</label>
+          <textarea id="msgGruppo" value={gruppo} onChange={(e) => { setGruppo(e.target.value); setGruppoInviato(false); }}
+                    placeholder="es. Questa settimana sposto le sessioni del martedì al mercoledì." />
+        </div>
+        <div className="azioni">
+          <button className="b b-ghost" onClick={() => setGruppoInviato(true)} disabled={!gruppo.trim()}>Invia a tutti</button>
+        </div>
+        {gruppoInviato && (
+          <div className="notaBox ambra" style={{ marginTop: 12 }}>
+            <p><b>Non è partito niente.</b> L'invio di gruppo non è ancora realizzato: qui vedi
+              come sarà, ma nessuno dei tuoi allievi ha ricevuto questo messaggio.</p>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+/* --------------------- 9. COMPENSI, FISCO, TRANQUILLITÀ --------------------- */
+
+function CoachCompensi({ compensiAnno, totaleAnno, nettoAnno, maturatoMese, inAttesa, inAttesaMese, nomeAllievo }) {
+  const [raggruppa, setRaggruppa] = useState("sessione"); // sessione | allievo | mese
+  const [dati, setDati] = useState({ cf: "BRTMRC88M01F205X", piva: "", indirizzo: "Via Roma 12, 20121 Milano" });
+  const piano = PIANO_COACH_DEMO;
+  const quota = totaleAnno / SOGLIA_FISCALE_EUR;
+  const vicino = quota >= AVVISO_SOGLIA_PCT;
+
+  const perAllievo = anyOf({});
+  const perMese = anyOf({});
+  compensiAnno.forEach((k) => {
+    perAllievo[k.allievoId] = (perAllievo[k.allievoId] || 0) + k.lordo;
+    const m = k.data.slice(0, 7);
+    perMese[m] = (perMese[m] || 0) + k.lordo;
+  });
+
+  return (
+    <div className="w">
+      <div className="stit" style={{ marginTop: 26 }}><span>Compensi {ANNO_DEMO}</span><span>{compensiAnno.length} sessioni</span></div>
+      <div className="kpigrid">
+        <div className="kbox">
+          <div className="klab">Totale lordo</div>
+          <div className="kval">{eur(totaleAnno)}</div>
+          <div className="ccsm" style={{ marginTop: 6 }}>netto {eur(nettoAnno)} · commissione {Math.round(COMMISSIONI_PIANO[piano] * 100)}%</div>
+        </div>
+        <div className="kbox">
+          <div className="klab">In attesa di liquidazione</div>
+          <div className="kval">{eur(inAttesa)}</div>
+          <div className="ccsm" style={{ marginTop: 6 }}>di cui {eur(inAttesaMese)} del mese in corso · {eur(maturatoMese)} maturati in tutto ad agosto</div>
+        </div>
+      </div>
+
+      <div className="stit"><span>Contatore soglia fiscale</span><span>promemoria, non consulenza</span></div>
+      <div className={`blocco ${vicino ? "" : ""}`}>
+        <div className="orebar" style={{ marginTop: 0 }}>
+          <i className="orebarfill" style={{ width: `${Math.min(100, quota * 100)}%`, background: vicino ? "var(--ambra)" : "var(--blu2)" }} />
+        </div>
+        <div className="riga" style={{ marginTop: 10 }}>
+          <span>Compensi {ANNO_DEMO}</span>
+          <b className="mn">{eur(totaleAnno)} su {eur(SOGLIA_FISCALE_EUR)}</b>
+        </div>
+        <div className="notaBox ambra" style={{ marginTop: 12 }}>
+          <p>
+            <b>Avvertenza.</b> Questo contatore è un promemoria informativo, non consulenza fiscale.
+            La soglia di {eur(SOGLIA_FISCALE_EUR)} è impostata come variabile di configurazione e
+            <b> va confermata con un commercialista</b>: la tua situazione può essere diversa
+            (altri redditi, regime già aperto, contributi). CORDA non ti dice cosa fare, ti dice
+            solo a che punto sei.
+          </p>
+        </div>
+      </div>
+
+      <div className="stit"><span>Estratto</span></div>
+      <div className="filtriNote">
+        {[["sessione", "Per sessione"], ["allievo", "Per allievo"], ["mese", "Per mese"]].map(([k, l]) => (
+          <button key={k} data-on={raggruppa === k ? "1" : "0"} onClick={() => setRaggruppa(k)}>{l}</button>
+        ))}
+      </div>
+
+      {raggruppa === "sessione" && (
+        <div className="tab tab4" style={{ marginTop: 12 }}>
+          <div className="tabTesta"><span>Data</span><span>Allievo</span><span>Lordo / netto</span><span>Stato</span></div>
+          {compensiAnno.slice().reverse().map((k) => (
+            <div className="tabRiga" key={k.id}>
+              <span><i className="et">Data</i>{fmtData(k.data)}</span>
+              <span><i className="et">Allievo</i>{nomeAllievo(k.allievoId)}</span>
+              <span><i className="et">Lordo / netto</i>{eur(k.lordo)} <span className="nn">/ {eur(nettoCoach(k.lordo, piano))}</span></span>
+              <span><i className="et">Stato</i><span className={`statoPag ${k.stato}`}>{STATO_COMPENSO[k.stato]}</span></span>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {raggruppa === "allievo" && (
+        <div className="tab tab3" style={{ marginTop: 12 }}>
+          <div className="tabTesta"><span>Allievo</span><span>Sessioni</span><span>Lordo</span></div>
+          {Object.keys(perAllievo).map((id) => (
+            <div className="tabRiga" key={id}>
+              <span><i className="et">Allievo</i>{nomeAllievo(id)}</span>
+              <span><i className="et">Sessioni</i>{compensiAnno.filter((k) => k.allievoId === id).length}</span>
+              <span><i className="et">Lordo</i>{eur(perAllievo[id])}</span>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {raggruppa === "mese" && (
+        <div className="tab tab3" style={{ marginTop: 12 }}>
+          <div className="tabTesta"><span>Mese</span><span>Sessioni</span><span>Lordo</span></div>
+          {Object.keys(perMese).sort().reverse().map((m) => (
+            <div className="tabRiga" key={m}>
+              <span><i className="et">Mese</i>{m}</span>
+              <span><i className="et">Sessioni</i>{compensiAnno.filter((k) => k.data.slice(0, 7) === m).length}</span>
+              <span><i className="et">Lordo</i>{eur(perMese[m])}</span>
+            </div>
+          ))}
+        </div>
+      )}
+
+      <div className="stit"><span>Documenti</span></div>
+      <div className="blocco">
+        <div className="riga">
+          <span>Ricevute e fatture generate dalla piattaforma <TagAnteprima /></span>
+          <span className="nn">non ancora attivo</span>
+        </div>
+        <div className="riga">
+          <span>Export annuale per il commercialista (CSV/PDF) <TagAnteprima /> <TagPiano f="export" /></span>
+          <span className="nn">non ancora attivo</span>
+        </div>
+        <p className="nota">
+          Generare documenti fiscali validi non è una schermata: è una responsabilità. Finché non è
+          fatta bene, qui non trovi un bottone che finge di funzionare.
         </p>
       </div>
 
-      <div className="stit"><span>Profilo pubblico</span></div>
+      <div className="stit"><span>I tuoi dati fiscali</span></div>
       <div className="blocco" style={{ marginBottom: 40 }}>
-        <div className="riga"><span>Account iRacing collegato</span><span className="mn" style={{ color: "var(--blu2)" }}>verificato</span></div>
-        <div className="riga"><span>Sessione di prova</span><span className="mn" style={{ color: "var(--blu2)" }}>superata</span></div>
-        <div className="riga"><span>Patto di risultato</span><span className="nn">non attivo</span></div>
-        <div style={{ marginTop: 16 }}>
-          <button className="b b-rosso">Modifica profilo</button>
+        <p className="nota" style={{ marginTop: 0 }}>
+          Servono alla piattaforma per gli obblighi di comunicazione: senza questi, i compensi non
+          possono essere liquidati.
+        </p>
+        <div className="campo">
+          <label htmlFor="fCf">Codice fiscale</label>
+          <input id="fCf" value={dati.cf} onChange={(e) => setDati({ ...dati, cf: e.target.value })} />
+        </div>
+        <div className="campo">
+          <label htmlFor="fPiva">Partita IVA (se la hai)</label>
+          <input id="fPiva" value={dati.piva} onChange={(e) => setDati({ ...dati, piva: e.target.value })} placeholder="Nessuna: compenso occasionale" />
+        </div>
+        <div className="campo">
+          <label htmlFor="fInd">Dati di fatturazione</label>
+          <input id="fInd" value={dati.indirizzo} onChange={(e) => setDati({ ...dati, indirizzo: e.target.value })} />
         </div>
       </div>
+    </div>
+  );
+}
+
+/* --------------------------- 10. ANALISI E RISULTATI --------------------------- */
+
+function CoachRisultati({ coach, allievi, allieviAttivi, aRischio, compensiAnno, nomeAllievo, apriAllievo }) {
+  const sessioni = compensiAnno.length;
+  const conRitorno = allievi.filter((a) => a.sessioni > 1).length;
+  const tassoRitorno = Math.round((conRitorno / allievi.length) * 100);
+
+  return (
+    <div className="w">
+      <div className="stit" style={{ marginTop: 26 }}><span>Il tuo riepilogo</span><span>{ANNO_DEMO}</span></div>
+      <div className="kpigrid">
+        <div className="kbox">
+          <div className="klab">Sessioni svolte</div>
+          <div className="kval">{sessioni}</div>
+          <div className="ccsm" style={{ marginTop: 6 }}>calcolate dalle sessioni pagate</div>
+        </div>
+        <div className="kbox">
+          <div className="klab">Allievi seguiti</div>
+          <div className="kval">{allievi.length}</div>
+          <div className="ccsm" style={{ marginTop: 6 }}>{allieviAttivi.length} attivi ora</div>
+        </div>
+        <div className="kbox">
+          <div className="klab">Tasso di ritorno</div>
+          <div className="kval">{tassoRitorno}%</div>
+          <div className="ccsm" style={{ marginTop: 6 }}>allievi tornati dopo la prima sessione</div>
+        </div>
+        <div className="kbox">
+          <div className="klab">No-show</div>
+          <div className="kval">0</div>
+          <div className="ccsm" style={{ marginTop: 6 }}>nessuna contestazione aperta</div>
+        </div>
+      </div>
+
+      <div className="stit"><span>Dove sei forte</span><span>variazione iRating mediana <TagAnteprima /></span></div>
+      <div className="blocco">
+        {FASCE.map((f) => {
+          const d = coach.fasce[f.k];
+          return (
+            <div className="riga" key={f.k}>
+              <span>{f.l}</span>
+              {d
+                ? <b className="mn" style={{ color: "var(--blu2)" }}>+{d[0]} iR · {d[1]} gg · {d[2]} allievi</b>
+                : <span className="nn">nessun allievo tracciato</span>}
+            </div>
+          );
+        })}
+        <p className="nota">
+          Questi numeri dipendono dall'integrazione iRacing, che non c'è ancora: nella demo sono
+          dati di esempio. Quando l'integrazione ci sarà, saranno l'unica cosa che un pilota guarda
+          davvero prima di scegliere.
+        </p>
+      </div>
+
+      <div className="stit"><span>Confronto fra i tuoi allievi <TagAnteprima /> <TagPiano f="confronto" /></span></div>
+      <div className="tab tab4">
+        <div className="tabTesta"><span>Allievo</span><span>iRating</span><span>Sessioni</span><span>Andamento</span></div>
+        {allievi.map((a) => (
+          <button className="tabRiga cliccabile" key={a.id} onClick={() => apriAllievo(a.id)}>
+            <span><i className="et">Allievo</i><b>{a.nome}</b></span>
+            <span><i className="et">iRating</i>{a.ir} iR</span>
+            <span><i className="et">Sessioni</i>{a.sessioni}</span>
+            <span><i className="et">Andamento</i><Spark curva={a.curva} start={a.curvaStart} w={90} h={26} /></span>
+          </button>
+        ))}
+      </div>
+
+      <div className="stit"><span>A rischio abbandono <TagPiano f="abbandono" /></span></div>
+      <div className="blocco">
+        {aRischio.length === 0 && <VuotoEsplicito>Nessun allievo fermo da più di {SETTIMANE_RISCHIO_ABBANDONO} settimane.</VuotoEsplicito>}
+        {aRischio.map((a) => (
+          <div className="riga" key={a.id}>
+            <span>{a.nome} <span className="nn">· ultima sessione {fmtData(a.ultimaSessione)}</span></span>
+            <button className="apri" style={{ flex: "none" }} onClick={() => apriAllievo(a.id)}>
+              fermo da {settimaneDa(a.ultimaSessione)} settimane →
+            </button>
+          </div>
+        ))}
+      </div>
+
+      {/* 12. telemetria: abbozzo visivo, non implementata */}
+      <div className="stit"><span>Telemetria <TagAnteprima /> <TagPiano f="telemetria" /></span></div>
+      <div className="blocco" style={{ marginBottom: 40 }}>
+        <p style={{ fontSize: 14.5, lineHeight: 1.6 }}>
+          L'analisi telemetrica esiste già altrove e la sanno fare in tanti. Quello che non esiste
+          è vederla <b>insieme al percorso di coaching</b>: «da quando lavoriamo sulla frenata, il
+          degrado nel terzo stint è calato».
+        </p>
+        <div className="telemetria">
+          {[["Consumo gomme", "−18% degrado nel 3° stint"], ["Carburante", "1.9 l/giro"],
+            ["Passo gara", "1:47.8 medio · Δ 0.3"], ["Confronto sessioni", "4 sessioni sovrapposte"],
+            ["Temperatura aria", "24 °C"], ["Temperatura asfalto", "31 °C"]].map(([t, v]) => (
+            <div className="telBox" key={t}>
+              <div className="klab">{t}</div>
+              <div className="mn" style={{ marginTop: 6, fontSize: 15 }}>{v}</div>
+            </div>
+          ))}
+        </div>
+        <div className="notaBox ambra" style={{ marginTop: 14 }}>
+          <p>
+            <b>Vista statica, non implementata.</b> Serve la telemetria via SDK iRacing, che oggi
+            non abbiamo. I numeri qui sopra sono un esempio di come sarà la pagina, non misure
+            reali: non usarli con un allievo.
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ---------------------------- 11. PIANI E ABBONAMENTO ---------------------------- */
+
+function CoachPiani() {
+  return (
+    <div className="w">
+      <div className="stit" style={{ marginTop: 26 }}><span>Piani</span><span>prezzi indicativi</span></div>
+      <div className="notaBox ambra">
+        <p>
+          <b>Niente di tutto questo è attivo.</b> I prezzi sono indicativi e servono a raccogliere
+          la tua reazione, non a venderti qualcosa: in questa demo non esiste alcun pagamento, e
+          tutte le funzioni dei piani superiori sono sbloccate perché tu possa provarle e dirci se
+          valgono la cifra.
+        </p>
+      </div>
+
+      <div className="pianiGrid">
+        {PIANI.map((p) => (
+          <div className="pianoCard" key={p.id} data-corrente={p.id === PIANO_COACH_DEMO ? "1" : "0"}>
+            <div className="rigaTop">
+              <div>
+                <div className="ccnome">{p.nome}</div>
+                <div className="ccsm">{p.riga}</div>
+              </div>
+              {p.id === PIANO_COACH_DEMO && <span className="irTag ok">Il tuo</span>}
+            </div>
+            <div className="prezzo lg" style={{ marginTop: 12 }}>
+              {p.prezzo === 0 ? "0 €" : `${p.prezzo} €`}<small> / mese</small>
+            </div>
+            <div className="ccsm">commissione {Math.round(COMMISSIONI_PIANO[p.id] * 100)}% sulle ore vendute</div>
+            <ul className="regole" style={{ marginTop: 14 }}>
+              {p.funzioni.map((f) => <li key={f}>{f}</li>)}
+            </ul>
+            {p.id !== "free" && <p className="nota">Comprende tutto il piano precedente.</p>}
+          </div>
+        ))}
+      </div>
+
+      <p className="nota" style={{ marginBottom: 40 }}>
+        Nel resto dell'area coach le funzioni dei piani superiori sono segnate con un'etichetta
+        discreta (<TagPiano f="preparazione" /> <TagPiano f="telemetria" />). Non bloccano niente:
+        se le proviamo insieme e non le usi, non devi pagarle.
+      </p>
     </div>
   );
 }
@@ -4007,6 +6074,14 @@ export default function App() {
   const [pagina, setPagina] = useState("home"); // home | login | app | candidatura
   const [ruolo, setRuolo] = useState("pilota");
   const [tab, setTab] = useState("cerca");
+  const [tabCoach, setTabCoach] = useState("oggi");
+  /* La disponibilità del coach vive QUI, non dentro l'area coach: la
+     modifica il coach, la legge il calendario di allocazione del pilota.
+     Una sorgente sola — se stesse dentro AreaCoach sarebbe una seconda
+     copia, e due copie della disponibilità significano prima o poi una
+     doppia prenotazione. */
+  const [dispCoach, setDispCoach] = useState(DISPONIBILITA_COACH_INIZIALE);
+  const [stanzaCoach, setStanzaCoach] = useState(anyOf(null)); // sessione aperta dal lato coach
   const [coach, setCoach] = useState(null);
   const [note, setNote] = useState(PERCORSO.note);
   const [chatCoachId, setChatCoachId] = useState(""); // "" = nessuna chat aperta
@@ -4154,7 +6229,7 @@ export default function App() {
     setPrenotazioni((prev) => prev.map((p) => (p.id === id ? { ...p, stato: "svolta" } : p)));
   };
 
-  useEffect(() => { window.scrollTo(0, 0); }, [pagina, tab, coach, chatCoachId]);
+  useEffect(() => { window.scrollTo(0, 0); }, [pagina, tab, tabCoach, coach, chatCoachId, stanzaCoach]);
 
   const vaiLogin = (r) => { setRuolo(r); setPagina("login"); };
   const vaiCandidatura = () => setPagina("candidatura");
@@ -4241,8 +6316,13 @@ export default function App() {
                 </>
               ) : (
                 <>
-                  <button data-on="1">Area coach</button>
-                  <span className="esci">Marco Bertolini</span>
+                  {[["oggi", "Oggi"], ["allievi", "Allievi"], ["agenda", "Agenda"],
+                    ["offerte", "Offerte"], ["profilo", "Profilo"], ["messaggi", "Messaggi"],
+                    ["compensi", "Compensi"], ["risultati", "Risultati"], ["piani", "Piani"]].map(([k, l]) => (
+                    <button key={k} data-on={tabCoach === k ? "1" : "0"}
+                            onClick={() => { setTabCoach(k); setStanzaCoach(null); }}>{l}</button>
+                  ))}
+                  <span className="esci">{COACHES[0].nome}</span>
                 </>
               )}
             </div>
@@ -4276,6 +6356,7 @@ export default function App() {
           {ruolo === "pilota" && !chatCoachId && !acquisto && calendarioCoach && (
             <CalendarioAllocazione coach={calendarioCoach}
                        walletOre={walletDi(anyOf(calendarioCoach).id).disponibili}
+                       disponibilita={anyOf(calendarioCoach).id === COACH_DEMO_ID ? dispCoach : null}
                        prenotazioni={prenotazioni} fusoPilota={FUSO_PILOTA_DEFAULT}
                        onConferma={allocaSlot} chiudi={chiudiCalendarioAllocazione}
                        vaiPercorso={() => { chiudiCalendarioAllocazione(); setCoach(null); setTab("percorso"); }} />
@@ -4306,7 +6387,16 @@ export default function App() {
             <SchedaPilota vaiPercorso={() => setTab("percorso")}
                           iracingCollegato={iracingCollegato} setIracingCollegato={setIracingCollegato} />
           )}
-          {ruolo === "coach" && <AreaCoach />}
+          {ruolo === "coach" && (stanzaCoach
+            ? <StanzaSessione prenotazione={stanzaCoach} coach={COACHES[0]} lato="coach"
+                              allievoNome={(ALLIEVI_COACH.find((a) => a.id === anyOf(stanzaCoach).allievoId) || {}).nome}
+                              chiudi={() => setStanzaCoach(null)} onTermina={() => {}} />
+            : <AreaCoach vista={tabCoach} setVista={setTabCoach}
+                         note={note} setNote={setNote} prenotazioni={prenotazioni}
+                         chatMessaggi={chatMessaggi} aggiornaMessaggi={aggiornaMessaggi}
+                         walletPerCoach={walletPerCoach}
+                         disponibilita={dispCoach} setDisponibilita={setDispCoach}
+                         apriStanza={(s) => setStanzaCoach(anyOf(s))} />)}
         </>
       )}
     </div>
