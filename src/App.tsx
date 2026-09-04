@@ -459,6 +459,33 @@ html,body{margin:0;padding:0;-webkit-text-size-adjust:100%;text-size-adjust:100%
      --blu2, come tutti i dati verificati */
   --eroe:var(--blu2);
   --linea:#E8B94C;
+  /* ---- token introdotti per il tema chiaro ----------------------------
+     Sullo scuro valgono esattamente quello che valeva prima (nessun
+     cambiamento visibile): esistono perche' il chiaro possa cambiare SOLO
+     token, senza regole sparse. --bordo resta il separatore fra blocchi;
+     --bordoForte e' il bordo dei CONTROLLI (campi, bottoni fantasma, slot),
+     che sul chiaro deve reggere 3:1 mentre un separatore no; --bordoTenue
+     e' il filo fra le righe dentro un blocco, il primo a diventare rumore
+     quando il fondo e' chiaro. */
+  --bordoForte:var(--bordo);
+  --bordoTenue:var(--bordo);
+  --navFondo:rgba(10,11,13,.94);
+  --suPieno:#fff;              /* testo sopra i riempimenti colorati pieni */
+  --trama:rgba(255,255,255,.022); /* righe diagonali dei segnaposto media */
+  /* la pista: sullo scuro l'asfalto e' piu' chiaro del fondo e i track
+     limits sono chiari; sul chiaro si ribalta (vedi il tema Carta) */
+  --pistaAsfalto:var(--bordo);
+  --pistaLimite:var(--bianco);
+  --pistaCordoloA:var(--rosso2);
+  --pistaCordoloB:var(--bianco);
+  --pistaNodo:var(--linea);
+  --pistaOpacita:.9;
+  --pistaOpacitaStretta:.4;
+  --pistaLimiteW:19px; --pistaAsfaltoW:14px;
+  --pistaCentro:transparent; --pistaCentroW:0; --pistaCentroStrettaW:0;
+  --pistaLimiteStrettaW:11px; --pistaAsfaltoStrettaW:8px;
+  --pistaTaccaW:7px; --pistaTaccaStrettaW:5px;
+  --pistaNodoW:7px; --pistaNodoStrettaW:6px;
   background:var(--nero); color:var(--bianco); min-height:100%;
   font-family:'Fraunces',Georgia,serif; -webkit-font-smoothing:antialiased; line-height:1.5;
 }
@@ -483,6 +510,148 @@ html,body{margin:0;padding:0;-webkit-text-size-adjust:100%;text-size-adjust:100%
   --bluHover:#3C6DF0; --rossoHover:#B32229;
   --eroe:var(--blu2);
 }
+
+/* ---- TEMA "Carta": la versione chiara ------------------------------------
+   Non e' lo scuro invertito. I valori sono stati riscelti uno per uno e i
+   contrasti verificati (rapporti WCAG indicati accanto): una palette scura
+   ribaltata su bianco produce colori che brillano sul nero e diventano
+   sgargianti sul chiaro.
+
+   Il fondo e' carta avorio, non bianco: il prodotto vende dati verificati, e
+   su una carta con un tono il numero-eroe legge come inchiostro su un foglio
+   di telemetria invece che come un'insegna accesa — che e' la prova a cui
+   questa palette doveva rispondere.
+
+   Inversione strutturale rispetto allo scuro: qui le SUPERFICI sono piu'
+   chiare del fondo (--nero2 > --nero), non piu' scure. Le card si alzano
+   verso la luce invece di scavare nel fondo, cosi' i blocchi si separano per
+   luminosita' e non per un bordo grigio chiarissimo attorno a tutto — che e'
+   uno dei segni generici da evitare.
+
+   I nomi dei token restano quelli dello scuro perche' il token descrive il
+   RUOLO, non la tinta: --nero e' "il fondo", --bianco e' "il testo
+   primario". Rinominarli avrebbe voluto dire riscrivere ogni schermata. */
+.crd[data-theme="carta"]{
+  --nero:#F4F0E7;        /* fondo, carta avorio */
+  --nero2:#FDFBF6;       /* superficie ALZATA (card, blocchi, barra) */
+  --nero3:#EBE5D8;       /* superficie incassata (barre di riempimento, chip) */
+  --bordo:#C6BCA6;       /* separatore fra blocchi */
+  --bordoTenue:#E4DCCB;  /* filo fra le righe dentro un blocco */
+  --bordoForte:#7D7364;  /* bordo dei controlli — 4.10:1, oltre il 3:1 richiesto */
+  --bianco:#1E1B16;      /* testo primario, bruno quasi-nero — 15.09:1 */
+  --grigio:#574F44;      /* testo secondario — 7.08:1, non un grigio slavato */
+  --grigio2:#6E6455;     /* etichette e terziario — 5.10:1 */
+
+  /* marchio: terracotta, 6.08:1. Resta raro come sullo scuro */
+  --rosso:#9C3A1E; --rosso2:#8E3319; --rossoSoft:rgba(156,58,30,.10);
+  --rossoHover:#87301A;
+
+  /* FIRMA del dato verificato: petrolio profondo. Sullo scuro il ruolo
+     "testo" (--blu2) era la variante PIU' CHIARA; sul chiaro si inverte, la
+     variante testo e' la piu' scura — 7.4:1 contro i 6.6:1 del riempimento */
+  --blu:#0D5F55; --blu2:#0B554C; --bluSoft:rgba(13,95,85,.10);
+  --bluHover:#0A4C44;
+
+  /* triade di stato: riscelta, non ribaltata. Il verde acido e l'oro chiaro
+     dello scuro qui diventerebbero fluorescenti */
+  --verde:#3D6B22; --verdeSoft:rgba(61,107,34,.12);   /* Consigliato — 5.55:1 */
+  --oro:#7A5A16;   --oroSoft:rgba(122,90,22,.12);     /* Neutro — 5.59:1 */
+  --ambra:#94481A; --ambraSoft:rgba(148,72,26,.12);   /* Avviso — 5.77:1 */
+  --distr:#9C3A1E; --distr2:#8E3319; --distrSoft:rgba(156,58,30,.10);
+
+  --eroe:var(--blu2);
+  --linea:#A9761F;       /* il giallo cordolo sul chiaro sbianca: ocra scuro */
+  --navFondo:rgba(253,251,246,.93);
+  --suPieno:#fff;        /* su --blu 6.6:1, su --rosso 6.9:1 */
+  --trama:rgba(30,27,22,.05);
+
+  /* la pista si ribalta: banda d'asfalto SCURA sulla carta, e i track limits
+     bianchi finalmente si vedono per contrasto contro l'asfalto invece che
+     contro il fondo — che e' anche come stanno le cose in pista. Il cordolo
+     lascia il rosso: saturo su carta chiara pesa troppo e ruberebbe
+     attenzione al marchio, che deve restare raro. Bianco/grigio scuro e'
+     un cordolo reale, presente su molti circuiti.
+     Spessori e opacita' scendono: una linea scura sul chiaro invade molto
+     piu' di quanto una linea chiara invadesse il nero. */
+  /* i tre strati, dal piu' largo al piu' stretto: asfalto (banda scura,
+     8.36:1 sul fondo) / riga bianca / asfalto di nuovo al centro. I nomi
+     dei token restano quelli dello scuro, dove il primo strato era il
+     limite bianco: cambia il valore, non il ruolo strutturale */
+  --pistaLimite:#4A453C;       /* strato largo: l'asfalto */
+  --pistaAsfalto:#FFFFFF;      /* strato di mezzo: i track limits */
+  --pistaCentro:#4A453C;       /* strato stretto: l'asfalto fra le due righe */
+  --pistaCordoloA:#FFFFFF;
+  --pistaCordoloB:#3E3A33;
+  --pistaNodo:#A9761F;
+  /* piu' sottile, non piu' sbiadita: una linea scura sul chiaro invade molto
+     piu' di una linea chiara sul nero, ma abbassare troppo l'opacita' la
+     faceva leggere come un grigio slavato invece che come asfalto */
+  --pistaOpacita:.62;
+  --pistaOpacitaStretta:.3;
+  --pistaLimiteW:13px; --pistaAsfaltoW:10px; --pistaCentroW:7px;
+  --pistaLimiteStrettaW:8px; --pistaAsfaltoStrettaW:6px; --pistaCentroStrettaW:4px;
+  --pistaTaccaW:5px; --pistaTaccaStrettaW:4px;
+  --pistaNodoW:7px; --pistaNodoStrettaW:6px;
+
+  /* sul chiaro l'antialiasing "antialiased" assottiglia il testo scuro e lo
+     fa sembrare sbiadito: sullo scuro serviva, qui va tolto */
+  -webkit-font-smoothing:auto; -moz-osx-font-smoothing:auto;
+}
+
+/* La triade di stato cambia TRATTAMENTO, non significato: sullo scuro sono
+   blocchi pieni, sul chiaro tre rettangoli saturi in fila urlerebbero. Qui
+   diventano chip a fondo tenue con testo scuro e bordo del proprio colore
+   (5.3:1 in tutti e tre i casi). Solo token, nessun esadecimale sparso. */
+.crd[data-theme="carta"] .stato{border-width:1px;font-weight:600}
+.crd[data-theme="carta"] .stato-consigliato{background:var(--verdeSoft);color:var(--verde);border-color:var(--verde)}
+.crd[data-theme="carta"] .stato-neutro{background:var(--oroSoft);color:var(--oro);border-color:var(--oro)}
+.crd[data-theme="carta"] .stato-avviso{background:var(--ambraSoft);color:var(--ambra);border-color:var(--ambra)}
+
+/* Sul chiaro il peso lo fa la tipografia, non il bagliore: i numeri-eroe
+   (saldo ore, +iR, compensi) guadagnano un filo di corpo e una spaziatura
+   piu' stretta, cosi' restano il primo elemento della gerarchia senza
+   dover accendere un colore. */
+.crd[data-theme="carta"] .kval,
+.crd[data-theme="carta"] .ccbig,
+.crd[data-theme="carta"] .metric .big{letter-spacing:-.035em}
+.crd[data-theme="carta"] .stit{color:var(--grigio)}
+.crd[data-theme="carta"] .cc{border-color:var(--bordoForte)}
+/* Il logo iRacing e' un tracciato bianco su trasparente: sul chiaro sparisce.
+   Non si tocca l'interruttore logo/testo del badge — il logo resta logo, e
+   prende la piastra scura con cui va usato sopra un fondo chiaro, che e' il
+   modo in cui questi marchi si mettono su carta. */
+.crd[data-theme="carta"] .platLogoStandalone{background:var(--bianco);padding:6px 8px;border-radius:2px}
+/* Le griglie diventano rumorose sul chiaro, ed è dove il significato si
+   ribalta: sullo scuro "libero" era il fondo nudo e "non disponibile" una
+   superficie appena più chiara, quindi il libero spariva nel fondo e andava
+   bene. Sul chiaro la stessa mappatura fa leggere i blocchi NON disponibili
+   come le celle più accese della griglia, cioè l'esatto contrario di quello
+   che devono comunicare. Qui il libero è la superficie pulita (carta bianca,
+   ci si può scrivere) e l'occupato è la superficie incassata. */
+.crd[data-theme="carta"] .calGrid{background:var(--bordoTenue)}
+.crd[data-theme="carta"] .calCell{background:var(--nero2)}
+.crd[data-theme="carta"] .calCell[data-stato="libero"]:hover{background:var(--bluSoft)}
+.crd[data-theme="carta"] .calCell[data-stato="occupato"]{background:var(--nero3);opacity:1}
+.crd[data-theme="carta"] .calCell[data-stato="non-disponibile"]{background:var(--nero3);opacity:.8}
+.crd[data-theme="carta"] .calCell[data-stato="passato"]{background:var(--nero3);opacity:.55}
+.crd[data-theme="carta"] .agendaSlot{background:var(--nero3)}
+.crd[data-theme="carta"] .agendaSlot[data-stato="aperto"]{background:var(--bluSoft)}
+.crd[data-theme="carta"] .agendaSlot[data-stato="occupato"]{background:var(--nero2)}
+/* stessa ragione: la barra piena deve essere il dato, non il contenitore */
+.crd[data-theme="carta"] .orebar{background:var(--nero3)}
+
+/* Il testo vince sulla pista, senza sbiadire la pista. Sullo scuro la
+   traiettoria era una linea chiara e sottile che passava dietro al testo
+   quasi senza farsi sentire; sul chiaro e' una banda scura, e dove taglia
+   un paragrafo lo rende faticoso. Invece di scolorirla fino a farla
+   sembrare un grigio qualunque, il testo dell'hero prende un alone del
+   colore della carta: si vede solo dove la banda passa sotto, e il
+   tracciato resta un tracciato. */
+.crd[data-theme="carta"] .h1,
+.crd[data-theme="carta"] .lead,
+.crd[data-theme="carta"] .sezhead .h2,
+.crd[data-theme="carta"] .sezhead .p{
+  text-shadow:0 0 7px var(--nero),0 0 4px var(--nero),0 0 2px var(--nero)}
 
 /* ---- TEMA A — "Teal" (ispirato Mercedes): un solo accento, dato+marchio+
    primario coincidono. Distruttivo resta un rosso a parte, per non confondersi. */
@@ -583,7 +752,7 @@ html,body{margin:0;padding:0;-webkit-text-size-adjust:100%;text-size-adjust:100%
 .eyebrow{font-family:'Saira Condensed',sans-serif;font-size:14px;font-weight:600;color:var(--grigio2);margin-bottom:6px}
 
 /* ---- barra ---- */
-.nav{position:sticky;top:0;z-index:40;background:rgba(10,11,13,.94);backdrop-filter:blur(10px);border-bottom:1px solid var(--bordo)}
+.nav{position:sticky;top:0;z-index:40;background:var(--navFondo);backdrop-filter:blur(10px);border-bottom:1px solid var(--bordo)}
 /* flex-wrap qui e' innocuo su desktop (il contenuto entra sempre su una riga
    entro i 1080px di .w): serve solo da rete di sicurezza per il breakpoint
    mobile qui sotto, che forza --navcta a andare a capo su riga propria */
@@ -603,20 +772,20 @@ html,body{margin:0;padding:0;-webkit-text-size-adjust:100%;text-size-adjust:100%
 .b{font-family:'Saira Condensed',sans-serif;font-weight:600;font-size:14px;letter-spacing:.01em;
   padding:11px 18px;border:1px solid transparent;cursor:pointer;border-radius:3px;transition:background .15s,border-color .15s}
 .b:focus-visible{outline:2px solid var(--bianco);outline-offset:2px}
-.b-rosso{background:var(--rosso);color:#fff}
+.b-rosso{background:var(--rosso);color:var(--suPieno)}
 .b-rosso:hover{background:var(--rossoHover)}
-.b-blu{background:var(--blu);color:#fff}
+.b-blu{background:var(--blu);color:var(--suPieno)}
 .b-blu:hover{background:var(--bluHover)}
-.b-distr{background:var(--distr);color:#fff}
+.b-distr{background:var(--distr);color:var(--suPieno)}
 .b-distr:hover{background:var(--distr2)}
-.b-ghost{background:transparent;border-color:var(--bordo);color:var(--bianco)}
+.b-ghost{background:transparent;border-color:var(--bordoForte);color:var(--bianco)}
 .b-ghost:hover{border-color:var(--grigio)}
 .b-lg{padding:15px 26px;font-size:16px;width:100%}
 @media(min-width:640px){.b-lg{width:auto}}
 
 /* ---- slot media ---- */
 .slot{position:relative;width:100%;border:1px dashed var(--bordo);background:
-  repeating-linear-gradient(135deg,transparent,transparent 9px,rgba(255,255,255,.022) 9px,rgba(255,255,255,.022) 18px),var(--nero2);
+  repeating-linear-gradient(135deg,transparent,transparent 9px,var(--trama) 9px,var(--trama) 18px),var(--nero2);
   display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:18px;text-align:center}
 .slot code{font-size:12px;letter-spacing:.1em;color:var(--grigio);
   border:1px solid var(--bordo);padding:3px 9px}
@@ -650,11 +819,11 @@ html,body{margin:0;padding:0;-webkit-text-size-adjust:100%;text-size-adjust:100%
    Con z-index negativo l'SVG dipinge nel livello sotto lo sfondo del
    contenuto normale, che è esattamente il "dietro al testo" richiesto,
    senza dover aggiungere z-index:1 a ogni sezione che ci sta sopra. */
-.pistaSvg{position:absolute;inset:0;width:100%;height:100%;z-index:-1;pointer-events:none;opacity:.9}
+.pistaSvg{position:absolute;inset:0;width:100%;height:100%;z-index:-1;pointer-events:none;opacity:var(--pistaOpacita)}
 @media(max-width:640px){
   /* su schermi stretti la banda non deve invadere il testo: piu' sottile
      e piu' tenue, non sparita — resta "riconoscibile come pista" */
-  .pistaSvg{opacity:.4}
+  .pistaSvg{opacity:var(--pistaOpacitaStretta)}
 }
 /* bordo/asfalto: stesso <path> disegnato due volte, larghezze diverse —
    il layer sotto (bianco, largo) resta visibile solo ai due bordi del
@@ -670,9 +839,20 @@ html,body{margin:0;padding:0;-webkit-text-size-adjust:100%;text-size-adjust:100%
    fascia d'asfalto vera e propria, larga abbastanza da leggersi come
    pista e non come un filo */
 .pistaLayer{stroke-linecap:round;vector-effect:non-scaling-stroke}
-.pistaBordo{stroke:var(--bianco);stroke-width:19}
-.pistaAsfalto{stroke:var(--bordo);stroke-width:14}
-@media(max-width:640px){.pistaBordo{stroke-width:11}.pistaAsfalto{stroke-width:8}}
+.pistaBordo{stroke:var(--pistaLimite);stroke-width:var(--pistaLimiteW)}
+.pistaAsfalto{stroke:var(--pistaAsfalto);stroke-width:var(--pistaAsfaltoW)}
+/* terzo strato, largo zero sullo scuro (dove non serve e non si disegna).
+   Sul chiaro serve eccome: con due soli strati il colore di sotto si vede
+   SOLO ai bordi esterni, quindi i track limits bianchi finivano fuori
+   dall'asfalto, contro la carta, e sparivano. Con tre strati la sequenza
+   diventa quella vera di una pista — asfalto, riga bianca dipinta sopra,
+   asfalto al centro — e il bianco si vede perche' ha l'asfalto sotto. */
+.pistaCentro{stroke:var(--pistaCentro);stroke-width:var(--pistaCentroW)}
+@media(max-width:640px){
+  .pistaBordo{stroke-width:var(--pistaLimiteStrettaW)}
+  .pistaAsfalto{stroke-width:var(--pistaAsfaltoStrettaW)}
+  .pistaCentro{stroke-width:var(--pistaCentroStrettaW)}
+}
 /* cordolo: tacche vere, perpendicolari alla direzione di marcia sullo
    SCHERMO (calcolate in JS, vedi PistaContinua — il viewBox deformato
    rende impossibile ottenerle con un angolo fisso nel markup), solo sul
@@ -681,17 +861,17 @@ html,body{margin:0;padding:0;-webkit-text-size-adjust:100%;text-size-adjust:100%
    intatti) — e' l'unico secondo uso del marchio in tutta l'home, oltre al
    logo */
 .pistaCordoloGruppo{transition:opacity .5s ease}
-.pistaTacca{stroke-width:7;vector-effect:non-scaling-stroke}
-@media(max-width:640px){.pistaTacca{stroke-width:5}}
-.pistaTacca[data-tinta="a"]{stroke:var(--rosso2)}
-.pistaTacca[data-tinta="b"]{stroke:var(--bianco)}
+.pistaTacca{stroke-width:var(--pistaTaccaW);vector-effect:non-scaling-stroke}
+@media(max-width:640px){.pistaTacca{stroke-width:var(--pistaTaccaStrettaW)}}
+.pistaTacca[data-tinta="a"]{stroke:var(--pistaCordoloA)}
+.pistaTacca[data-tinta="b"]{stroke:var(--pistaCordoloB)}
 /* nodo: marcatore discreto (non un disco) che "si accende" quando la
    linea raggiunge l'aggancio di un passaggio — vedi il trigger nel
    commento di PistaContinua. transform-origin al centro cosi' lo scale
    rimane concentrico invece di spostare il punto */
-.pistaNodo{stroke:var(--linea);stroke-width:7;stroke-linecap:round;
+.pistaNodo{stroke:var(--pistaNodo);stroke-width:var(--pistaNodoW);stroke-linecap:round;
   transform-origin:center;transform-box:fill-box;transition:opacity .3s ease,transform .3s ease}
-@media(max-width:640px){.pistaNodo{stroke-width:6}}
+@media(max-width:640px){.pistaNodo{stroke-width:var(--pistaNodoStrettaW)}}
 @media(prefers-reduced-motion:reduce){
   .pistaCordoloGruppo,.pistaNodo{transition:none}
 }
@@ -791,7 +971,7 @@ html,body{margin:0;padding:0;-webkit-text-size-adjust:100%;text-size-adjust:100%
 .porta p{color:var(--grigio);font-size:14.5px;line-height:1.6;flex:1;margin:0 0 20px}
 
 .faq{border-top:1px solid var(--bordo)}
-.faq details{border-bottom:1px solid var(--bordo);padding:18px 0}
+.faq details{border-bottom:1px solid var(--bordoTenue);padding:18px 0}
 .faq summary{cursor:pointer;font-family:'Saira Condensed',sans-serif;font-weight:600;font-size:16.5px;list-style:none}
 .faq summary::-webkit-details-marker{display:none}
 .faq summary::before{content:"+ ";color:var(--grigio)}
@@ -804,11 +984,11 @@ html,body{margin:0;padding:0;-webkit-text-size-adjust:100%;text-size-adjust:100%
 /* ---- login ---- */
 .auth{min-height:calc(100vh - 62px);display:flex;align-items:center;justify-content:center;padding:40px 20px}
 .authbox{width:100%;max-width:420px;border:1px solid var(--bordo);background:var(--nero2);padding:28px}
-.tabs{display:grid;grid-template-columns:1fr 1fr;gap:0;border:1px solid var(--bordo);margin:20px 0 22px}
+.tabs{display:grid;grid-template-columns:1fr 1fr;gap:0;border:1px solid var(--bordoForte);margin:20px 0 22px}
 .tabs button{background:transparent;border:0;padding:12px;cursor:pointer;color:var(--grigio);
   font-family:'Saira Condensed',sans-serif;font-weight:600;font-size:14px}
-.tabs button[data-on="1"][data-r="pilota"]{background:var(--blu);color:#fff}
-.tabs button[data-on="1"][data-r="coach"]{background:var(--rosso);color:#fff}
+.tabs button[data-on="1"][data-r="pilota"]{background:var(--blu);color:var(--suPieno)}
+.tabs button[data-on="1"][data-r="coach"]{background:var(--rosso);color:var(--suPieno)}
 .campo{margin-bottom:14px}
 /* diretto, non discendente: senza, questa regola scavalcava anche le label
    dei checkbox dentro un .checkgrid annidato in un .campo (font monospace
@@ -823,10 +1003,10 @@ html,body{margin:0;padding:0;-webkit-text-size-adjust:100%;text-size-adjust:100%
    di lato: esattamente il bug "casella a un estremo, etichetta all'altro,
    vuoto in mezzo" segnalato. Qui si corregge alla radice, non sulle singole
    schermate dove si è visto: vale per ogni .campo, presente e futuro. */
-.campo input:not([type="checkbox"]):not([type="radio"]){width:100%;background:var(--nero);border:1px solid var(--bordo);color:var(--bianco);
+.campo input:not([type="checkbox"]):not([type="radio"]){width:100%;background:var(--nero);border:1px solid var(--bordoForte);color:var(--bianco);
   padding:11px 12px;font-family:'Saira Condensed',sans-serif;font-size:14px;border-radius:2px}
 .campo input:focus{outline:none;border-color:var(--grigio)}
-.campo select,.campo textarea{width:100%;background:var(--nero);border:1px solid var(--bordo);color:var(--bianco);
+.campo select,.campo textarea{width:100%;background:var(--nero);border:1px solid var(--bordoForte);color:var(--bianco);
   padding:11px 12px;font-family:'Saira Condensed',sans-serif;font-size:14px;border-radius:2px}
 .campo textarea{resize:vertical;min-height:88px;line-height:1.5}
 .campo select:focus,.campo textarea:focus{outline:none;border-color:var(--grigio)}
@@ -886,7 +1066,7 @@ html,body{margin:0;padding:0;-webkit-text-size-adjust:100%;text-size-adjust:100%
    regola dava flex:1 anche ai suoi checkbox, stirandoli a riempire l'intera
    riga (il caso piu' vistoso del bug: la casella diventava un rettangolo
    largo quanto tutta la riga, il testo spinto ai margini). */
-.frow select,.frow input:not([type="checkbox"]):not([type="radio"]){flex:1;min-width:0;background:var(--nero);color:var(--bianco);border:1px solid var(--bordo);
+.frow select,.frow input:not([type="checkbox"]):not([type="radio"]){flex:1;min-width:0;background:var(--nero);color:var(--bianco);border:1px solid var(--bordoForte);
   padding:8px 10px;font-family:'Saira Condensed',sans-serif;font-size:13px;border-radius:2px}
 .frow input::placeholder{color:var(--grigio2)}
 
@@ -933,9 +1113,32 @@ html,body{margin:0;padding:0;-webkit-text-size-adjust:100%;text-size-adjust:100%
 .fit.no{border-color:var(--bordo);background:var(--nero);color:var(--grigio2)}
 .stato{display:inline-flex;align-items:center;font-family:'Saira Condensed',sans-serif;font-size:10.5px;
   letter-spacing:.1em;text-transform:uppercase;padding:4px 9px;border:1px solid transparent;border-radius:2px}
-.stato-consigliato{background:var(--verde);color:#fff}
+.stato-consigliato{background:var(--verde);color:var(--suPieno)}
 .stato-neutro{background:var(--oro);color:#241A05}
-.stato-avviso{background:var(--ambra);color:#fff}
+.stato-avviso{background:var(--ambra);color:var(--suPieno)}
+/* La triade non puo' dipendere dal solo colore: chi non distingue verde e
+   rosso deve poterli separare comunque. L'etichetta c'era gia' (Consigliato
+   / Neutro / Avviso); qui si aggiunge una FORMA disegnata con i bordi —
+   cerchio, quadrato, triangolo — invece di un carattere, cosi' non finisce
+   letta ad alta voce dai lettori di schermo, che leggono gia' l'etichetta. */
+.stato::before{content:"";display:inline-block;width:8px;height:8px;margin-right:7px;
+  background:currentColor;flex:none}
+.stato-consigliato::before{border-radius:50%}
+.stato-neutro::before{border-radius:1px}
+.stato-avviso::before{width:0;height:0;background:none;
+  border-left:5px solid transparent;border-right:5px solid transparent;
+  border-bottom:9px solid currentColor;border-radius:0}
+
+/* selettore del tema: due sole voci pubbliche (Scuro / Chiaro), perche' il
+   confronto A/B e' il punto. I quattro temi di sviluppo restano raggiungibili
+   solo da ?tema=nome, come prima. */
+.temaSw{display:inline-flex;border:1px solid var(--bordoForte);border-radius:2px;overflow:hidden;flex:none}
+.temaSw button{background:transparent;border:0;color:var(--grigio2);cursor:pointer;
+  font-family:'Saira Condensed',sans-serif;font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;
+  padding:7px 10px;min-height:34px;white-space:nowrap}
+.temaSw button[data-on="1"]{background:var(--nero3);color:var(--bianco)}
+.temaSw button:focus-visible{outline:2px solid var(--blu2);outline-offset:-2px}
+@media(max-width:640px){.temaSw button{min-height:44px;padding:7px 12px}}
 .notaBox{border:1px solid var(--bordo);background:var(--nero2);padding:14px 16px;margin-top:10px;font-size:13px;line-height:1.6}
 .notaBox b{color:var(--bianco)}
 .notaBox.ambra{border-color:var(--ambra);background:var(--ambraSoft)}
@@ -945,7 +1148,7 @@ html,body{margin:0;padding:0;-webkit-text-size-adjust:100%;text-size-adjust:100%
 .notaBox.distr{border-color:var(--distr);background:var(--distrSoft)}
 .notaBox.distr b{color:var(--distr2)}
 .altList{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
-.altList button{background:var(--nero);border:1px solid var(--bordo);color:var(--bianco);
+.altList button{background:var(--nero);border:1px solid var(--bordoForte);color:var(--bianco);
   font-family:'Saira Condensed',sans-serif;font-size:11.5px;padding:6px 10px;cursor:pointer;border-radius:2px}
 .altList button:hover{border-color:var(--blu2);color:var(--blu2)}
 .chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:14px}
@@ -975,7 +1178,7 @@ html,body{margin:0;padding:0;-webkit-text-size-adjust:100%;text-size-adjust:100%
   background:var(--blu2);border:2px solid var(--nero);cursor:pointer}
 
 .blocco{border:1px solid var(--bordo);background:var(--nero2);padding:18px}
-.riga{display:flex;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid var(--bordo);font-size:14px;align-items:baseline}
+.riga{display:flex;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid var(--bordoTenue);font-size:14px;align-items:baseline}
 .riga:last-child{border-bottom:0}
 .riga .nn{font-family:'Saira Condensed',sans-serif;font-size:11px;color:var(--grigio2)}
 .stit{font-family:'Saira Condensed',sans-serif;font-size:15px;font-weight:600;color:var(--grigio2);
@@ -983,7 +1186,7 @@ html,body{margin:0;padding:0;-webkit-text-size-adjust:100%;text-size-adjust:100%
   display:flex;justify-content:space-between;gap:10px}
 .nota{font-size:12.5px;color:var(--grigio2);line-height:1.6;margin-top:12px}
 .indietro{background:none;border:0;color:var(--grigio2);cursor:pointer;font-size:13px;padding:18px 0 6px;font-family:'Saira Condensed',sans-serif}
-.slotchip{border:1px solid var(--bordo);background:var(--nero);color:var(--bianco);padding:11px;
+.slotchip{border:1px solid var(--bordoForte);background:var(--nero);color:var(--bianco);padding:11px;
   cursor:pointer;font-family:'Saira Condensed',sans-serif;font-size:13px;border-radius:2px}
 .slotchip[data-on="1"]{border-color:var(--blu2);background:var(--bluSoft);color:var(--blu2)}
 .slotgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px}
@@ -1002,7 +1205,10 @@ html,body{margin:0;padding:0;-webkit-text-size-adjust:100%;text-size-adjust:100%
 .recmeta{display:flex;gap:12px;flex-wrap:wrap;font-family:'Saira Condensed',sans-serif;font-size:11.5px;color:var(--grigio2)}
 .dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:8px;vertical-align:middle}
 .orebar{height:8px;background:var(--bordo);border-radius:4px;overflow:hidden;margin-top:14px}
-.orebarfill{height:100%;background:var(--blu2)}
+/* display:block: nel contatore fiscale il riempimento era un <i>, quindi un
+   elemento inline, e larghezza/altezza venivano ignorate — barra sempre
+   vuota. Sullo scuro non si notava, sul chiaro salta all'occhio */
+.orebarfill{display:block;height:100%;background:var(--blu2)}
 
 /* ---- pacchetti ore: auto-fit si impila da solo sotto un certo spazio,
    niente media query dedicata da mantenere in giro ---- */
@@ -1061,7 +1267,7 @@ html,body{margin:0;padding:0;-webkit-text-size-adjust:100%;text-size-adjust:100%
 .azsess.avvia{color:var(--verde)}
 .azsess.avvia:hover{border-color:var(--verde)}
 .badge{display:inline-flex;align-items:center;justify-content:center;min-width:16px;height:16px;
-  padding:0 4px;margin-left:7px;border-radius:8px;background:var(--ambra);color:#fff;
+  padding:0 4px;margin-left:7px;border-radius:8px;background:var(--ambra);color:var(--suPieno);
   font-family:'Saira Condensed',sans-serif;font-size:10px;font-weight:600;vertical-align:middle}
 .chatBox{border:1px solid var(--bordo);background:var(--nero2);padding:16px;margin-top:20px;
   display:flex;flex-direction:column;gap:10px;max-height:60vh;overflow-y:auto}
@@ -1070,7 +1276,7 @@ html,body{margin:0;padding:0;-webkit-text-size-adjust:100%;text-size-adjust:100%
 .msg .msgOra{display:flex;align-items:center;gap:8px;margin-top:5px;
   font-family:'Saira Condensed',sans-serif;font-size:10px;opacity:.75}
 .msg.loro{align-self:flex-start;background:var(--nero3);color:var(--bianco);border:1px solid var(--bordo)}
-.msg.mio{align-self:flex-end;background:var(--blu);color:#fff}
+.msg.mio{align-self:flex-end;background:var(--blu);color:var(--suPieno)}
 .msgAzione{background:none;border:0;padding:0;cursor:pointer;font-family:'Saira Condensed',sans-serif;
   font-size:10px;text-decoration:underline;color:inherit;opacity:.9}
 .msgAzione.fatta{text-decoration:none;cursor:default}
@@ -1089,10 +1295,10 @@ html,body{margin:0;padding:0;-webkit-text-size-adjust:100%;text-size-adjust:100%
 .prefEmail{display:flex;align-items:flex-start;gap:9px;margin-top:16px;font-size:12.5px;
   color:var(--grigio2);line-height:1.5;cursor:pointer}
 .prefEmail input{margin-top:3px;accent-color:var(--blu2);flex:none}
-.emailBanner{position:sticky;top:62px;z-index:30;background:var(--blu);color:#fff}
+.emailBanner{position:sticky;top:62px;z-index:30;background:var(--blu);color:var(--suPieno)}
 .emailBannerin{display:flex;align-items:center;gap:12px;padding:10px 20px;font-size:13.5px}
 .emailBannerin b{font-weight:700}
-.emailBanner button{background:none;border:0;color:#fff;cursor:pointer;font:inherit}
+.emailBanner button{background:none;border:0;color:var(--suPieno);cursor:pointer;font:inherit}
 .emailBanner .apriBanner{text-decoration:underline;font-weight:600;margin-left:auto}
 .emailBanner .chiudiBanner{font-size:16px;opacity:.85;padding:0 2px}
 .emailBanner .chiudiBanner:hover{opacity:1}
@@ -1116,7 +1322,7 @@ html,body{margin:0;padding:0;-webkit-text-size-adjust:100%;text-size-adjust:100%
 
 /* ---- "con chi hai lavorato prima": impila su mobile, affianca da tablet in su (punto 3) ---- */
 .storicoRiga{display:flex;flex-direction:column;gap:4px;padding:10px 0;
-  border-bottom:1px solid var(--bordo);font-size:14px}
+  border-bottom:1px solid var(--bordoTenue);font-size:14px}
 .storicoRiga:last-child{border-bottom:0}
 @media(min-width:640px){.storicoRiga{flex-direction:row;justify-content:space-between;align-items:baseline;gap:14px}}
 
@@ -1143,8 +1349,8 @@ html,body{margin:0;padding:0;-webkit-text-size-adjust:100%;text-size-adjust:100%
    760px l'etichetta sparisce e ricompare la riga di intestazione. */
 .tab{margin-top:8px}
 .tabTesta{display:none;font-family:'Saira Condensed',sans-serif;font-size:11.5px;letter-spacing:.04em;
-  color:var(--grigio2);padding-bottom:8px;border-bottom:1px solid var(--bordo);gap:12px}
-.tabRiga{display:grid;grid-template-columns:1fr;gap:3px 12px;padding:13px 0;border-bottom:1px solid var(--bordo);
+  color:var(--grigio2);padding-bottom:8px;border-bottom:1px solid var(--bordoTenue);gap:12px}
+.tabRiga{display:grid;grid-template-columns:1fr;gap:3px 12px;padding:13px 0;border-bottom:1px solid var(--bordoTenue);
   font-size:14px;align-items:baseline;min-width:0}
 .tabRiga:last-child{border-bottom:0}
 .tabRiga > span{min-width:0;overflow-wrap:anywhere}
@@ -1166,11 +1372,11 @@ button.tabRiga:focus-visible{outline:2px solid var(--blu2);outline-offset:-2px}
 .azioni{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px}
 .azioni .b{flex:0 1 auto}
 .subnav{display:flex;flex-wrap:wrap;gap:8px;margin:18px 0 4px}
-.subnav button{background:var(--nero);border:1px solid var(--bordo);color:var(--grigio);cursor:pointer;
+.subnav button{background:var(--nero);border:1px solid var(--bordoForte);color:var(--grigio);cursor:pointer;
   font-family:'Saira Condensed',sans-serif;font-size:13.5px;padding:10px 14px;min-height:44px;border-radius:2px}
 .subnav button[data-on="1"]{border-color:var(--bianco);color:var(--bianco)}
 .filtriNote{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
-.filtriNote button{background:var(--nero);border:1px solid var(--bordo);color:var(--grigio);cursor:pointer;
+.filtriNote button{background:var(--nero);border:1px solid var(--bordoForte);color:var(--grigio);cursor:pointer;
   font-family:'Saira Condensed',sans-serif;font-size:12.5px;padding:9px 12px;min-height:44px;border-radius:2px;
   max-width:100%;overflow-wrap:anywhere;text-align:left}
 .filtriNote button[data-on="1"]{border-color:var(--blu2);color:var(--blu2);background:var(--bluSoft)}
@@ -1191,7 +1397,7 @@ button.tabRiga:focus-visible{outline:2px solid var(--blu2);outline-offset:-2px}
 .agendaCoach{display:flex;gap:6px;overflow-x:auto;padding-bottom:8px;margin-top:12px;-webkit-overflow-scrolling:touch}
 .agendaCol{flex:0 0 auto;width:64px;display:flex;flex-direction:column;gap:4px}
 .agendaTesta{font-family:'Saira Condensed',sans-serif;font-size:12px;color:var(--grigio2);text-align:center;padding-bottom:4px}
-.agendaSlot{min-height:44px;border:1px solid var(--bordo);background:var(--nero);color:var(--grigio2);
+.agendaSlot{min-height:44px;border:1px solid var(--bordoForte);background:var(--nero);color:var(--grigio2);
   cursor:pointer;font-family:'Saira Condensed',sans-serif;font-size:12px;border-radius:2px}
 .agendaSlot[data-stato="aperto"]{border-color:var(--blu2);background:var(--bluSoft);color:var(--blu2)}
 .agendaSlot[data-stato="occupato"]{border-color:var(--verde);background:var(--nero3);color:var(--verde)}
@@ -1768,6 +1974,7 @@ function PistaContinua({ passoRefs, children }) {
              qualunque curva, senza calcolare un offset geometrico vero */}
           <path className="pistaLayer pistaBordo" d={PISTA_PATH_D} fill="none" strokeLinecap="round" />
           <path className="pistaLayer pistaAsfalto" d={PISTA_PATH_D} fill="none" strokeLinecap="round" />
+          <path className="pistaLayer pistaCentro" d={PISTA_PATH_D} fill="none" strokeLinecap="round" />
           <g className="pistaCordoloGruppo">
             {tacche.map((t, i) => (
               <line key={i} className="pistaTacca" data-tinta={t.tinta}
@@ -6100,6 +6307,11 @@ export default function App() {
     if (typeof window === "undefined") return "";
     return new URLSearchParams(window.location.search).get("tema") || "";
   });
+  // il selettore pubblico ha due sole voci: lo scuro approvato ("") e il
+  // chiaro ("carta"). Gli altri quattro temi restano strumenti di sviluppo
+  // raggiungibili solo da ?tema=nome, e in quel caso il selettore non si
+  // mostra: sarebbe un terzo stato che non sa rappresentare
+  const temaEsterno = tema !== "" && tema !== "carta";
 
   // iR del pilota per il matching: non e' piu' un filtro manuale, arriva
   // dall'account iRacing collegato (mock). Senza collegamento non c'e' un
@@ -6287,6 +6499,14 @@ export default function App() {
             </nav>
           )}
           <div className="navcta">
+            {!temaEsterno && (
+              <div className="temaSw" role="group" aria-label="Tema dell'interfaccia">
+                <button data-on={tema === "" ? "1" : "0"} aria-pressed={tema === ""}
+                        onClick={() => setTema("")}>Scuro</button>
+                <button data-on={tema === "carta" ? "1" : "0"} aria-pressed={tema === "carta"}
+                        onClick={() => setTema("carta")}>Chiaro</button>
+              </div>
+            )}
             {pagina === "app" ? (
               <button className="b b-ghost" onClick={esci}>Esci</button>
             ) : (
