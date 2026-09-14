@@ -445,20 +445,45 @@ html,body{margin:0;padding:0;-webkit-text-size-adjust:100%;text-size-adjust:100%
 .crd{
   --nero:#171512; --nero2:#221E19; --nero3:#2B251F; --bordo:#3A3229;
   --bianco:#F2EDE3; --grigio:#B7AE9E; --grigio2:#867A66;
-  --rosso:#8A2E1F; --rosso2:#D4573E; --rossoSoft:rgba(212,87,62,.14);
+  /* MARCHIO: papaya pieno. E' il riempimento, non il testo — al contrario
+     del mattone di prima, che era scuro e portava sopra il gesso. Sul papaya
+     il gesso darebbe 2.16:1, illeggibile: sopra ci va il tarmac (--suMarchio),
+     che rende 7.24:1, un filo meglio dei 7.22:1 di prima. */
+  --rosso:#FF8000; --rosso2:#FF9933; --rossoSoft:rgba(255,128,0,.14);
+  --suMarchio:#241A05;
+  /* testo dentro i badge della triade: era gesso su Consigliato e Avviso
+     (2.91:1 e 3.13:1, sotto soglia da prima di questo giro) e tarmac solo su
+     Neutro. Con lo spostamento della triade e' l'occasione per renderli
+     coerenti: tarmac su tutti e tre, 5.88 / 5.57 / 4.51:1 */
+  --suStato:#241A05;
+  /* DATO VERIFICATO: acquamarina, invariata. E' l'unica cosa che non si
+     tocca quando cambia il marchio — a 142 gradi di tinta dal papaya, cioe'
+     il massimo di separazione possibile: il dato non si confondera' mai col
+     marchio, che era il punto. */
   --blu:#3E9E90; --blu2:#6FD1C4; --bluSoft:rgba(111,209,196,.14);
-  --ambra:#C97A3B; --ambraSoft:rgba(201,122,59,.14);
+  /* La triade doveva spostarsi: col marchio a 30 gradi di tinta, l'Avviso
+     ambra stava a 3 gradi e il Neutro oro a 6 — lo stesso colore per il
+     marchio e per un avviso. Avviso vira al rosso (ora libero, il marchio ha
+     lasciato quella zona) e Neutro diventa davvero neutro, un grigio caldo
+     al 10% di saturazione: piu' corretto anche nel significato, "ne' bene
+     ne' male" non e' un colore. */
+  --ambra:#D85C42; --ambraSoft:rgba(216,92,66,.14);
   --verde:#7FA33C; --verdeSoft:rgba(127,163,60,.14);
-  --oro:#B08D57; --oroSoft:rgba(176,141,87,.14);
+  --oro:#9A9284; --oroSoft:rgba(154,146,132,.14);
   /* azione distruttiva: variabile a parte, cosi' non si confonde con il
      marchio ne' con l'avviso — coincide col rosso di sempre, come da sempre */
-  --distr:#8A2E1F; --distr2:#D4573E; --distrSoft:rgba(212,87,62,.14);
+  --distr:#8A2E1F; --distr2:#D85C42; --distrSoft:rgba(216,92,66,.14);
   /* hover dei bottoni primari, disaccoppiato da --blu2/--rosso2 */
-  --bluHover:#5BC2B3; --rossoHover:#E06A50;
+  --bluHover:#5BC2B3; --rossoHover:#FFA04D;
   /* colore del solo "numero-eroe" (es. il grande +iR in Home): segue
      --blu2, come tutti i dati verificati */
   --eroe:var(--blu2);
-  --linea:#E8B94C;
+  /* TRAIETTORIA: non e' piu' un colore, e' gesso. Il giallo cordolo stava a
+     12 gradi dal papaya: tre accenti diventavano due arancioni e un verde.
+     Portandola a un gesso caldo (22% di saturazione: si legge come materiale,
+     non come tinta) restano due soli colori con un significato — marchio e
+     dato — e la traiettoria torna a essere struttura. */
+  --linea:#BFB49B;
   /* ---- token introdotti per il tema chiaro ----------------------------
      Sullo scuro valgono esattamente quello che valeva prima (nessun
      cambiamento visibile): esistono perche' il chiaro possa cambiare SOLO
@@ -476,13 +501,12 @@ html,body{margin:0;padding:0;-webkit-text-size-adjust:100%;text-size-adjust:100%
      limits sono chiari; sul chiaro si ribalta (vedi il tema Carta) */
   --pistaAsfalto:var(--bordo);
   --pistaLimite:var(--bianco);
-  --pistaCordoloA:var(--rosso2);
-  --pistaCordoloB:var(--bianco);
+  --pistaCordoloA:var(--bianco);
+  --pistaCordoloB:#6B6152;
   --pistaNodo:var(--linea);
   --pistaOpacita:.9;
   --pistaOpacitaStretta:.4;
   --pistaLimiteW:19px; --pistaAsfaltoW:14px;
-  --pistaCentro:transparent; --pistaCentroW:0; --pistaCentroStrettaW:0;
   --pistaLimiteStrettaW:11px; --pistaAsfaltoStrettaW:8px;
   --pistaTaccaW:7px; --pistaTaccaStrettaW:5px;
   --pistaNodoW:7px; --pistaNodoStrettaW:6px;
@@ -499,6 +523,7 @@ html,body{margin:0;padding:0;-webkit-text-size-adjust:100%;text-size-adjust:100%
    precedente, conservata qui invece che persa. Nessuna regola di
    struttura tocca questi blocchi: solo variabili. */
 .crd[data-theme="attuale"]{
+  --suMarchio:#fff; /* qui il riempimento del marchio resta scuro */
   --nero:#0A0B0D; --nero2:#121418; --nero3:#1A1D23; --bordo:#282C34;
   --bianco:#FFFFFF; --grigio:#9BA3AF; --grigio2:#6B727D;
   --rosso:#8E1A20; --rosso2:#B32229; --rossoSoft:rgba(179,34,41,.12);
@@ -511,151 +536,10 @@ html,body{margin:0;padding:0;-webkit-text-size-adjust:100%;text-size-adjust:100%
   --eroe:var(--blu2);
 }
 
-/* ---- TEMA "Carta": la versione chiara ------------------------------------
-   Non e' lo scuro invertito. I valori sono stati riscelti uno per uno e i
-   contrasti verificati (rapporti WCAG indicati accanto): una palette scura
-   ribaltata su bianco produce colori che brillano sul nero e diventano
-   sgargianti sul chiaro.
-
-   Il fondo e' carta avorio, non bianco: il prodotto vende dati verificati, e
-   su una carta con un tono il numero-eroe legge come inchiostro su un foglio
-   di telemetria invece che come un'insegna accesa — che e' la prova a cui
-   questa palette doveva rispondere.
-
-   Inversione strutturale rispetto allo scuro: qui le SUPERFICI sono piu'
-   chiare del fondo (--nero2 > --nero), non piu' scure. Le card si alzano
-   verso la luce invece di scavare nel fondo, cosi' i blocchi si separano per
-   luminosita' e non per un bordo grigio chiarissimo attorno a tutto — che e'
-   uno dei segni generici da evitare.
-
-   I nomi dei token restano quelli dello scuro perche' il token descrive il
-   RUOLO, non la tinta: --nero e' "il fondo", --bianco e' "il testo
-   primario". Rinominarli avrebbe voluto dire riscrivere ogni schermata. */
-.crd[data-theme="carta"]{
-  --nero:#F4F0E7;        /* fondo, carta avorio */
-  --nero2:#FDFBF6;       /* superficie ALZATA (card, blocchi, barra) */
-  --nero3:#EBE5D8;       /* superficie incassata (barre di riempimento, chip) */
-  --bordo:#C6BCA6;       /* separatore fra blocchi */
-  --bordoTenue:#E4DCCB;  /* filo fra le righe dentro un blocco */
-  --bordoForte:#7D7364;  /* bordo dei controlli — 4.10:1, oltre il 3:1 richiesto */
-  --bianco:#1E1B16;      /* testo primario, bruno quasi-nero — 15.09:1 */
-  --grigio:#574F44;      /* testo secondario — 7.08:1, non un grigio slavato */
-  --grigio2:#6E6455;     /* etichette e terziario — 5.10:1 */
-
-  /* marchio: terracotta, 6.08:1. Resta raro come sullo scuro */
-  --rosso:#9C3A1E; --rosso2:#8E3319; --rossoSoft:rgba(156,58,30,.10);
-  --rossoHover:#87301A;
-
-  /* FIRMA del dato verificato: petrolio profondo. Sullo scuro il ruolo
-     "testo" (--blu2) era la variante PIU' CHIARA; sul chiaro si inverte, la
-     variante testo e' la piu' scura — 7.4:1 contro i 6.6:1 del riempimento */
-  --blu:#0D5F55; --blu2:#0B554C; --bluSoft:rgba(13,95,85,.10);
-  --bluHover:#0A4C44;
-
-  /* triade di stato: riscelta, non ribaltata. Il verde acido e l'oro chiaro
-     dello scuro qui diventerebbero fluorescenti */
-  --verde:#3D6B22; --verdeSoft:rgba(61,107,34,.12);   /* Consigliato — 5.55:1 */
-  --oro:#7A5A16;   --oroSoft:rgba(122,90,22,.12);     /* Neutro — 5.59:1 */
-  --ambra:#94481A; --ambraSoft:rgba(148,72,26,.12);   /* Avviso — 5.77:1 */
-  --distr:#9C3A1E; --distr2:#8E3319; --distrSoft:rgba(156,58,30,.10);
-
-  --eroe:var(--blu2);
-  --linea:#A9761F;       /* il giallo cordolo sul chiaro sbianca: ocra scuro */
-  --navFondo:rgba(253,251,246,.93);
-  --suPieno:#fff;        /* su --blu 6.6:1, su --rosso 6.9:1 */
-  --trama:rgba(30,27,22,.05);
-
-  /* la pista si ribalta: banda d'asfalto SCURA sulla carta, e i track limits
-     bianchi finalmente si vedono per contrasto contro l'asfalto invece che
-     contro il fondo — che e' anche come stanno le cose in pista. Il cordolo
-     lascia il rosso: saturo su carta chiara pesa troppo e ruberebbe
-     attenzione al marchio, che deve restare raro. Bianco/grigio scuro e'
-     un cordolo reale, presente su molti circuiti.
-     Spessori e opacita' scendono: una linea scura sul chiaro invade molto
-     piu' di quanto una linea chiara invadesse il nero. */
-  /* i tre strati, dal piu' largo al piu' stretto: asfalto (banda scura,
-     8.36:1 sul fondo) / riga bianca / asfalto di nuovo al centro. I nomi
-     dei token restano quelli dello scuro, dove il primo strato era il
-     limite bianco: cambia il valore, non il ruolo strutturale */
-  --pistaLimite:#4A453C;       /* strato largo: l'asfalto */
-  --pistaAsfalto:#FFFFFF;      /* strato di mezzo: i track limits */
-  --pistaCentro:#4A453C;       /* strato stretto: l'asfalto fra le due righe */
-  --pistaCordoloA:#FFFFFF;
-  --pistaCordoloB:#3E3A33;
-  --pistaNodo:#A9761F;
-  /* piu' sottile, non piu' sbiadita: una linea scura sul chiaro invade molto
-     piu' di una linea chiara sul nero, ma abbassare troppo l'opacita' la
-     faceva leggere come un grigio slavato invece che come asfalto */
-  --pistaOpacita:.62;
-  --pistaOpacitaStretta:.3;
-  --pistaLimiteW:13px; --pistaAsfaltoW:10px; --pistaCentroW:7px;
-  --pistaLimiteStrettaW:8px; --pistaAsfaltoStrettaW:6px; --pistaCentroStrettaW:4px;
-  --pistaTaccaW:5px; --pistaTaccaStrettaW:4px;
-  --pistaNodoW:7px; --pistaNodoStrettaW:6px;
-
-  /* sul chiaro l'antialiasing "antialiased" assottiglia il testo scuro e lo
-     fa sembrare sbiadito: sullo scuro serviva, qui va tolto */
-  -webkit-font-smoothing:auto; -moz-osx-font-smoothing:auto;
-}
-
-/* La triade di stato cambia TRATTAMENTO, non significato: sullo scuro sono
-   blocchi pieni, sul chiaro tre rettangoli saturi in fila urlerebbero. Qui
-   diventano chip a fondo tenue con testo scuro e bordo del proprio colore
-   (5.3:1 in tutti e tre i casi). Solo token, nessun esadecimale sparso. */
-.crd[data-theme="carta"] .stato{border-width:1px;font-weight:600}
-.crd[data-theme="carta"] .stato-consigliato{background:var(--verdeSoft);color:var(--verde);border-color:var(--verde)}
-.crd[data-theme="carta"] .stato-neutro{background:var(--oroSoft);color:var(--oro);border-color:var(--oro)}
-.crd[data-theme="carta"] .stato-avviso{background:var(--ambraSoft);color:var(--ambra);border-color:var(--ambra)}
-
-/* Sul chiaro il peso lo fa la tipografia, non il bagliore: i numeri-eroe
-   (saldo ore, +iR, compensi) guadagnano un filo di corpo e una spaziatura
-   piu' stretta, cosi' restano il primo elemento della gerarchia senza
-   dover accendere un colore. */
-.crd[data-theme="carta"] .kval,
-.crd[data-theme="carta"] .ccbig,
-.crd[data-theme="carta"] .metric .big{letter-spacing:-.035em}
-.crd[data-theme="carta"] .stit{color:var(--grigio)}
-.crd[data-theme="carta"] .cc{border-color:var(--bordoForte)}
-/* Il logo iRacing e' un tracciato bianco su trasparente: sul chiaro sparisce.
-   Non si tocca l'interruttore logo/testo del badge — il logo resta logo, e
-   prende la piastra scura con cui va usato sopra un fondo chiaro, che e' il
-   modo in cui questi marchi si mettono su carta. */
-.crd[data-theme="carta"] .platLogoStandalone{background:var(--bianco);padding:6px 8px;border-radius:2px}
-/* Le griglie diventano rumorose sul chiaro, ed è dove il significato si
-   ribalta: sullo scuro "libero" era il fondo nudo e "non disponibile" una
-   superficie appena più chiara, quindi il libero spariva nel fondo e andava
-   bene. Sul chiaro la stessa mappatura fa leggere i blocchi NON disponibili
-   come le celle più accese della griglia, cioè l'esatto contrario di quello
-   che devono comunicare. Qui il libero è la superficie pulita (carta bianca,
-   ci si può scrivere) e l'occupato è la superficie incassata. */
-.crd[data-theme="carta"] .calGrid{background:var(--bordoTenue)}
-.crd[data-theme="carta"] .calCell{background:var(--nero2)}
-.crd[data-theme="carta"] .calCell[data-stato="libero"]:hover{background:var(--bluSoft)}
-.crd[data-theme="carta"] .calCell[data-stato="occupato"]{background:var(--nero3);opacity:1}
-.crd[data-theme="carta"] .calCell[data-stato="non-disponibile"]{background:var(--nero3);opacity:.8}
-.crd[data-theme="carta"] .calCell[data-stato="passato"]{background:var(--nero3);opacity:.55}
-.crd[data-theme="carta"] .agendaSlot{background:var(--nero3)}
-.crd[data-theme="carta"] .agendaSlot[data-stato="aperto"]{background:var(--bluSoft)}
-.crd[data-theme="carta"] .agendaSlot[data-stato="occupato"]{background:var(--nero2)}
-/* stessa ragione: la barra piena deve essere il dato, non il contenitore */
-.crd[data-theme="carta"] .orebar{background:var(--nero3)}
-
-/* Il testo vince sulla pista, senza sbiadire la pista. Sullo scuro la
-   traiettoria era una linea chiara e sottile che passava dietro al testo
-   quasi senza farsi sentire; sul chiaro e' una banda scura, e dove taglia
-   un paragrafo lo rende faticoso. Invece di scolorirla fino a farla
-   sembrare un grigio qualunque, il testo dell'hero prende un alone del
-   colore della carta: si vede solo dove la banda passa sotto, e il
-   tracciato resta un tracciato. */
-.crd[data-theme="carta"] .h1,
-.crd[data-theme="carta"] .lead,
-.crd[data-theme="carta"] .sezhead .h2,
-.crd[data-theme="carta"] .sezhead .p{
-  text-shadow:0 0 7px var(--nero),0 0 4px var(--nero),0 0 2px var(--nero)}
-
 /* ---- TEMA A — "Teal" (ispirato Mercedes): un solo accento, dato+marchio+
    primario coincidono. Distruttivo resta un rosso a parte, per non confondersi. */
 .crd[data-theme="teal"]{
+  --suMarchio:#fff; /* qui il riempimento del marchio resta scuro */
   --nero:#0A0A0A; --nero2:#141618; --nero3:#1B1E20; --bordo:#262A2C;
   --bianco:#FFFFFF; --grigio:#9BA3A6; --grigio2:#63696B;
   --rosso:#00A897; --rosso2:#00D2BE; --rossoSoft:rgba(0,210,190,.12);
@@ -671,6 +555,7 @@ html,body{margin:0;padding:0;-webkit-text-size-adjust:100%;text-size-adjust:100%
    numero-eroe (.numero-eroe) prende il papaya — i numeri normali (--blu2)
    restano chiari, cosi' il dato continua a leggersi come "misurato". */
 .crd[data-theme="papaya"]{
+  --suMarchio:#fff; /* qui il riempimento del marchio resta scuro */
   --nero:#010101; --nero2:#121212; --nero3:#1A1A1A; --bordo:#262626;
   --bianco:#FFFFFF; --grigio:#9A9A9A; --grigio2:#5E5E5E;
   --rosso:#D96C00; --rosso2:#FF8000; --rossoSoft:rgba(255,128,0,.12);
@@ -691,6 +576,7 @@ html,body{margin:0;padding:0;-webkit-text-size-adjust:100%;text-size-adjust:100%
    con un tono piu' acceso per i piccoli testi (--rosso2), perche' il
    bordeaux pieno è troppo scuro per restare leggibile su nero. */
 .crd[data-theme="oro-bordeaux"]{
+  --suMarchio:#fff; /* qui il riempimento del marchio resta scuro */
   --nero:#141414; --nero2:#1E1B1C; --nero3:#262122; --bordo:#302A2B;
   --bianco:#FCFCFC; --grigio:#9A9A9A; --grigio2:#5E5E5E;
   --rosso:#3F0E1D; --rosso2:#A8385A; --rossoSoft:rgba(168,56,90,.14);
@@ -710,6 +596,7 @@ html,body{margin:0;padding:0;-webkit-text-size-adjust:100%;text-size-adjust:100%
    sui bottoni pieni il testo deve restare scuro (regola dedicata sotto),
    non bianco come negli altri temi. */
 .crd[data-theme="menta-navy"]{
+  --suMarchio:#fff; /* qui il riempimento del marchio resta scuro */
   --nero:#0A0F1E; --nero2:#122046; --nero3:#1A2C5A; --bordo:#26386B;
   --bianco:#FBFBFB; --grigio:#ABABAB; --grigio2:#6B7488;
   --rosso:#6FC98A; --rosso2:#96DFA8; --rossoSoft:rgba(150,223,168,.12);
@@ -772,7 +659,7 @@ html,body{margin:0;padding:0;-webkit-text-size-adjust:100%;text-size-adjust:100%
 .b{font-family:'Saira Condensed',sans-serif;font-weight:600;font-size:14px;letter-spacing:.01em;
   padding:11px 18px;border:1px solid transparent;cursor:pointer;border-radius:3px;transition:background .15s,border-color .15s}
 .b:focus-visible{outline:2px solid var(--bianco);outline-offset:2px}
-.b-rosso{background:var(--rosso);color:var(--suPieno)}
+.b-rosso{background:var(--rosso);color:var(--suMarchio)}
 .b-rosso:hover{background:var(--rossoHover)}
 .b-blu{background:var(--blu);color:var(--suPieno)}
 .b-blu:hover{background:var(--bluHover)}
@@ -841,17 +728,9 @@ html,body{margin:0;padding:0;-webkit-text-size-adjust:100%;text-size-adjust:100%
 .pistaLayer{stroke-linecap:round;vector-effect:non-scaling-stroke}
 .pistaBordo{stroke:var(--pistaLimite);stroke-width:var(--pistaLimiteW)}
 .pistaAsfalto{stroke:var(--pistaAsfalto);stroke-width:var(--pistaAsfaltoW)}
-/* terzo strato, largo zero sullo scuro (dove non serve e non si disegna).
-   Sul chiaro serve eccome: con due soli strati il colore di sotto si vede
-   SOLO ai bordi esterni, quindi i track limits bianchi finivano fuori
-   dall'asfalto, contro la carta, e sparivano. Con tre strati la sequenza
-   diventa quella vera di una pista — asfalto, riga bianca dipinta sopra,
-   asfalto al centro — e il bianco si vede perche' ha l'asfalto sotto. */
-.pistaCentro{stroke:var(--pistaCentro);stroke-width:var(--pistaCentroW)}
 @media(max-width:640px){
   .pistaBordo{stroke-width:var(--pistaLimiteStrettaW)}
   .pistaAsfalto{stroke-width:var(--pistaAsfaltoStrettaW)}
-  .pistaCentro{stroke-width:var(--pistaCentroStrettaW)}
 }
 /* cordolo: tacche vere, perpendicolari alla direzione di marcia sullo
    SCHERMO (calcolate in JS, vedi PistaContinua — il viewBox deformato
@@ -988,7 +867,7 @@ html,body{margin:0;padding:0;-webkit-text-size-adjust:100%;text-size-adjust:100%
 .tabs button{background:transparent;border:0;padding:12px;cursor:pointer;color:var(--grigio);
   font-family:'Saira Condensed',sans-serif;font-weight:600;font-size:14px}
 .tabs button[data-on="1"][data-r="pilota"]{background:var(--blu);color:var(--suPieno)}
-.tabs button[data-on="1"][data-r="coach"]{background:var(--rosso);color:var(--suPieno)}
+.tabs button[data-on="1"][data-r="coach"]{background:var(--rosso);color:var(--suMarchio)}
 .campo{margin-bottom:14px}
 /* diretto, non discendente: senza, questa regola scavalcava anche le label
    dei checkbox dentro un .checkgrid annidato in un .campo (font monospace
@@ -1113,9 +992,9 @@ html,body{margin:0;padding:0;-webkit-text-size-adjust:100%;text-size-adjust:100%
 .fit.no{border-color:var(--bordo);background:var(--nero);color:var(--grigio2)}
 .stato{display:inline-flex;align-items:center;font-family:'Saira Condensed',sans-serif;font-size:10.5px;
   letter-spacing:.1em;text-transform:uppercase;padding:4px 9px;border:1px solid transparent;border-radius:2px}
-.stato-consigliato{background:var(--verde);color:var(--suPieno)}
-.stato-neutro{background:var(--oro);color:#241A05}
-.stato-avviso{background:var(--ambra);color:var(--suPieno)}
+.stato-consigliato{background:var(--verde);color:var(--suStato)}
+.stato-neutro{background:var(--oro);color:var(--suStato)}
+.stato-avviso{background:var(--ambra);color:var(--suStato)}
 /* La triade non puo' dipendere dal solo colore: chi non distingue verde e
    rosso deve poterli separare comunque. L'etichetta c'era gia' (Consigliato
    / Neutro / Avviso); qui si aggiunge una FORMA disegnata con i bordi —
@@ -1129,16 +1008,6 @@ html,body{margin:0;padding:0;-webkit-text-size-adjust:100%;text-size-adjust:100%
   border-left:5px solid transparent;border-right:5px solid transparent;
   border-bottom:9px solid currentColor;border-radius:0}
 
-/* selettore del tema: due sole voci pubbliche (Scuro / Chiaro), perche' il
-   confronto A/B e' il punto. I quattro temi di sviluppo restano raggiungibili
-   solo da ?tema=nome, come prima. */
-.temaSw{display:inline-flex;border:1px solid var(--bordoForte);border-radius:2px;overflow:hidden;flex:none}
-.temaSw button{background:transparent;border:0;color:var(--grigio2);cursor:pointer;
-  font-family:'Saira Condensed',sans-serif;font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;
-  padding:7px 10px;min-height:34px;white-space:nowrap}
-.temaSw button[data-on="1"]{background:var(--nero3);color:var(--bianco)}
-.temaSw button:focus-visible{outline:2px solid var(--blu2);outline-offset:-2px}
-@media(max-width:640px){.temaSw button{min-height:44px;padding:7px 12px}}
 .notaBox{border:1px solid var(--bordo);background:var(--nero2);padding:14px 16px;margin-top:10px;font-size:13px;line-height:1.6}
 .notaBox b{color:var(--bianco)}
 .notaBox.ambra{border-color:var(--ambra);background:var(--ambraSoft)}
@@ -1974,7 +1843,6 @@ function PistaContinua({ passoRefs, children }) {
              qualunque curva, senza calcolare un offset geometrico vero */}
           <path className="pistaLayer pistaBordo" d={PISTA_PATH_D} fill="none" strokeLinecap="round" />
           <path className="pistaLayer pistaAsfalto" d={PISTA_PATH_D} fill="none" strokeLinecap="round" />
-          <path className="pistaLayer pistaCentro" d={PISTA_PATH_D} fill="none" strokeLinecap="round" />
           <g className="pistaCordoloGruppo">
             {tacche.map((t, i) => (
               <line key={i} className="pistaTacca" data-tinta={t.tinta}
@@ -2031,13 +1899,13 @@ function Home({ vaiLogin, vaiCandidatura }) {
               <BadgeIRacing />
               <h1 className="h1">
                 <span className="h1riga">Trova il coach</span>
-                <span className="h1riga">che ti fa salire</span>
-                <span className="h1riga"><em>davvero.</em></span>
+                <span className="h1riga">che ti fa crescere</span>
+                <span className="h1riga"><em>per davvero.</em></span>
               </h1>
               <p className="lead">
                 Su CORDA ogni coach è valutato con un solo numero: l'iRating che i suoi allievi hanno
-                guadagnato dopo la prima sessione. Il dato arriva dall'account iRacing dell'allievo,
-                non da una recensione.
+                guadagnato dopo le prime sessioni. Il dato arriva dall'account iRacing dell'allievo,
+                monitorato settimana per settimana.
               </p>
               <div className="ctas">
                 <button className="b b-blu b-lg" onClick={() => vaiLogin("pilota")}>
@@ -2078,8 +1946,8 @@ function Home({ vaiLogin, vaiCandidatura }) {
               <div className="eyebrow">Come funziona</div>
               <h2 className="h2">Tre passaggi, nessuna sorpresa.</h2>
               <p className="p">
-                Colleghi il tuo account iRacing una volta sola. Da lì in poi la piattaforma sa da dove
-                parti e misura dove arrivi.
+                Collega il tuo account a iRacing una volta sola. La piattaforma saprà da dove parti
+                e misurerà i tuoi miglioramenti.
               </p>
             </div>
 
@@ -2092,8 +1960,8 @@ function Home({ vaiLogin, vaiCandidatura }) {
                   <div className="num">01</div>
                   <h3>Dici da dove parti</h3>
                   <p>
-                    Categoria, vettura, obiettivo e il tuo iRating attuale. Ti mostriamo solo i coach
-                    che hanno risultati con piloti della tua fascia, non i più veloci in assoluto.
+                    Categorie, vetture e obiettivi. Ti mostriamo solo i coach più adatti alla tua
+                    esperienza, non i più veloci in assoluto.
                   </p>
                 </div>
               </div>
@@ -2103,10 +1971,10 @@ function Home({ vaiLogin, vaiCandidatura }) {
                 </div>
                 <div className="passoTesto">
                   <div className="num">02</div>
-                  <h3>Guidi con il coach</h3>
+                  <h3>Test Drive live con il Coach</h3>
                   <p>
-                    Sessione da un'ora in pista insieme. Il pagamento resta in deposito fino a 24 ore
-                    dopo: se il coach non si presenta, torna a te.
+                    Sessione da un'ora in pista insieme analizzando linee e telemetria. Il pagamento
+                    resta in deposito fino a 24 ore dopo: se il coach non si presenta, torna a te.
                   </p>
                 </div>
               </div>
@@ -2116,10 +1984,10 @@ function Home({ vaiLogin, vaiCandidatura }) {
                 </div>
                 <div className="passoTesto">
                   <div className="num">03</div>
-                  <h3>Vedi se è servito</h3>
+                  <h3>Metti in pratica</h3>
                   <p>
                     Corri le tue gare normalmente. La piattaforma confronta la tua curva iRating con i
-                    trenta giorni precedenti e dice se il lavoro ha funzionato.
+                    trenta giorni precedenti e dice se il lavoro sta funzionando.
                   </p>
                 </div>
               </div>
@@ -2163,7 +2031,7 @@ function Home({ vaiLogin, vaiCandidatura }) {
         <div className="w">
           <div className="sezhead">
             <div className="eyebrow">Da che parte stai</div>
-            <h2 className="h2">Due ingressi, due mestieri diversi.</h2>
+            <h2 className="h2">Due ingressi, due ruoli differenti.</h2>
           </div>
           <div className="due">
             <div className="porta blu">
@@ -2197,8 +2065,7 @@ function Home({ vaiLogin, vaiCandidatura }) {
             <h2 className="h2">Partiamo da iRacing.</h2>
             <p className="p">
               Una sola piattaforma, tutte le sue categorie: gran turismo, prototipi, monoposto,
-              ovali. Coach scelti a mano, nessun profilo finto. Gli altri simulatori arrivano
-              quando qui il sistema funziona davvero.
+              ovali. Coach scelti a mano, nessun profilo finto.
             </p>
             <div className="ctas" style={{ marginTop: 26 }}>
               <button className="b b-blu b-lg" onClick={() => vaiLogin("pilota")}>Inizia ora</button>
@@ -6307,11 +6174,6 @@ export default function App() {
     if (typeof window === "undefined") return "";
     return new URLSearchParams(window.location.search).get("tema") || "";
   });
-  // il selettore pubblico ha due sole voci: lo scuro approvato ("") e il
-  // chiaro ("carta"). Gli altri quattro temi restano strumenti di sviluppo
-  // raggiungibili solo da ?tema=nome, e in quel caso il selettore non si
-  // mostra: sarebbe un terzo stato che non sa rappresentare
-  const temaEsterno = tema !== "" && tema !== "carta";
 
   // iR del pilota per il matching: non e' piu' un filtro manuale, arriva
   // dall'account iRacing collegato (mock). Senza collegamento non c'e' un
@@ -6499,14 +6361,6 @@ export default function App() {
             </nav>
           )}
           <div className="navcta">
-            {!temaEsterno && (
-              <div className="temaSw" role="group" aria-label="Tema dell'interfaccia">
-                <button data-on={tema === "" ? "1" : "0"} aria-pressed={tema === ""}
-                        onClick={() => setTema("")}>Scuro</button>
-                <button data-on={tema === "carta" ? "1" : "0"} aria-pressed={tema === "carta"}
-                        onClick={() => setTema("carta")}>Chiaro</button>
-              </div>
-            )}
             {pagina === "app" ? (
               <button className="b b-ghost" onClick={esci}>Esci</button>
             ) : (
