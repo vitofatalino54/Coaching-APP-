@@ -507,7 +507,7 @@ html,body{margin:0;padding:0;-webkit-text-size-adjust:100%;text-size-adjust:100%
   --pistaOpacita:.9;
   --pistaOpacitaStretta:.4;
   --pistaLimiteW:19px; --pistaAsfaltoW:14px;
-  --pistaLimiteStrettaW:11px; --pistaAsfaltoStrettaW:8px;
+  --pistaLimiteStrettaW:7px; --pistaAsfaltoStrettaW:4.5px;
   --pistaTaccaW:7px; --pistaTaccaStrettaW:5px;
   --pistaNodoW:7px; --pistaNodoStrettaW:6px;
   background:var(--nero); color:var(--bianco); min-height:100%;
@@ -706,11 +706,33 @@ html,body{margin:0;padding:0;-webkit-text-size-adjust:100%;text-size-adjust:100%
    Con z-index negativo l'SVG dipinge nel livello sotto lo sfondo del
    contenuto normale, che è esattamente il "dietro al testo" richiesto,
    senza dover aggiungere z-index:1 a ogni sezione che ci sta sopra. */
-.pistaSvg{position:absolute;inset:0;width:100%;height:100%;z-index:-1;pointer-events:none;opacity:var(--pistaOpacita)}
-@media(max-width:640px){
-  /* su schermi stretti la banda non deve invadere il testo: piu' sottile
-     e piu' tenue, non sparita — resta "riconoscibile come pista" */
-  .pistaSvg{opacity:var(--pistaOpacitaStretta)}
+/* Stato di sicurezza: finche' la misura delle zone di rispetto non e'
+   avvenuta — senza JavaScript, o se l'effetto non parte — la traiettoria
+   resta smorzata invece di stendersi a piena intensita' sopra un paragrafo.
+   data-misurata="1" arriva dal componente solo dopo il primo calcolo. */
+.pistaSvg{position:absolute;inset:0;width:100%;height:100%;z-index:-1;pointer-events:none;
+  opacity:calc(var(--pistaOpacita) * .45);transition:opacity .25s ease}
+.pistaSvg[data-misurata="1"]{opacity:var(--pistaOpacita)}
+@media(max-width:899.98px){
+  .pistaSvg{opacity:calc(var(--pistaOpacitaStretta) * .45)}
+  .pistaSvg[data-misurata="1"]{opacity:var(--pistaOpacitaStretta)}
+}
+@media(prefers-reduced-motion:reduce){.pistaSvg{transition:none}}
+/* Su colonna singola i blocchi occupano tutta la larghezza: non resta un
+   corridoio interno dove passare, e mascherarli tutti cancellerebbe oltre il
+   40% del percorso — la soglia oltre cui la maschera non e' piu' la
+   soluzione giusta. La traiettoria si sposta quindi nel margine della
+   pagina, dove non incontra testo. E' una trasformazione del gruppo, non un
+   secondo tracciato da tenere allineato a mano.
+   La soglia e' 900px e non un valore scelto a occhio: e' esattamente dove
+   .herogrid passa da una a due colonne. Sotto quella larghezza titolo,
+   paragrafo e fascia numeri occupano l'intera riga (misurato a 844px: 38%
+   del percorso finirebbe sotto maschera, al limite della soglia oltre cui
+   la maschera non regge piu'); sopra, si apre la colonna destra dove la
+   traiettoria passa davvero. */
+.pistaTrasf{transform-box:view-box;transform-origin:0 0}
+@media(max-width:899.98px){
+  .pistaTrasf{transform:translateX(0.4px) scaleX(0.02)}
 }
 /* bordo/asfalto: stesso <path> disegnato due volte, larghezze diverse —
    il layer sotto (bianco, largo) resta visibile solo ai due bordi del
@@ -728,7 +750,7 @@ html,body{margin:0;padding:0;-webkit-text-size-adjust:100%;text-size-adjust:100%
 .pistaLayer{stroke-linecap:round;vector-effect:non-scaling-stroke}
 .pistaBordo{stroke:var(--pistaLimite);stroke-width:var(--pistaLimiteW)}
 .pistaAsfalto{stroke:var(--pistaAsfalto);stroke-width:var(--pistaAsfaltoW)}
-@media(max-width:640px){
+@media(max-width:899.98px){
   .pistaBordo{stroke-width:var(--pistaLimiteStrettaW)}
   .pistaAsfalto{stroke-width:var(--pistaAsfaltoStrettaW)}
 }
@@ -1601,11 +1623,13 @@ function Spark({ curva, start, w = 110, h = 36 }) {
    qualunque contenitore, per costruzione, perché preserveAspectRatio="none"
    la stira in modo lineare in verticale. */
 const PISTA_PATH_D =
-  "M 10 0 C 22.5 21.7, 85.0 97.5, 85 130 " +
-  "C 70.0 150.0, 20.0 175.0, 10 195 " +
-  "C 4.0 215.0, 20.0 270.0, 42 300 " +
-  "C 51.0 332.5, 63.8 366.2, 64 390 " +
-  "C 64.2 413.8, 46.8 421.3, 43 443 " +
+  "M 10 0 C 21.0 7.3, 62.2 23.7, 76 44 " +
+  "C 89.8 64.3, 94.7 93.7, 93 122 " +
+  "C 92.0 165.0, 80.0 206.0, 66 214 " +
+  "C 56.0 222.0, 78.0 240.0, 88 262 " +
+  "C 87.0 281.3, 64.0 308.7, 60 330 " +
+  "C 56.0 351.3, 66.8 371.2, 64 390 " +
+  "C 61.2 408.8, 46.8 421.3, 43 443 " +
   "C 39.2 464.7, 41.0 494.3, 41 520 " +
   "C 41.0 545.7, 41.3 578.7, 43 597 " +
   "C 44.7 615.3, 48.5 611.8, 51 630 " +
@@ -1615,19 +1639,20 @@ const PISTA_PATH_D =
   "C 41.7 834.3, 41.7 867.5, 42 893 " +
   "C 42.3 918.5, 45.3 951.2, 46 969 " +
   "C 46.7 986.8, 46.0 994.8, 46 1000";
-/* frazioni di lunghezza d'arco (0→1 sull'intero PISTA_PATH_D) di ogni
-   punto notevole — calcolate campionando la curva, non a occhio (script
-   in scratchpad, riportato qui perché la geometria sopra è quella
-   verificata a occhio in browser, inclusa la posizione reale dei riquadri
-   video via getBoundingClientRect). Un solo sistema di riferimento per
-   tutto: dove finisce il disegno progressivo (dashoffset) E dove si
-   accende ogni nodo/blocco E dove si accende il cordolo sono la STESSA
-   frazione, mai calcoli indipendenti — era esattamente il bug #1 di
-   questo giro (il nodo si accendeva secondo la posizione reale del
-   blocco in pagina, la linea secondo tutt'altra formula: non erano MAI
-   garantite di coincidere, il nodo restava acceso senza traccia). */
-const PISTA_APICE_INIZIO = 0.17; // poco prima di P2 (0.2336): il cordolo si accende qui
-const PISTA_APICE_FINE = 0.29; // poco dopo P2: il cordolo si spegne qui, resta solo la fascia
+/* Il tornante non e' piu' addosso al titolo e alla CTA. Misurando i riquadri
+   reali a 1280px, l'hero ha un'area libera da contenuti sotto il video
+   (x 62-90, y 165-268: sotto il video, sopra la fascia numeri, a destra dei
+   bottoni): l'apice e il cordolo stanno li'. E' l'applicazione della regola
+   "se l'apice cade su un blocco di testo, si sposta l'apice, non lo si
+   maschera" — il cordolo e' l'elemento piu' invadente e non deve avvicinarsi
+   al testo nemmeno mascherato. */
+const PISTA_APICE_INIZIO = 0.20; // poco prima dell'apice (0.2429): il cordolo si accende qui
+const PISTA_APICE_FINE = 0.285; // poco dopo: il cordolo si spegne, resta la fascia
+// margine di rispetto attorno ai blocchi di testo, in pixel schermo. Il
+// cordolo ne vuole di piu': le sue strisce ad alto contrasto disturbano la
+// lettura molto piu' della banda d'asfalto, quindi sparisce prima.
+const PISTA_RISPETTO_PX = 10;
+const PISTA_RISPETTO_CORDOLO_PX = 26;
 // ogni ancora e' il CENTRO verticale del passo corrispondente, con la x
 // del punto della curva in quel punto già dentro al corridoio fra le due
 // colonne (non nel riquadro video) — vedi il commento sopra
@@ -1640,6 +1665,28 @@ const PISTA_FINESTRA = 0.10; // ampiezza della transizione (in frazione di progr
 // basta ed e' sempre stabile — piu' robusto che assumere che la frazione
 // di LUNGHEZZA D'ARCO coincida con la frazione di y (non coincide: il
 // tornante dell'hero percorre piu' strada orizzontale che verticale)
+/* Riquadro di ingombro in coordinate di LAYOUT, relativo alla zona.
+   Non getBoundingClientRect: i tre blocchi "passo" entrano con una
+   translateX, e misurarli col bounding box farebbe ballare la maschera
+   insieme all'animazione, lasciando scoperto il testo proprio mentre
+   scorre dentro. offsetLeft/offsetTop ignorano le transform e danno la
+   posizione a riposo, che e' quella che conta. */
+function riquadroLayout(el, zonaEl) {
+  let x = 0, y = 0, n = el;
+  while (n && n !== zonaEl) { x += n.offsetLeft; y += n.offsetTop; n = n.offsetParent; }
+  return { x, y, w: el.offsetWidth, h: el.offsetHeight };
+}
+
+// un punto e' dentro una zona di rispetto? (coordinate viewBox)
+function dentroZona(px, py, zone, extraX, extraY) {
+  for (let i = 0; i < zone.length; i++) {
+    const z = zone[i];
+    if (px >= z.x - extraX && px <= z.x + z.w + extraX &&
+        py >= z.y - extraY && py <= z.y + z.h + extraY) return true;
+  }
+  return false;
+}
+
 function trovaPuntoPerY(path, L, targetY, campioni) {
   let punto = path.getPointAtLength(0);
   for (let i = 0; i <= campioni; i++) {
@@ -1655,70 +1702,123 @@ function PistaContinua({ passoRefs, children }) {
   const rifZona = React.useRef(anyOf(null));
   const [nodi, setNodi] = useState(anyOf([]));
   const [tacche, setTacche] = useState(anyOf([]));
+  const [zone, setZone] = useState(anyOf([]));
+  // finche' la misura non e' avvenuta la pista resta discreta (vedi
+  // .pistaSvg / [data-misurata]): senza JS, o se la misura non parte,
+  // meglio una traiettoria smorzata che una banda a piena intensita'
+  // sopra un paragrafo.
+  const [misurata, setMisurata] = useState(false);
 
-  // geometria di nodi e tacche: calcolata dal <path> reale, non indovinata
-  // a mano — ricalcolata anche al resize, perché le tacche del cordolo
-  // devono restare perpendicolari ALLO SCHERMO (vedi sotto) e lo schermo
-  // cambia proporzioni.
+  /* Geometria e zone di rispetto, ricalcolate dal DOM reale — mai coordinate
+     scritte a mano, che al primo cambio di testo, lingua o larghezza
+     finirebbero fuori posto. Si rifa' al ridimensionamento, al cambio di
+     orientamento, quando i font web finiscono di caricare (cambiano
+     l'altezza delle righe, quindi gli ingombri) e quando un blocco marcato
+     cambia dimensione (ResizeObserver). Tutto limitato da requestAnimationFrame. */
   useEffect(() => {
     function calcola() {
       const svg = rifSvg.current;
+      const zonaEl = rifZona.current;
       const path = svg && svg.querySelector(".pistaLayer");
-      if (!path || typeof window === "undefined") return;
-      const L = path.getTotalLength();
-      setNodi(PISTA_ANCORE.map((f) => trovaPuntoPerY(path, L, f * 1000, 400)));
+      if (!path || !zonaEl || typeof window === "undefined") return;
+      const larghezza = zonaEl.offsetWidth, altezza = zonaEl.offsetHeight;
+      if (!larghezza || !altezza) return;
+      const sx = larghezza / 100, sy = altezza / 1000; // px schermo per unita' di viewBox
 
-      // tacche del cordolo, perpendicolari alla direzione di marcia SULLO
-      // SCHERMO — non nello spazio interno del viewBox. Il viewBox è
-      // deformato apposta (preserveAspectRatio="none", per adattarsi a
-      // contenitori di proporzioni molto diverse), quindi un angolo
-      // corretto nello spazio sorgente esce storto una volta stirato: la
-      // versione precedente lo ignorava e rinunciava a tacche vere
-      // (tratteggio parallelo alla curva, dichiarato come ripiego). Qui si
-      // calcola il fattore di scala reale (sx,sy = pixel schermo per unità
-      // di viewBox) dal bounding box dell'svg, si porta la tangente in
-      // spazio schermo, la si ruota di 90°, e si riporta la direzione
-      // risultante nello spazio del viewBox DIVIDENDO per lo stesso
-      // fattore — cosicché quando l'SVG la ristira, torni perpendicolare
-      // per davvero sullo schermo. Le tacche campionano DIRETTAMENTE il
-      // path principale (tra PISTA_APICE_INIZIO e _FINE), non una copia
-      // separata: allineamento perfetto con la fascia d'asfalto per
-      // costruzione, mai da tenere sincronizzato a mano.
-      const rect = svg.getBoundingClientRect();
-      const sx = rect.width / 100;
-      const sy = rect.height / 1000;
-      if (!sx || !sy) return;
+      // 1) zone di rispetto: dai riquadri reali dei blocchi marcati, piu' un
+      //    margine. Il riquadro e' quello del BLOCCO, non di ogni riga: un
+      //    ritaglio seghettato riga per riga sarebbe peggio del problema.
+      const m = PISTA_RISPETTO_PX;
+      const nuoveZone = anyOf([]);
+      zonaEl.querySelectorAll("[data-traiettoria-evita]").forEach((el) => {
+        const r = riquadroLayout(el, zonaEl);
+        if (!r.w || !r.h) return;
+        nuoveZone.push({
+          x: (r.x - m) / sx, y: (r.y - m) / sy,
+          w: (r.w + 2 * m) / sx, h: (r.h + 2 * m) / sy,
+        });
+      });
+      setZone(nuoveZone);
+
+      const L = path.getTotalLength();
+
+      // 2) nodi: un marcatore tagliato a meta' e' brutto, quindi se cade in
+      //    una zona non lo si ritaglia — lo si fa scorrere lungo il percorso
+      //    finche' non ne esce.
+      const exX = m / sx, exY = m / sy;
+      setNodi(PISTA_ANCORE.map((f) => {
+        let p = trovaPuntoPerY(path, L, f * 1000, 400);
+        if (!dentroZona(p.x, p.y, nuoveZone, exX, exY)) return p;
+        for (let d = 1; d <= 60; d++) {
+          for (const verso of [1, -1]) {
+            const q = trovaPuntoPerY(path, L, (f * 1000) + verso * d * 6, 400);
+            if (!dentroZona(q.x, q.y, nuoveZone, exX, exY)) return q;
+          }
+        }
+        return p;
+      }));
+
+      // 3) tacche del cordolo, perpendicolari alla direzione di marcia SULLO
+      //    SCHERMO — non nello spazio interno del viewBox, che e' deformato
+      //    apposta (preserveAspectRatio="none"): un angolo corretto nello
+      //    spazio sorgente esce storto una volta stirato. Si porta la
+      //    tangente in spazio schermo, la si ruota di 90 gradi, e si riporta
+      //    la direzione nel viewBox dividendo per gli stessi fattori.
+      //    Le tacche vicine a un blocco di testo NON vengono disegnate: il
+      //    cordolo non deve comparire in prossimita' del testo nemmeno
+      //    mascherato. Dove non c'e' un apice libero da contenuti — cioe' su
+      //    colonna singola, al telefono — non ne resta nessuna, ed e' giusto
+      //    cosi'.
+      const exCX = PISTA_RISPETTO_CORDOLO_PX / sx, exCY = PISTA_RISPETTO_CORDOLO_PX / sy;
       const nTacche = 9;
-      // lunghezza della tacca in pixel schermo reali, non in unità di
-      // viewBox: dipende dalla LARGHEZZA della zona (rect.height è
-      // l'altezza di tutta la zona hero+numeri+passaggi, enorme e non
-      // pertinente qui), clampata a un intervallo leggibile su ogni schermo
-      const lunghezzaSchermo = Math.max(14, Math.min(26, rect.width * 0.022));
-      const nuove = anyOf([]);
+      const lunghezzaSchermo = Math.max(14, Math.min(26, larghezza * 0.022));
+      const nuoveTacche = anyOf([]);
       for (let i = 0; i < nTacche; i++) {
         const t = PISTA_APICE_INIZIO + ((i + 0.5) / nTacche) * (PISTA_APICE_FINE - PISTA_APICE_INIZIO);
         const p = path.getPointAtLength(t * L);
+        if (dentroZona(p.x, p.y, nuoveZone, exCX, exCY)) continue;
         const p2 = path.getPointAtLength(Math.min(L, t * L + 0.5));
         const dx = p2.x - p.x, dy = p2.y - p.y;
-        const tsx = dx * sx, tsy = dy * sy; // tangente in spazio schermo
+        const tsx = dx * sx, tsy = dy * sy;
         const tl = Math.hypot(tsx, tsy) || 1;
-        const perpSx = -tsy / tl, perpSy = tsx / tl; // perpendicolare, spazio schermo, unitaria
-        // riportata nello spazio del viewBox e scalata alla lunghezza voluta
+        const perpSx = -tsy / tl, perpSy = tsx / tl;
         const vx = (perpSx / sx) * lunghezzaSchermo;
         const vy = (perpSy / sy) * lunghezzaSchermo;
-        nuove.push({
+        nuoveTacche.push({
           x1: p.x - vx / 2, y1: p.y - vy / 2,
           x2: p.x + vx / 2, y2: p.y + vy / 2,
           tinta: i % 2 === 0 ? "a" : "b",
         });
       }
-      setTacche(nuove);
+      setTacche(nuoveTacche);
+      setMisurata(true);
     }
+
+    let atteso = false;
+    function pianifica() {
+      if (atteso) return;
+      atteso = true;
+      requestAnimationFrame(() => { atteso = false; calcola(); });
+    }
+
     calcola();
-    let t;
-    function onResize() { clearTimeout(t); t = setTimeout(calcola, 120); }
-    window.addEventListener("resize", onResize);
-    return () => { clearTimeout(t); window.removeEventListener("resize", onResize); };
+    window.addEventListener("resize", pianifica);
+    window.addEventListener("orientationchange", pianifica);
+    // i font web cambiano l'altezza delle righe: prima che siano pronti gli
+    // ingombri misurati non sono quelli definitivi
+    if (typeof document !== "undefined" && document.fonts && document.fonts.ready) {
+      document.fonts.ready.then(pianifica).catch(() => {});
+    }
+    let ro = anyOf(null);
+    if (typeof ResizeObserver !== "undefined" && rifZona.current) {
+      ro = new ResizeObserver(pianifica);
+      rifZona.current.querySelectorAll("[data-traiettoria-evita]").forEach((el) => ro.observe(el));
+    }
+    return () => {
+      window.removeEventListener("resize", pianifica);
+      window.removeEventListener("orientationchange", pianifica);
+      if (ro) ro.disconnect();
+    };
   }, []);
 
   useEffect(() => {
@@ -1823,44 +1923,58 @@ function PistaContinua({ passoRefs, children }) {
   }, [passoRefs]);
 
   const idClip = React.useId();
+  const idMask = `m${idClip.replace(/:/g, "")}`;
   return (
     <div ref={rifZona} className="pistaZona">
       <svg ref={rifSvg} className="pistaSvg" viewBox="0 0 100 1000" preserveAspectRatio="none"
-           aria-hidden="true" focusable="false">
+           aria-hidden="true" focusable="false" data-misurata={misurata ? "1" : "0"}>
         <defs>
           {/* il ritaglio che disegna progressivamente la pista: un <rect>
-             che cresce in altezza da 0 a 1000 (l'intero viewBox) via ref,
-             mai via stroke-dasharray/dashoffset — vedi il commento nello
-             scroll-effect sul perché quella tecnica va evitata qui */}
+             che cresce in altezza da 0 a 1000 (l'intero viewBox) via ref */}
           <clipPath id={idClip} clipPathUnits="userSpaceOnUse">
             <rect className="pistaClipRect" x="0" y="0" width="100" height="1000" />
           </clipPath>
+          {/* Le zone di rispetto: bianco = si vede, nero = la traiettoria
+             passa dietro. I rettangoli arrivano dalla misura del DOM, non da
+             coordinate fisse. La maschera sta sul gruppo che contiene TUTTO
+             (asfalto, track limits, cordolo, nodi): applicarla a ogni livello
+             separatamente li farebbe disallineare fra loro. */}
+          <mask id={idMask} maskUnits="userSpaceOnUse" x="0" y="0" width="100" height="1000">
+            <rect x="0" y="0" width="100" height="1000" fill="#fff" />
+            {zone.map((z, i) => (
+              <rect key={i} x={z.x} y={z.y} width={z.w} height={z.h} fill="#000" />
+            ))}
+          </mask>
         </defs>
-        <g clipPath={`url(#${idClip})`}>
-          {/* bordo/track-limits: stroke piu' chiaro e piu' largo SOTTO,
-             l'asfalto piu' scuro e piu' stretto SOPRA lascia visibile solo
-             un margine ai due lati — parallelo per costruzione lungo
-             qualunque curva, senza calcolare un offset geometrico vero */}
-          <path className="pistaLayer pistaBordo" d={PISTA_PATH_D} fill="none" strokeLinecap="round" />
-          <path className="pistaLayer pistaAsfalto" d={PISTA_PATH_D} fill="none" strokeLinecap="round" />
-          <g className="pistaCordoloGruppo">
-            {tacche.map((t, i) => (
-              <line key={i} className="pistaTacca" data-tinta={t.tinta}
-                    x1={t.x1} y1={t.y1} x2={t.x2} y2={t.y2} vectorEffect="non-scaling-stroke" />
+        <g mask={`url(#${idMask})`}>
+          {/* su colonna singola non esiste un corridoio interno: mascherare
+             tutti i blocchi cancellerebbe oltre il 40% del percorso, che e'
+             la soglia oltre cui la maschera non e' piu' la soluzione. La
+             traiettoria si sposta nel margine della pagina (vedi .pistaTrasf
+             nel CSS), dove non incontra testo e non ha bisogno di maschera. */}
+          <g className="pistaTrasf">
+            <g clipPath={`url(#${idClip})`}>
+              {/* bordo/track-limits: stroke piu' chiaro e piu' largo SOTTO,
+                 l'asfalto piu' scuro e piu' stretto SOPRA lascia visibile
+                 solo un margine ai due lati */}
+              <path className="pistaLayer pistaBordo" d={PISTA_PATH_D} fill="none" strokeLinecap="round" />
+              <path className="pistaLayer pistaAsfalto" d={PISTA_PATH_D} fill="none" strokeLinecap="round" />
+              <g className="pistaCordoloGruppo">
+                {tacche.map((t, i) => (
+                  <line key={i} className="pistaTacca" data-tinta={t.tinta}
+                        x1={t.x1} y1={t.y1} x2={t.x2} y2={t.y2} vectorEffect="non-scaling-stroke" />
+                ))}
+              </g>
+            </g>
+            {/* i nodi restano fuori dal ritaglio progressivo (si accendono via
+               opacity, vedi lo scroll-effect) ma dentro alla maschera; e
+               comunque sono gia' stati spostati fuori dalle zone in fase di
+               calcolo, cosi' non capita di vederne uno tagliato a meta' */}
+            {nodi.map((n, i) => (
+              <line key={i} className="pistaNodo" x1={n.x} y1={n.y} x2={n.x} y2={n.y} vectorEffect="non-scaling-stroke" />
             ))}
           </g>
         </g>
-        {/* i nodi restano FUORI dal ritaglio: si accendono/spengono via
-           opacity (vedi lo scroll-effect), non seguono il bordo del
-           ritaglio — un segmento di lunghezza zero con stroke-linecap:round
-           e non-scaling-stroke disegna un punto di diametro costante in
-           pixel reali — un <circle> col solo raggio si sarebbe deformato
-           in un'ellisse, perché il viewBox è deformato apposta
-           (preserveAspectRatio="none") per adattarsi a container di
-           proporzioni diverse */}
-        {nodi.map((n, i) => (
-          <line key={i} className="pistaNodo" x1={n.x} y1={n.y} x2={n.x} y2={n.y} vectorEffect="non-scaling-stroke" />
-        ))}
       </svg>
       {children}
     </div>
@@ -1897,17 +2011,17 @@ function Home({ vaiLogin, vaiCandidatura }) {
           <div className="w herogrid">
             <div className="heroTesto">
               <BadgeIRacing />
-              <h1 className="h1">
+              <h1 className="h1" data-traiettoria-evita>
                 <span className="h1riga">Trova il coach</span>
                 <span className="h1riga">che ti fa crescere</span>
                 <span className="h1riga"><em>per davvero.</em></span>
               </h1>
-              <p className="lead">
+              <p className="lead" data-traiettoria-evita>
                 Su CORDA ogni coach è valutato con un solo numero: l'iRating che i suoi allievi hanno
                 guadagnato dopo le prime sessioni. Il dato arriva dall'account iRacing dell'allievo,
                 monitorato settimana per settimana.
               </p>
-              <div className="ctas">
+              <div className="ctas" data-traiettoria-evita>
                 <button className="b b-blu b-lg" onClick={() => vaiLogin("pilota")}>
                   Cerco un coach
                 </button>
@@ -1926,7 +2040,7 @@ function Home({ vaiLogin, vaiCandidatura }) {
         {/* NUMERI */}
         <section className="band">
           <div className="w">
-            <div className="bandin">
+            <div className="bandin" data-traiettoria-evita>
               <div className="bcell"><b>18</b><span>coach verificati</span></div>
               <div className="bcell"><b>+412</b><span>iR mediani per allievo</span></div>
               <div className="bcell"><b>30 gg</b><span>tempo mediano</span></div>
@@ -1942,7 +2056,7 @@ function Home({ vaiLogin, vaiCandidatura }) {
            03 da sinistra — la stessa alternanza della curva sopra. */}
         <section className="sez" id="come">
           <div className="w">
-            <div className="sezhead">
+            <div className="sezhead" data-traiettoria-evita>
               <div className="eyebrow">Come funziona</div>
               <h2 className="h2">Tre passaggi, nessuna sorpresa.</h2>
               <p className="p">
@@ -1956,7 +2070,7 @@ function Home({ vaiLogin, vaiCandidatura }) {
                 <div className="passoMedia">
                   <Media id="V02" ratio="4 / 3" nota="Schermata di ricerca coach, con i filtri che si muovono." />
                 </div>
-                <div className="passoTesto">
+                <div className="passoTesto" data-traiettoria-evita>
                   <div className="num">01</div>
                   <h3>Dici da dove parti</h3>
                   <p>
@@ -1969,7 +2083,7 @@ function Home({ vaiLogin, vaiCandidatura }) {
                 <div className="passoMedia">
                   <Media id="V03" ratio="4 / 3" nota="Sessione live: schermo del coach con telemetria e onboard dell'allievo." />
                 </div>
-                <div className="passoTesto">
+                <div className="passoTesto" data-traiettoria-evita>
                   <div className="num">02</div>
                   <h3>Test Drive live con il Coach</h3>
                   <p>
@@ -1982,7 +2096,7 @@ function Home({ vaiLogin, vaiCandidatura }) {
                 <div className="passoMedia">
                   <Media id="V04" ratio="4 / 3" nota="Curva iRating che sale, con il marcatore della prima sessione." />
                 </div>
-                <div className="passoTesto">
+                <div className="passoTesto" data-traiettoria-evita>
                   <div className="num">03</div>
                   <h3>Metti in pratica</h3>
                   <p>
